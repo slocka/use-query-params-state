@@ -2,16 +2,16 @@ import { isNumber } from './utils';
 
 export const parsers = {
   ARRAY__STRINGS: {
-    toUrl(array?: Array<string>): string | null {
-      return array ? array.join(',') : null;
+    toUrl(array?: Array<string> | null): string | undefined {
+      return array ? array.join(',') : undefined;
     },
     fromUrl(str: string): Array<string> | null {
       return str ? str.split(',') : null;
     },
   },
   ARRAY__NUMBERS: {
-    toUrl(array?: Array<number>): string | null {
-      return array ? array.join(',') : null;
+    toUrl(array?: Array<number> | null): string | undefined {
+      return array ? array.join(',') : undefined;
     },
     fromUrl(str: string): Array<number> | null {
       return str ? str.split(',').map(Number) : null;
@@ -24,8 +24,8 @@ export const parsers = {
   },
   BOOLEAN: {
     toUrl: (bool: boolean): string => bool.toString(),
-    fromUrl: (str?: string): boolean | null =>
-      typeof str !== 'undefined' ? str === 'true' : null,
+    fromUrl: (str?: string): boolean | undefined =>
+      typeof str !== 'undefined' ? str === 'true' : undefined,
   },
   NUMBER: {
     toUrl: (number: number): string => {

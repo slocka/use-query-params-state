@@ -3,7 +3,7 @@ export type KeyObject = { [key: string]: any };
 /**
  * Config object to define :
  *  - Which params can be read/updated from the URL
- *  - How to serialise/deserialize each param.
+ *  - How to serialize/deserialize each param.
  *  - Validate the params.
  *  - A default value
  */
@@ -18,7 +18,7 @@ export type ValidatorFunction = (value: any, queryParams: object) => void;
  * used to serialize/deserialize the query parameters.
  */
 export interface UrlParser {
-  toUrl: (param: any) => string;
+  toUrl: (param: any) => string | undefined;
   fromUrl: (url: string) => any;
 }
 
