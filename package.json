@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.0.1",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -35,6 +35,10 @@
   "name": "use-query-params-state",
   "author": "Vincent Comby",
   "module": "dist/use-query-params-state.esm.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/slocka/use-query-params-state"
+  },
   "devDependencies": {
     "@testing-library/dom": "^7.2.1",
     "@testing-library/react": "^10.0.2",
