@@ -115,6 +115,34 @@ describe('With default value', () => {
     expect(params.arrayStringParam).toEqual(['one', 'two', 'three']);
     expect(params.arrayNumberParam).toEqual([1, 2, 3]);
   });
+
+  test('It should allow defaultValue to be a function', () => {
+    let dynamicValue = 1;
+    const useQueryParamsState = createTypedQueryParamsHook({
+      numberParam: defineProp(URL_PARSERS.NUMBER, {
+        defaultValue: () => dynamicValue,
+      }),
+      otherParam: defineProp(URL_PARSERS.STRING),
+    });
+
+    const { result } = renderHook(() => useQueryParamsState(), { wrapper });
+    const [params] = result.current;
+    expect(params.numberParam).toEqual(1);
+
+    // Update the value, next render should default numberParam to this new value
+    dynamicValue = 2;
+
+    // Trigger a re-render
+    act(() => {
+      const setParams = result.current[1];
+      setParams({
+        otherParam: 'something new',
+      });
+    });
+
+    const [paramsAfterUpdate] = result.current;
+    expect(paramsAfterUpdate.numberParam).toEqual(2);
+  });
 });
 
 describe('Others', () => {
@@ -158,10 +186,6 @@ describe('Others', () => {
     expect(queryString).toContain('stringParamEncoded=Hello%2520World');
   });
 });
-
-describe('With default value', () => {});
-
-// test("It returns a default value")
 
 // test("It validates URL state")
 

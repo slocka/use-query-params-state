@@ -5,7 +5,7 @@ import qs from 'qs';
 
 import { useHistory, useLocation } from 'react-router-dom';
 
-import { isUndefined } from './utils';
+import { isUndefined, isFunction } from './utils';
 
 export function useTypedQueryParams(
   config: TypedQueryParamsConfig
@@ -83,7 +83,10 @@ function deserializeQueryParamsValues(
   return Object.keys(config).reduce((acc, propKey) => {
     const { parser, defaultValue } = config[propKey];
     let value = parser.fromUrl(queryParams[propKey]);
-    acc[propKey] = !isUndefined(value) && value !== null ? value : defaultValue;
+    acc[propKey] =
+      !isUndefined(value) && value !== null
+        ? value
+        : getDefaultValue(defaultValue);
 
     return acc;
   }, {} as KeyObject);
@@ -128,4 +131,19 @@ function runParamsValidators(
 
     return acc;
   }, parsedQueryParams);
+}
+
+/**
+ * TODO: For the moment, there is no much point of using a default value as a function
+ * as we are not passing any runtime props yet.
+ * This can still be useful if we want to get the default based on the latest
+ * value in local storage for example.
+ * @param defaultValue
+ */
+function getDefaultValue(defaultValue: any): any {
+  if (isFunction(defaultValue)) {
+    return defaultValue();
+  }
+
+  return defaultValue;
 }
