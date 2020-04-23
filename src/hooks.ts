@@ -27,7 +27,7 @@ export function useTypedQueryParams(
   const validatedQueryParams = useMemo(() => {
     // Validate each prop if a validator function has been provided.
     return runParamsValidators(config, parsedQueryParams);
-  }, [parsedQueryParamsHash]);
+  }, [parsedQueryParamsHash, config]);
 
   const setTypedQueryParams = useCallback(
     newQueryParams => {
@@ -48,7 +48,7 @@ export function useTypedQueryParams(
 
       history.push(newLocation);
     },
-    [history, location, rawQueryParams]
+    [history, location, rawQueryParams, config]
   );
 
   /**
