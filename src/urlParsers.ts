@@ -1,4 +1,4 @@
-import { isNumber } from './utils';
+import { isNumber } from './lib';
 
 export const parsers = {
   ARRAY__STRINGS: {

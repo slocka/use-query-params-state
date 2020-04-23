@@ -1,4 +1,4 @@
-import { isUndefined, isFunction } from './utils';
+import { isUndefined, isFunction } from './lib';
 import { TypedQueryParamsConfig, KeyObject } from './types';
 
 /**

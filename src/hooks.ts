@@ -9,7 +9,7 @@ import {
 } from './serializer';
 import { runParamsValidators } from './validators';
 
-export function useTypedQueryParams(
+export function useQueryParamsState(
   config: TypedQueryParamsConfig
 ): Array<any> {
   const history = useHistory();
