@@ -37,6 +37,12 @@ export function useTypedQueryParams(
         ...rawQueryParams,
         ...newQueryParams,
       };
+
+      // Raise a JS error if we are trying to set a value that doesn't pass the validator
+      runParamsValidators(config, newQueryParams, /** throwOnError */ true);
+
+      /** TODO: Shall we push param if value is equal to the default value? */
+
       const serializedQueryParams = serializeQueryParamsValues(
         config,
         queryParams

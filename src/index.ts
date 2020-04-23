@@ -14,7 +14,7 @@ import { isUndefined, isFunction } from './utils';
 import { QueryParamsConfigError } from './errors';
 
 export const URL_PARSERS = parsers;
-export const parserValidators = validators;
+export const paramValidators = validators;
 
 export function defineProp(
   propParser: UrlParser,
