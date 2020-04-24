@@ -6,7 +6,8 @@ import { TypedQueryParamsConfig, KeyObject } from './types';
 import {
   serializeQueryParamsValues,
   deserializeQueryParamsValues,
-} from './serializer';
+} from './serializer/serialize';
+
 import { runParamsValidators } from './validators';
 
 export function useQueryParamsState(
@@ -26,12 +27,12 @@ export function useQueryParamsState(
   // Keep the same object reference as long as the hash stays the same.
   // We could have used rawQueryParams instead of the hash of parsedQueryParams,
   // but we want to ignore other query strings params.
-  const validatedQueryParams = useMemo(() => {
+  const queryParamsState = useMemo(() => {
     // Validate each prop if a validator function has been provided.
     return runParamsValidators(config, parsedQueryParams);
   }, [parsedQueryParamsHash, config]);
 
-  const setTypedQueryParams = useCallback(
+  const setQueryParamsState = useCallback(
     newQueryParams => {
       const queryParams = {
         ...rawQueryParams,
@@ -60,10 +61,7 @@ export function useQueryParamsState(
     [history, location, rawQueryParams, config]
   );
 
-  /**
-   * Probably we should always return the same reference if the params value hasn't changed.
-   */
-  return [validatedQueryParams, setTypedQueryParams, config];
+  return [queryParamsState, setQueryParamsState, config];
 }
 
 /**

@@ -7,8 +7,8 @@ import { getAppWrapper } from './getAppWrapper';
 import {
   useQueryParamsState,
   defineProp,
-  URL_PARSERS,
-  paramValidators,
+  PARAM_TYPES,
+  VALIDATORS,
 } from '../src/index';
 import { QueryParamsValidationError } from '../src/errors';
 
@@ -21,11 +21,11 @@ beforeEach(() => {
 
 describe('Basic tests', () => {
   const queryParamsStateConfig = {
-    booleanParam: defineProp(URL_PARSERS.BOOLEAN),
-    stringParam: defineProp(URL_PARSERS.STRING),
-    numberParam: defineProp(URL_PARSERS.NUMBER),
-    arrayStringParam: defineProp(URL_PARSERS.ARRAY__STRINGS),
-    arrayNumberParam: defineProp(URL_PARSERS.ARRAY__NUMBERS),
+    booleanParam: defineProp(PARAM_TYPES.BOOLEAN),
+    stringParam: defineProp(PARAM_TYPES.STRING),
+    numberParam: defineProp(PARAM_TYPES.NUMBER),
+    arrayStringParam: defineProp(PARAM_TYPES.ARRAY__STRINGS),
+    arrayNumberParam: defineProp(PARAM_TYPES.ARRAY__NUMBERS),
   };
 
   test('It initialize with the state from the URL', () => {
@@ -109,17 +109,19 @@ describe('Basic tests', () => {
     expect(params.arrayStringParam).toEqual(['one', 'two']);
     expect(queryString).toContain('arrayStringParam=one%2Ctwo');
   });
+
+  test.skip("It doesn't change the query params reference", () => {});
 });
 
 describe('With default value', () => {
   const queryParamsStateConfig = {
-    booleanParam: defineProp(URL_PARSERS.BOOLEAN, { defaultValue: false }),
-    stringParam: defineProp(URL_PARSERS.STRING, { defaultValue: 'default' }),
-    numberParam: defineProp(URL_PARSERS.NUMBER, { defaultValue: 6 }),
-    arrayStringParam: defineProp(URL_PARSERS.ARRAY__STRINGS, {
+    booleanParam: defineProp(PARAM_TYPES.BOOLEAN, { defaultValue: false }),
+    stringParam: defineProp(PARAM_TYPES.STRING, { defaultValue: 'default' }),
+    numberParam: defineProp(PARAM_TYPES.NUMBER, { defaultValue: 6 }),
+    arrayStringParam: defineProp(PARAM_TYPES.ARRAY__STRINGS, {
       defaultValue: ['check', 'check'],
     }),
-    arrayNumberParam: defineProp(URL_PARSERS.ARRAY__NUMBERS, {
+    arrayNumberParam: defineProp(PARAM_TYPES.ARRAY__NUMBERS, {
       defaultValue: [],
     }),
   };
@@ -157,10 +159,10 @@ describe('With default value', () => {
   test('It should allow defaultValue to be a function', () => {
     let dynamicValue = 1;
     const queryParamsStateConfig = {
-      numberParam: defineProp(URL_PARSERS.NUMBER, {
+      numberParam: defineProp(PARAM_TYPES.NUMBER, {
         defaultValue: () => dynamicValue,
       }),
-      otherParam: defineProp(URL_PARSERS.STRING),
+      otherParam: defineProp(PARAM_TYPES.STRING),
     };
 
     const { result } = renderHook(
@@ -188,8 +190,8 @@ describe('With default value', () => {
 
 describe('Serializer', () => {
   const queryParamsStateConfig = {
-    stringParam: defineProp(URL_PARSERS.STRING),
-    stringParamEncoded: defineProp(URL_PARSERS.STRING),
+    stringParam: defineProp(PARAM_TYPES.STRING),
+    stringParamEncoded: defineProp(PARAM_TYPES.STRING),
   };
 
   test("It shouldn't not interpret commas in params of type STRING as array separator.", () => {
@@ -241,7 +243,7 @@ describe('query param validators', () => {
   describe('When reading the state', () => {
     test('It should not touch the param if param is valid', () => {
       const queryParamsStateConfig = {
-        numberParam: defineProp(URL_PARSERS.NUMBER, {
+        numberParam: defineProp(PARAM_TYPES.NUMBER, {
           defaultValue: 6,
           validator: lessThan10Validator,
         }),
@@ -261,7 +263,7 @@ describe('query param validators', () => {
 
     test('It should use the default state if param is invalid', () => {
       const queryParamsStateConfig = {
-        numberParam: defineProp(URL_PARSERS.NUMBER, {
+        numberParam: defineProp(PARAM_TYPES.NUMBER, {
           defaultValue: 6,
           validator: lessThan10Validator,
         }),
@@ -282,9 +284,9 @@ describe('query param validators', () => {
     describe('With predefined validators', () => {
       test('It should not touch the state if value is oneOf(..)', () => {
         const queryParamsStateConfig = {
-          stringParam: defineProp(URL_PARSERS.STRING, {
+          stringParam: defineProp(PARAM_TYPES.STRING, {
             defaultValue: 'default value',
-            validator: paramValidators.oneOf(['default value', 'hello']),
+            validator: VALIDATORS.oneOf(['default value', 'hello']),
           }),
         };
 
@@ -302,9 +304,9 @@ describe('query param validators', () => {
 
       test('It should default the state if value is not oneOf(..)', () => {
         const queryParamsStateConfig = {
-          stringParam: defineProp(URL_PARSERS.STRING, {
+          stringParam: defineProp(PARAM_TYPES.STRING, {
             defaultValue: 'default value',
-            validator: paramValidators.oneOf(['default value', 'hello']),
+            validator: VALIDATORS.oneOf(['default value', 'hello']),
           }),
         };
 
@@ -325,7 +327,7 @@ describe('query param validators', () => {
   describe('When writing the state', () => {
     test('It update param if param is valid', () => {
       const queryParamsStateConfig = {
-        numberParam: defineProp(URL_PARSERS.NUMBER, {
+        numberParam: defineProp(PARAM_TYPES.NUMBER, {
           defaultValue: 6,
           validator: lessThan10Validator,
         }),
@@ -352,7 +354,7 @@ describe('query param validators', () => {
 
     test('It should use the default state if param is invalid', () => {
       const queryParamsStateConfig = {
-        numberParam: defineProp(URL_PARSERS.NUMBER, {
+        numberParam: defineProp(PARAM_TYPES.NUMBER, {
           defaultValue: 6,
           validator: lessThan10Validator,
         }),
@@ -375,16 +377,15 @@ describe('query param validators', () => {
       expect(params.numberParam).toEqual(6);
 
       const queryString = history.location.search;
-      console.log('queryString', queryString);
       expect(queryString).toEqual('');
     });
 
     describe('With predefined validators', () => {
       test('It should set the state if value is oneOf(..)', () => {
         const queryParamsStateConfig = {
-          stringParam: defineProp(URL_PARSERS.STRING, {
+          stringParam: defineProp(PARAM_TYPES.STRING, {
             defaultValue: 'default value',
-            validator: paramValidators.oneOf(['default value', 'hello']),
+            validator: VALIDATORS.oneOf(['default value', 'hello']),
           }),
         };
 
@@ -409,9 +410,9 @@ describe('query param validators', () => {
 
       test('It should default the state if value is not oneOf(..)', () => {
         const queryParamsStateConfig = {
-          stringParam: defineProp(URL_PARSERS.STRING, {
+          stringParam: defineProp(PARAM_TYPES.STRING, {
             defaultValue: 'default value',
-            validator: paramValidators.oneOf(['default value', 'hello']),
+            validator: VALIDATORS.oneOf(['default value', 'hello']),
           }),
         };
 

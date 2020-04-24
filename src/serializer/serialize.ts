@@ -1,5 +1,5 @@
-import { isUndefined, isFunction } from './lib';
-import { TypedQueryParamsConfig, KeyObject } from './types';
+import { isUndefined, isFunction } from '../lib';
+import { TypedQueryParamsConfig, KeyObject } from '../types';
 
 /**
  * Parse each individual query params with the parser provided for each prop

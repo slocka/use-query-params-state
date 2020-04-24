@@ -1,6 +1,6 @@
-import { isNumber } from './lib';
+import { isNumber } from '../lib';
 
-export const parsers = {
+const serializers = {
   ARRAY__STRINGS: {
     toUrl(array?: Array<string> | null): string | undefined {
       return array ? array.join(',') : undefined;
@@ -41,3 +41,5 @@ export const parsers = {
     },
   },
 };
+
+export default serializers;
