@@ -12,7 +12,7 @@ import { runParamsValidators } from './validators';
 import { normalizeConfig } from './lib';
 
 export function useQueryParamsState(config: queryParamsConfig): Array<any> {
-  const normalizedConfig = normalizeConfig(config);
+  const normalizedConfig = useMemo(() => normalizeConfig(config), [config]);
   const history = useHistory();
   const location = useLocation();
   const rawQueryParams = useReactRouterQueryParams();
