@@ -80,6 +80,35 @@ describe('Basic tests', () => {
     expect(params.arrayNumberParam).toEqual([1, 2]);
     expect(queryString).toContain('arrayNumberParam=1%2C2');
   });
+
+  test('It can apply partial updates', () => {
+    const { result } = renderHook(
+      () => useQueryParamsState(queryParamsStateConfig),
+      { wrapper }
+    );
+
+    act(() => {
+      const setParams = result.current[1];
+      setParams({
+        numberParam: 5,
+      });
+    });
+
+    act(() => {
+      const setParams = result.current[1];
+      setParams({
+        arrayStringParam: ['one', 'two'],
+      });
+    });
+
+    const [params] = result.current;
+    const queryString = history.location.search;
+
+    expect(params.numberParam).toEqual(5);
+    expect(queryString).toContain('numberParam=5');
+    expect(params.arrayStringParam).toEqual(['one', 'two']);
+    expect(queryString).toContain('arrayStringParam=one%2Ctwo');
+  });
 });
 
 describe('With default value', () => {
@@ -205,7 +234,6 @@ describe('Serializer', () => {
 describe('query param validators', () => {
   const lessThan10Validator = (stateValue: any) => {
     if (stateValue >= 10) {
-      console.log('THROW');
       throw new QueryParamsValidationError('Invalid number');
     }
   };

@@ -43,10 +43,11 @@ export function useQueryParamsState(
 
       /** TODO: Shall we push param if value is equal to the default value? */
 
-      const serializedQueryParams = serializeQueryParamsValues(
-        config,
-        queryParams
-      );
+      const serializedQueryParams = {
+        ...queryParams,
+        ...serializeQueryParamsValues(config, newQueryParams),
+      };
+
       const newQueryString = qs.stringify(serializedQueryParams);
 
       const newLocation = {
