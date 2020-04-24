@@ -5,9 +5,8 @@ export const PARAM_TYPES = serializers;
 export const VALIDATORS = validators;
 
 export {
-  defineProp,
   createCustomUrlParser,
-  createTypedQueryParamsHook,
+  createUseQueryParamsStateHook,
 } from './helpers';
 
 export { useQueryParamsState } from './hooks';

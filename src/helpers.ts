@@ -1,32 +1,6 @@
-import {
-  ParserOptions,
-  UrlParser,
-  TypedQueryParamsConfig,
-  TypedQueryParamsPropConfig,
-} from './types';
+import { queryParamsConfig, queryParamType } from './types';
 
-import { isUndefined, isFunction } from './lib';
-import { QueryParamsConfigError } from './errors';
 import { useQueryParamsState } from './hooks';
-
-export function defineProp(
-  propParser: UrlParser,
-  propParserOptions: ParserOptions = {}
-): TypedQueryParamsPropConfig {
-  if (!propParser) {
-    throw new QueryParamsConfigError('Missing parser definition.');
-  }
-
-  return {
-    parser: propParser,
-    defaultValue: !isUndefined(propParserOptions.defaultValue)
-      ? propParserOptions.defaultValue
-      : null,
-    validator: isFunction(propParserOptions.validator)
-      ? propParserOptions.validator
-      : null,
-  };
-}
 
 /**
  * Helper to create a custom UrlParser object.
@@ -36,7 +10,7 @@ export function defineProp(
 export function createCustomUrlParser(
   serializer: (param: any) => string,
   deserializer: (url: string) => any
-): UrlParser {
+): queryParamType {
   return {
     toUrl: serializer,
     fromUrl: deserializer,
@@ -45,13 +19,13 @@ export function createCustomUrlParser(
 
 /**
  * Create a hook to read your query params as defined in the provided
- * typedQueryParamsConfig.
- * @param typedQueryParamsConfig
+ * queryParamsConfig.
+ * @param queryParamsConfig
  */
-export function createTypedQueryParamsHook(
-  typedQueryParamsConfig: TypedQueryParamsConfig
+export function createUseQueryParamsStateHook(
+  queryParamsConfig: queryParamsConfig
 ) {
   return () => {
-    return useQueryParamsState(typedQueryParamsConfig);
+    return useQueryParamsState(queryParamsConfig);
   };
 }

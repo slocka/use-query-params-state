@@ -1,3 +1,6 @@
+import { queryParamsConfig, NormalizedQueryParamsConfig } from 'types';
+import serializers from './serializer/serializers';
+
 export function isFunction(fn: any): boolean {
   /*
    * Safari 9 has a bug that returns typeof `object` for a function.
@@ -15,4 +18,21 @@ export function isUndefined(obj: any): boolean {
 
 export function isNumber(value: any): boolean {
   return typeof value === 'number';
+}
+
+export function normalizeConfig(
+  config: queryParamsConfig
+): NormalizedQueryParamsConfig {
+  return Object.keys(config).reduce((acc, propKey) => {
+    let { type } = config[propKey];
+    if (!type) {
+      type = serializers.STRING;
+    }
+    acc[propKey] = {
+      ...config[propKey],
+      type,
+    };
+
+    return acc;
+  }, {} as NormalizedQueryParamsConfig);
 }

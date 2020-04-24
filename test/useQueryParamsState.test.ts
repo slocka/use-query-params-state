@@ -4,12 +4,7 @@ import '@testing-library/jest-dom';
 
 import { getAppWrapper } from './getAppWrapper';
 
-import {
-  useQueryParamsState,
-  defineProp,
-  PARAM_TYPES,
-  VALIDATORS,
-} from '../src/index';
+import { useQueryParamsState, PARAM_TYPES, VALIDATORS } from '../src/index';
 import { QueryParamsValidationError } from '../src/errors';
 
 let history: MemoryHistory;
@@ -21,11 +16,11 @@ beforeEach(() => {
 
 describe('Basic tests', () => {
   const queryParamsStateConfig = {
-    booleanParam: defineProp(PARAM_TYPES.BOOLEAN),
-    stringParam: defineProp(PARAM_TYPES.STRING),
-    numberParam: defineProp(PARAM_TYPES.NUMBER),
-    arrayStringParam: defineProp(PARAM_TYPES.ARRAY__STRINGS),
-    arrayNumberParam: defineProp(PARAM_TYPES.ARRAY__NUMBERS),
+    booleanParam: { type: PARAM_TYPES.BOOLEAN },
+    stringParam: { type: PARAM_TYPES.STRING },
+    numberParam: { type: PARAM_TYPES.NUMBER },
+    arrayStringParam: { type: PARAM_TYPES.ARRAY__STRINGS },
+    arrayNumberParam: { type: PARAM_TYPES.ARRAY__NUMBERS },
   };
 
   test('It initialize with the state from the URL', () => {
@@ -115,15 +110,14 @@ describe('Basic tests', () => {
 
 describe('With default value', () => {
   const queryParamsStateConfig = {
-    booleanParam: defineProp(PARAM_TYPES.BOOLEAN, { defaultValue: false }),
-    stringParam: defineProp(PARAM_TYPES.STRING, { defaultValue: 'default' }),
-    numberParam: defineProp(PARAM_TYPES.NUMBER, { defaultValue: 6 }),
-    arrayStringParam: defineProp(PARAM_TYPES.ARRAY__STRINGS, {
+    booleanParam: { type: PARAM_TYPES.BOOLEAN, defaultValue: false },
+    stringParam: { type: PARAM_TYPES.STRING, defaultValue: 'default' },
+    numberParam: { type: PARAM_TYPES.NUMBER, defaultValue: 6 },
+    arrayStringParam: {
+      type: PARAM_TYPES.ARRAY__STRINGS,
       defaultValue: ['check', 'check'],
-    }),
-    arrayNumberParam: defineProp(PARAM_TYPES.ARRAY__NUMBERS, {
-      defaultValue: [],
-    }),
+    },
+    arrayNumberParam: { type: PARAM_TYPES.ARRAY__NUMBERS, defaultValue: [] },
   };
 
   test('It should use the default value if param is not defined in the URL', () => {
@@ -159,10 +153,11 @@ describe('With default value', () => {
   test('It should allow defaultValue to be a function', () => {
     let dynamicValue = 1;
     const queryParamsStateConfig = {
-      numberParam: defineProp(PARAM_TYPES.NUMBER, {
+      numberParam: {
+        type: PARAM_TYPES.NUMBER,
         defaultValue: () => dynamicValue,
-      }),
-      otherParam: defineProp(PARAM_TYPES.STRING),
+      },
+      otherParam: { type: PARAM_TYPES.STRING },
     };
 
     const { result } = renderHook(
@@ -190,8 +185,8 @@ describe('With default value', () => {
 
 describe('Serializer', () => {
   const queryParamsStateConfig = {
-    stringParam: defineProp(PARAM_TYPES.STRING),
-    stringParamEncoded: defineProp(PARAM_TYPES.STRING),
+    stringParam: { type: PARAM_TYPES.STRING },
+    stringParamEncoded: { type: PARAM_TYPES.STRING },
   };
 
   test("It shouldn't not interpret commas in params of type STRING as array separator.", () => {
@@ -243,10 +238,11 @@ describe('query param validators', () => {
   describe('When reading the state', () => {
     test('It should not touch the param if param is valid', () => {
       const queryParamsStateConfig = {
-        numberParam: defineProp(PARAM_TYPES.NUMBER, {
+        numberParam: {
+          type: PARAM_TYPES.NUMBER,
           defaultValue: 6,
           validator: lessThan10Validator,
-        }),
+        },
       };
 
       const url = '/test?numberParam=9';
@@ -263,10 +259,11 @@ describe('query param validators', () => {
 
     test('It should use the default state if param is invalid', () => {
       const queryParamsStateConfig = {
-        numberParam: defineProp(PARAM_TYPES.NUMBER, {
+        numberParam: {
+          type: PARAM_TYPES.NUMBER,
           defaultValue: 6,
           validator: lessThan10Validator,
-        }),
+        },
       };
 
       const url = '/test?numberParam=12';
@@ -284,10 +281,11 @@ describe('query param validators', () => {
     describe('With predefined validators', () => {
       test('It should not touch the state if value is oneOf(..)', () => {
         const queryParamsStateConfig = {
-          stringParam: defineProp(PARAM_TYPES.STRING, {
+          stringParam: {
+            type: PARAM_TYPES.STRING,
             defaultValue: 'default value',
             validator: VALIDATORS.oneOf(['default value', 'hello']),
-          }),
+          },
         };
 
         const url = '/test?stringParam=hello';
@@ -304,10 +302,11 @@ describe('query param validators', () => {
 
       test('It should default the state if value is not oneOf(..)', () => {
         const queryParamsStateConfig = {
-          stringParam: defineProp(PARAM_TYPES.STRING, {
+          stringParam: {
+            type: PARAM_TYPES.STRING,
             defaultValue: 'default value',
             validator: VALIDATORS.oneOf(['default value', 'hello']),
-          }),
+          },
         };
 
         const url = '/test?stringParam=world';
@@ -327,10 +326,11 @@ describe('query param validators', () => {
   describe('When writing the state', () => {
     test('It update param if param is valid', () => {
       const queryParamsStateConfig = {
-        numberParam: defineProp(PARAM_TYPES.NUMBER, {
+        numberParam: {
+          type: PARAM_TYPES.NUMBER,
           defaultValue: 6,
           validator: lessThan10Validator,
-        }),
+        },
       };
 
       const { result } = renderHook(
@@ -354,10 +354,11 @@ describe('query param validators', () => {
 
     test('It should use the default state if param is invalid', () => {
       const queryParamsStateConfig = {
-        numberParam: defineProp(PARAM_TYPES.NUMBER, {
+        numberParam: {
+          type: PARAM_TYPES.NUMBER,
           defaultValue: 6,
           validator: lessThan10Validator,
-        }),
+        },
       };
 
       const { result } = renderHook(
@@ -383,10 +384,11 @@ describe('query param validators', () => {
     describe('With predefined validators', () => {
       test('It should set the state if value is oneOf(..)', () => {
         const queryParamsStateConfig = {
-          stringParam: defineProp(PARAM_TYPES.STRING, {
+          stringParam: {
+            type: PARAM_TYPES.STRING,
             defaultValue: 'default value',
             validator: VALIDATORS.oneOf(['default value', 'hello']),
-          }),
+          },
         };
 
         const { result } = renderHook(
@@ -410,10 +412,11 @@ describe('query param validators', () => {
 
       test('It should default the state if value is not oneOf(..)', () => {
         const queryParamsStateConfig = {
-          stringParam: defineProp(PARAM_TYPES.STRING, {
+          stringParam: {
+            type: PARAM_TYPES.STRING,
             defaultValue: 'default value',
             validator: VALIDATORS.oneOf(['default value', 'hello']),
-          }),
+          },
         };
 
         const { result } = renderHook(

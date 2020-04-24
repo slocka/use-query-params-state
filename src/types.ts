@@ -7,8 +7,8 @@ export type KeyObject = { [key: string]: any };
  *  - Validate the params.
  *  - A default value
  */
-export type TypedQueryParamsConfig = {
-  [key: string]: TypedQueryParamsPropConfig;
+export type queryParamsConfig = {
+  [key: string]: queryParamConfig;
 };
 
 export type ValidatorFunction = (value: any, queryParams: object) => void;
@@ -17,7 +17,7 @@ export type ValidatorFunction = (value: any, queryParams: object) => void;
  * Object containing two function
  * used to serialize/deserialize the query parameters.
  */
-export interface UrlParser {
+export interface queryParamType {
   toUrl: (param: any) => string | undefined;
   fromUrl: (url: string) => any;
 }
@@ -27,8 +27,18 @@ export interface ParserOptions {
   validator?: (value: any) => void;
 }
 
-export interface TypedQueryParamsPropConfig {
-  parser: UrlParser;
-  defaultValue: any;
-  validator: ValidatorFunction | null | undefined;
+export interface queryParamConfig {
+  type?: queryParamType;
+  defaultValue?: any;
+  validator?: ValidatorFunction;
+}
+
+export interface NormalizedQueryParamsConfig {
+  [key: string]: NormalizedQueryParamConfig;
+}
+
+export interface NormalizedQueryParamConfig {
+  type: queryParamType;
+  defaultValue?: any;
+  validator?: ValidatorFunction;
 }

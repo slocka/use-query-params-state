@@ -2,24 +2,24 @@ import { useCallback, useMemo } from 'react';
 import qs from 'qs';
 import { useHistory, useLocation } from 'react-router-dom';
 
-import { TypedQueryParamsConfig, KeyObject } from './types';
+import { queryParamsConfig, KeyObject } from './types';
 import {
   serializeQueryParamsValues,
   deserializeQueryParamsValues,
 } from './serializer/serialize';
 
 import { runParamsValidators } from './validators';
+import { normalizeConfig } from './lib';
 
-export function useQueryParamsState(
-  config: TypedQueryParamsConfig
-): Array<any> {
+export function useQueryParamsState(config: queryParamsConfig): Array<any> {
+  const normalizedConfig = normalizeConfig(config);
   const history = useHistory();
   const location = useLocation();
   const rawQueryParams = useReactRouterQueryParams();
 
   // Convert queryParams values from string to the type defined for each query param.
   const parsedQueryParams = deserializeQueryParamsValues(
-    config,
+    normalizedConfig,
     rawQueryParams
   );
 
@@ -29,8 +29,8 @@ export function useQueryParamsState(
   // but we want to ignore other query strings params.
   const queryParamsState = useMemo(() => {
     // Validate each prop if a validator function has been provided.
-    return runParamsValidators(config, parsedQueryParams);
-  }, [parsedQueryParamsHash, config]);
+    return runParamsValidators(normalizedConfig, parsedQueryParams);
+  }, [parsedQueryParamsHash, normalizedConfig]);
 
   const setQueryParamsState = useCallback(
     newQueryParams => {
@@ -40,13 +40,17 @@ export function useQueryParamsState(
       };
 
       // Raise a JS error if we are trying to set a value that doesn't pass the validator
-      runParamsValidators(config, newQueryParams, /** throwOnError */ true);
+      runParamsValidators(
+        normalizedConfig,
+        newQueryParams,
+        /** throwOnError */ true
+      );
 
       /** TODO: Shall we push param if value is equal to the default value? */
 
       const serializedQueryParams = {
         ...queryParams,
-        ...serializeQueryParamsValues(config, newQueryParams),
+        ...serializeQueryParamsValues(normalizedConfig, newQueryParams),
       };
 
       const newQueryString = qs.stringify(serializedQueryParams);
@@ -58,10 +62,10 @@ export function useQueryParamsState(
 
       history.push(newLocation);
     },
-    [history, location, rawQueryParams, config]
+    [history, location, rawQueryParams, normalizedConfig]
   );
 
-  return [queryParamsState, setQueryParamsState, config];
+  return [queryParamsState, setQueryParamsState, normalizedConfig];
 }
 
 /**

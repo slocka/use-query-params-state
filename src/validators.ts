@@ -1,5 +1,5 @@
 import { QueryParamsConfigError, QueryParamsValidationError } from './errors';
-import { TypedQueryParamsConfig, KeyObject } from './types';
+import { queryParamsConfig, KeyObject } from './types';
 
 /**
  * For each query param where a validator function was provided, run the validator function.
@@ -8,7 +8,7 @@ import { TypedQueryParamsConfig, KeyObject } from './types';
  * @param parsedQueryParams
  */
 export function runParamsValidators(
-  config: TypedQueryParamsConfig,
+  config: queryParamsConfig,
   parsedQueryParams: KeyObject,
   throwOnError: boolean = false
 ): KeyObject {
