@@ -29,6 +29,7 @@ export function useTypedQueryParams(
   const validatedQueryParams = useMemo(() => {
     // Validate each prop if a validator function has been provided.
     return runParamsValidators(config, parsedQueryParams);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [parsedQueryParamsHash, config]);
 
   const setTypedQueryParams = useCallback(
