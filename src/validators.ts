@@ -1,4 +1,5 @@
 import { QueryParamsConfigError, QueryParamsValidationError } from './errors';
+import { TypedQueryParamsConfig, KeyObject } from './types';
 
 const parserValidators = {
   oneOf: (possibleValues: Array<any>) => {
@@ -21,5 +22,31 @@ const parserValidators = {
     };
   },
 };
+
+/**
+ * For each query param where a validator function was provided, run the validator function.
+ * If the validation fails, the provided default value will be used.
+ * @param config
+ * @param parsedQueryParams
+ */
+export function runParamsValidators(
+  config: TypedQueryParamsConfig,
+  parsedQueryParams: KeyObject
+): KeyObject {
+  return Object.keys(config).reduce((acc, propKey) => {
+    const { validator, defaultValue } = config[propKey];
+    if (validator) {
+      const paramValue = parsedQueryParams[propKey];
+      try {
+        validator(paramValue, parsedQueryParams);
+      } catch (err) {
+        // The parsed value is incorrect, use the default value instead.
+        acc[propKey] = defaultValue;
+      }
+    }
+
+    return acc;
+  }, parsedQueryParams);
+}
 
 export default parserValidators;
