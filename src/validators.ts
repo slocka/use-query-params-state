@@ -1,5 +1,5 @@
 import { QueryParamsConfigError, QueryParamsValidationError } from './errors';
-import { queryParamsConfig, KeyObject } from './types';
+import { QueryParamsNormalizedConfig } from './types';
 
 /**
  * For each query param where a validator function was provided, run the validator function.
@@ -8,10 +8,10 @@ import { queryParamsConfig, KeyObject } from './types';
  * @param parsedQueryParams
  */
 export function runParamsValidators(
-  config: queryParamsConfig,
-  parsedQueryParams: KeyObject,
+  config: QueryParamsNormalizedConfig,
+  parsedQueryParams: Record<string, any>,
   throwOnError: boolean = false
-): KeyObject {
+): Record<string, any> {
   return Object.keys(config).reduce((acc, propKey) => {
     const { validator, defaultValue } = config[propKey];
     if (validator) {

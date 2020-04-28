@@ -1,4 +1,4 @@
-import { queryParamsConfig, queryParamType } from './types';
+import { QueryParamsConfig, QueryParamType } from './types';
 
 import { useQueryParamsState } from './hooks';
 
@@ -8,9 +8,9 @@ import { useQueryParamsState } from './hooks';
  * @param fromUrl - Function to parse your stringified value.
  */
 export function createCustomUrlParser(
-  serializer: (param: any) => string,
-  deserializer: (url: string) => any
-): queryParamType {
+  serializer: (param: any) => string | null | undefined,
+  deserializer: (url?: string | null) => any
+): QueryParamType {
   return {
     toUrl: serializer,
     fromUrl: deserializer,
@@ -23,7 +23,7 @@ export function createCustomUrlParser(
  * @param queryParamsConfig
  */
 export function createUseQueryParamsStateHook(
-  queryParamsConfig: queryParamsConfig
+  queryParamsConfig: QueryParamsConfig
 ) {
   return () => {
     return useQueryParamsState(queryParamsConfig);

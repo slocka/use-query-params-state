@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react';
 import qs from 'qs';
 import { useHistory, useLocation } from 'react-router-dom';
 
-import { queryParamsConfig, KeyObject } from './types';
+import { QueryParamsConfig, QueryParamType, ValidatorFunction } from './types';
 import {
   serializeQueryParamsValues,
   deserializeQueryParamsValues,
@@ -11,7 +11,7 @@ import {
 import { runParamsValidators } from './validators';
 import { normalizeConfig } from './lib';
 
-export function useQueryParamsState(config: queryParamsConfig): Array<any> {
+export function useQueryParamsState(config: QueryParamsConfig): Array<any> {
   const normalizedConfig = useMemo(() => normalizeConfig(config), [config]);
   const history = useHistory();
   const location = useLocation();
@@ -68,11 +68,21 @@ export function useQueryParamsState(config: queryParamsConfig): Array<any> {
   return [queryParamsState, setQueryParamsState, normalizedConfig];
 }
 
+export function useQueryParam(
+  paramName: string,
+  type: QueryParamType,
+  defaultValue?: any,
+  validator?: ValidatorFunction
+) {
+  return useQueryParamsState({
+    [paramName]: { type, defaultValue, validator },
+  });
+}
 /**
  * Extract parameters from query string and return
  * them in the shape of a key/value object.
  */
-function useReactRouterQueryParams(): KeyObject {
+function useReactRouterQueryParams(): Record<string, string> {
   const location = useLocation();
   const queryString = location.search.replace(/^\?/, '');
 

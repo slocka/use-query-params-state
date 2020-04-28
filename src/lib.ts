@@ -1,4 +1,4 @@
-import { queryParamsConfig, NormalizedQueryParamsConfig } from 'types';
+import { QueryParamsConfig, QueryParamsNormalizedConfig } from 'types';
 import serializers from './serializer/serializers';
 
 export function isFunction(fn: any): boolean {
@@ -20,19 +20,22 @@ export function isNumber(value: any): boolean {
   return typeof value === 'number';
 }
 
+/**
+ * Make the "type" prop of each param option mandatory
+ * (Default to string if not specified)
+ * @param config
+ */
 export function normalizeConfig(
-  config: queryParamsConfig
-): NormalizedQueryParamsConfig {
+  config: QueryParamsConfig
+): QueryParamsNormalizedConfig {
   return Object.keys(config).reduce((acc, propKey) => {
-    let { type } = config[propKey];
-    if (!type) {
-      type = serializers.STRING;
-    }
+    let paramOptions = config[propKey];
+    const type = !paramOptions.type ? serializers.STRING : paramOptions.type;
     acc[propKey] = {
       ...config[propKey],
       type,
     };
 
     return acc;
-  }, {} as NormalizedQueryParamsConfig);
+  }, {} as QueryParamsNormalizedConfig);
 }
