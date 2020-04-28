@@ -105,6 +105,33 @@ describe('Basic tests', () => {
     expect(queryString).toContain('arrayStringParam=one%2Ctwo');
   });
 
+  test('It should allow to omit the type property', () => {
+    // All the params will be strings
+    const queryParamsStateConfig = {
+      booleanParam: {},
+      stringParam: {},
+      numberParam: {},
+      arrayStringParam: {},
+      arrayNumberParam: {},
+    };
+
+    const url =
+      '/test?booleanParam=true&stringParam=test&numberParam=0&arrayStringParam=one,two,three&arrayNumberParam=1,2,3';
+
+    history.push(url);
+
+    const { result } = renderHook(
+      () => useQueryParamsState(queryParamsStateConfig),
+      { wrapper }
+    );
+    const [params] = result.current;
+    expect(params.booleanParam).toBe('true');
+    expect(params.stringParam).toEqual('test');
+    expect(params.numberParam).toEqual('0');
+    expect(params.arrayStringParam).toEqual('one,two,three');
+    expect(params.arrayNumberParam).toEqual('1,2,3');
+  });
+
   test.skip("It doesn't change the query params reference", () => {});
 });
 
@@ -133,7 +160,7 @@ describe('With default value', () => {
     expect(params.arrayNumberParam).toEqual([]);
   });
 
-  test('It should overwrite the default value if param is in the URL', () => {
+  test('It should not overwrite the default value if param is in the URL', () => {
     const url =
       '/test?booleanParam=true&stringParam=test&numberParam=0&arrayStringParam=one,two,three&arrayNumberParam=1,2,3';
     history.push(url);

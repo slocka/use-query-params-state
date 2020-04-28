@@ -70,13 +70,22 @@ export function useQueryParamsState(config: QueryParamsConfig): Array<any> {
 
 export function useQueryParam(
   paramName: string,
-  type: QueryParamType,
+  type?: QueryParamType,
   defaultValue?: any,
   validator?: ValidatorFunction
 ) {
-  return useQueryParamsState({
+  const [params, setParams] = useQueryParamsState({
     [paramName]: { type, defaultValue, validator },
   });
+
+  const setParam = useCallback(
+    value => {
+      setParams({ [paramName]: value });
+    },
+    [setParams]
+  );
+
+  return [params[paramName], setParam];
 }
 /**
  * Extract parameters from query string and return

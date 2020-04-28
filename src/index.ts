@@ -9,4 +9,4 @@ export {
   createUseQueryParamsStateHook,
 } from './helpers';
 
-export { useQueryParamsState } from './hooks';
+export { useQueryParamsState, useQueryParam } from './hooks';
