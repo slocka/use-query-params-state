@@ -6,7 +6,11 @@ export const parsers = {
       return array ? array.join(',') : undefined;
     },
     fromUrl(str: string): Array<string> | null {
-      return str ? str.split(',') : null;
+      if (typeof str === 'undefined') {
+        return null;
+      }
+
+      return str ? str.split(',') : [];
     },
   },
   ARRAY__NUMBERS: {
@@ -14,7 +18,11 @@ export const parsers = {
       return array ? array.join(',') : undefined;
     },
     fromUrl(str: string): Array<number> | null {
-      return str ? str.split(',').map(Number) : null;
+      if (typeof str === 'undefined') {
+        return null;
+      }
+
+      return str ? str.split(',').map(Number) : [];
     },
   },
   STRING: {
