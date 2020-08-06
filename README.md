@@ -1,4 +1,4 @@
-# use-query-params-state
+# use-query-params-state (BETA)
 
 React hooks based on react-router to manage your application state through the URL query parameters.
 
