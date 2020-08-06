@@ -1,5 +1,9 @@
-import { isUndefined, isFunction } from './utils';
-import { TypedQueryParamsConfig, KeyObject } from './types';
+import { isUndefined, isFunction } from '../lib';
+import {
+  QueryParams,
+  SerializedQueryParams,
+  QueryParamsNormalizedConfig,
+} from '../types';
 
 /**
  * Parse each individual query params with the parser provided for each prop
@@ -10,34 +14,34 @@ import { TypedQueryParamsConfig, KeyObject } from './types';
  * @param queryParams - Raw query params extracted from the URL but not parsed.
  */
 export function deserializeQueryParamsValues(
-  config: TypedQueryParamsConfig,
-  queryParams: KeyObject
-): object {
+  config: QueryParamsNormalizedConfig,
+  serializedQueryParams: SerializedQueryParams
+): QueryParams {
   return Object.keys(config).reduce((acc, propKey) => {
-    const { parser, defaultValue } = config[propKey];
-    let value = parser.fromUrl(queryParams[propKey]);
+    const { type, defaultValue } = config[propKey];
+    let value = type.fromUrl(serializedQueryParams[propKey]);
     acc[propKey] =
       !isUndefined(value) && value !== null
         ? value
         : getDefaultValue(defaultValue);
 
     return acc;
-  }, {} as KeyObject);
+  }, {} as QueryParams);
 }
 
 export function serializeQueryParamsValues(
-  config: TypedQueryParamsConfig,
-  queryParams: KeyObject
-): object {
+  config: QueryParamsNormalizedConfig,
+  queryParams: QueryParams
+): SerializedQueryParams {
   return Object.keys(queryParams).reduce((acc, propKey) => {
-    const { parser } = config[propKey];
-    let value = parser.toUrl(queryParams[propKey]);
+    const { type } = config[propKey];
+    let value = type.toUrl(queryParams[propKey]);
     if (!isUndefined(value)) {
       acc[propKey] = value;
     }
 
     return acc;
-  }, {} as KeyObject);
+  }, {} as SerializedQueryParams);
 }
 
 /**
