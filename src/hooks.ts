@@ -30,6 +30,7 @@ export function useQueryParamsState(config: QueryParamsConfig): Array<any> {
   const queryParamsState = useMemo(() => {
     // Validate each prop if a validator function has been provided.
     return runParamsValidators(normalizedConfig, parsedQueryParams);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [parsedQueryParamsHash, normalizedConfig]);
 
   const setQueryParamsState = useCallback(
@@ -82,7 +83,7 @@ export function useQueryParam(
     value => {
       setParams({ [paramName]: value });
     },
-    [setParams]
+    [setParams, paramName]
   );
 
   return [params[paramName], setParam];
