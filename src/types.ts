@@ -1,5 +1,3 @@
-export type KeyObject = { [key: string]: any };
-
 /**
  * Config object to define :
  *  - Which params can be read/updated from the URL
@@ -7,9 +5,8 @@ export type KeyObject = { [key: string]: any };
  *  - Validate the params.
  *  - A default value
  */
-export type TypedQueryParamsConfig = {
-  [key: string]: TypedQueryParamsPropConfig;
-};
+export type QueryParamsConfig = Record<string, Partial<QueryParamOptions>>;
+export type QueryParamsNormalizedConfig = Record<string, QueryParamOptions>;
 
 export type ValidatorFunction = (value: any, queryParams: object) => void;
 
@@ -17,18 +14,16 @@ export type ValidatorFunction = (value: any, queryParams: object) => void;
  * Object containing two function
  * used to serialize/deserialize the query parameters.
  */
-export interface UrlParser {
-  toUrl: (param: any) => string | undefined;
-  fromUrl: (url: string) => any;
+export interface QueryParamType {
+  toUrl: (param: any) => string | null | undefined;
+  fromUrl: (url?: string | null) => any;
 }
 
-export interface ParserOptions {
+export interface QueryParamOptions {
+  type: QueryParamType;
   defaultValue?: any;
-  validator?: (value: any) => void;
+  validator?: ValidatorFunction;
 }
 
-export interface TypedQueryParamsPropConfig {
-  parser: UrlParser;
-  defaultValue: any;
-  validator: ValidatorFunction | null | undefined;
-}
+export type SerializedQueryParams = Record<string, string | null | undefined>;
+export type QueryParams = Record<string, any>;

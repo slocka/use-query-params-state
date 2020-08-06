@@ -2,23 +2,24 @@ import { useCallback, useMemo } from 'react';
 import qs from 'qs';
 import { useHistory, useLocation } from 'react-router-dom';
 
-import { TypedQueryParamsConfig, KeyObject } from './types';
+import { QueryParamsConfig, QueryParamType, ValidatorFunction } from './types';
 import {
   serializeQueryParamsValues,
   deserializeQueryParamsValues,
-} from './serializer';
-import { runParamsValidators } from './validators';
+} from './serializer/serialize';
 
-export function useTypedQueryParams(
-  config: TypedQueryParamsConfig
-): Array<any> {
+import { runParamsValidators } from './validators';
+import { normalizeConfig } from './lib';
+
+export function useQueryParamsState(config: QueryParamsConfig): Array<any> {
+  const normalizedConfig = useMemo(() => normalizeConfig(config), [config]);
   const history = useHistory();
   const location = useLocation();
   const rawQueryParams = useReactRouterQueryParams();
 
   // Convert queryParams values from string to the type defined for each query param.
   const parsedQueryParams = deserializeQueryParamsValues(
-    config,
+    normalizedConfig,
     rawQueryParams
   );
 
@@ -26,22 +27,33 @@ export function useTypedQueryParams(
   // Keep the same object reference as long as the hash stays the same.
   // We could have used rawQueryParams instead of the hash of parsedQueryParams,
   // but we want to ignore other query strings params.
-  const validatedQueryParams = useMemo(() => {
+  const queryParamsState = useMemo(() => {
     // Validate each prop if a validator function has been provided.
-    return runParamsValidators(config, parsedQueryParams);
+    return runParamsValidators(normalizedConfig, parsedQueryParams);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [parsedQueryParamsHash, config]);
+  }, [parsedQueryParamsHash, normalizedConfig]);
 
-  const setTypedQueryParams = useCallback(
+  const setQueryParamsState = useCallback(
     newQueryParams => {
       const queryParams = {
         ...rawQueryParams,
         ...newQueryParams,
       };
-      const serializedQueryParams = serializeQueryParamsValues(
-        config,
-        queryParams
+
+      // Raise a JS error if we are trying to set a value that doesn't pass the validator
+      runParamsValidators(
+        normalizedConfig,
+        newQueryParams,
+        /** throwOnError */ true
       );
+
+      /** TODO: Shall we push param if value is equal to the default value? */
+
+      const serializedQueryParams = {
+        ...queryParams,
+        ...serializeQueryParamsValues(normalizedConfig, newQueryParams),
+      };
+
       const newQueryString = qs.stringify(serializedQueryParams);
 
       const newLocation = {
@@ -51,20 +63,36 @@ export function useTypedQueryParams(
 
       history.push(newLocation);
     },
-    [history, location, rawQueryParams, config]
+    [history, location, rawQueryParams, normalizedConfig]
   );
 
-  /**
-   * Probably we should always return the same reference if the params value hasn't changed.
-   */
-  return [validatedQueryParams, setTypedQueryParams, config];
+  return [queryParamsState, setQueryParamsState, normalizedConfig];
 }
 
+export function useQueryParam(
+  paramName: string,
+  type?: QueryParamType,
+  defaultValue?: any,
+  validator?: ValidatorFunction
+) {
+  const [params, setParams] = useQueryParamsState({
+    [paramName]: { type, defaultValue, validator },
+  });
+
+  const setParam = useCallback(
+    value => {
+      setParams({ [paramName]: value });
+    },
+    [setParams, paramName]
+  );
+
+  return [params[paramName], setParam];
+}
 /**
  * Extract parameters from query string and return
  * them in the shape of a key/value object.
  */
-function useReactRouterQueryParams(): KeyObject {
+function useReactRouterQueryParams(): Record<string, string> {
   const location = useLocation();
   const queryString = location.search.replace(/^\?/, '');
 

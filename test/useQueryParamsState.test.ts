@@ -1,13 +1,11 @@
 import { createMemoryHistory, MemoryHistory } from 'history';
 import { renderHook, act } from '@testing-library/react-hooks';
 import '@testing-library/jest-dom';
+
 import { getAppWrapper } from './getAppWrapper';
 
-import {
-  createTypedQueryParamsHook,
-  defineProp,
-  URL_PARSERS,
-} from '../src/index';
+import { useQueryParamsState, PARAM_TYPES, VALIDATORS } from '../src/index';
+import { QueryParamsValidationError } from '../src/errors';
 
 let history: MemoryHistory;
 let wrapper: React.ComponentType;
@@ -18,15 +16,12 @@ beforeEach(() => {
 
 describe('Basic tests', () => {
   const queryParamsStateConfig = {
-    booleanParam: defineProp(URL_PARSERS.BOOLEAN),
-    stringParam: defineProp(URL_PARSERS.STRING),
-    numberParam: defineProp(URL_PARSERS.NUMBER),
-    arrayStringParam: defineProp(URL_PARSERS.ARRAY__STRINGS),
-    arrayNumberParam: defineProp(URL_PARSERS.ARRAY__NUMBERS),
+    booleanParam: { type: PARAM_TYPES.BOOLEAN },
+    stringParam: { type: PARAM_TYPES.STRING },
+    numberParam: { type: PARAM_TYPES.NUMBER },
+    arrayStringParam: { type: PARAM_TYPES.ARRAY__STRINGS },
+    arrayNumberParam: { type: PARAM_TYPES.ARRAY__NUMBERS },
   };
-  const useQueryParamsState = createTypedQueryParamsHook(
-    queryParamsStateConfig
-  );
 
   test('It initialize with the state from the URL', () => {
     const url =
@@ -34,7 +29,10 @@ describe('Basic tests', () => {
 
     history.push(url);
 
-    const { result } = renderHook(() => useQueryParamsState(), { wrapper });
+    const { result } = renderHook(
+      () => useQueryParamsState(queryParamsStateConfig),
+      { wrapper }
+    );
     const [params] = result.current;
     expect(params.booleanParam).toBe(true);
     expect(params.stringParam).toEqual('test');
@@ -44,7 +42,10 @@ describe('Basic tests', () => {
   });
 
   test('It updates the URL with the correct value', () => {
-    const { result } = renderHook(() => useQueryParamsState(), { wrapper });
+    const { result } = renderHook(
+      () => useQueryParamsState(queryParamsStateConfig),
+      { wrapper }
+    );
     act(() => {
       const setParams = result.current[1];
       setParams({
@@ -74,26 +75,83 @@ describe('Basic tests', () => {
     expect(params.arrayNumberParam).toEqual([1, 2]);
     expect(queryString).toContain('arrayNumberParam=1%2C2');
   });
+
+  test('It can apply partial updates', () => {
+    const { result } = renderHook(
+      () => useQueryParamsState(queryParamsStateConfig),
+      { wrapper }
+    );
+
+    act(() => {
+      const setParams = result.current[1];
+      setParams({
+        numberParam: 5,
+      });
+    });
+
+    act(() => {
+      const setParams = result.current[1];
+      setParams({
+        arrayStringParam: ['one', 'two'],
+      });
+    });
+
+    const [params] = result.current;
+    const queryString = history.location.search;
+
+    expect(params.numberParam).toEqual(5);
+    expect(queryString).toContain('numberParam=5');
+    expect(params.arrayStringParam).toEqual(['one', 'two']);
+    expect(queryString).toContain('arrayStringParam=one%2Ctwo');
+  });
+
+  test('It should allow to omit the type property', () => {
+    // All the params will be strings
+    const queryParamsStateConfig = {
+      booleanParam: {},
+      stringParam: {},
+      numberParam: {},
+      arrayStringParam: {},
+      arrayNumberParam: {},
+    };
+
+    const url =
+      '/test?booleanParam=true&stringParam=test&numberParam=0&arrayStringParam=one,two,three&arrayNumberParam=1,2,3';
+
+    history.push(url);
+
+    const { result } = renderHook(
+      () => useQueryParamsState(queryParamsStateConfig),
+      { wrapper }
+    );
+    const [params] = result.current;
+    expect(params.booleanParam).toBe('true');
+    expect(params.stringParam).toEqual('test');
+    expect(params.numberParam).toEqual('0');
+    expect(params.arrayStringParam).toEqual('one,two,three');
+    expect(params.arrayNumberParam).toEqual('1,2,3');
+  });
+
+  test.skip("It doesn't change the query params reference", () => {});
 });
 
 describe('With default value', () => {
   const queryParamsStateConfig = {
-    booleanParam: defineProp(URL_PARSERS.BOOLEAN, { defaultValue: false }),
-    stringParam: defineProp(URL_PARSERS.STRING, { defaultValue: 'default' }),
-    numberParam: defineProp(URL_PARSERS.NUMBER, { defaultValue: 6 }),
-    arrayStringParam: defineProp(URL_PARSERS.ARRAY__STRINGS, {
+    booleanParam: { type: PARAM_TYPES.BOOLEAN, defaultValue: false },
+    stringParam: { type: PARAM_TYPES.STRING, defaultValue: 'default' },
+    numberParam: { type: PARAM_TYPES.NUMBER, defaultValue: 6 },
+    arrayStringParam: {
+      type: PARAM_TYPES.ARRAY__STRINGS,
       defaultValue: ['check', 'check'],
-    }),
-    arrayNumberParam: defineProp(URL_PARSERS.ARRAY__NUMBERS, {
-      defaultValue: [],
-    }),
+    },
+    arrayNumberParam: { type: PARAM_TYPES.ARRAY__NUMBERS, defaultValue: [] },
   };
-  const useQueryParamsState = createTypedQueryParamsHook(
-    queryParamsStateConfig
-  );
 
   test('It should use the default value if param is not defined in the URL', () => {
-    const { result } = renderHook(() => useQueryParamsState(), { wrapper });
+    const { result } = renderHook(
+      () => useQueryParamsState(queryParamsStateConfig),
+      { wrapper }
+    );
     const [params] = result.current;
     expect(params.booleanParam).toBe(false);
     expect(params.stringParam).toEqual('default');
@@ -102,12 +160,15 @@ describe('With default value', () => {
     expect(params.arrayNumberParam).toEqual([]);
   });
 
-  test('It should overwrite the default value if param is in the URL', () => {
+  test('It should not overwrite the default value if param is in the URL', () => {
     const url =
       '/test?booleanParam=true&stringParam=test&numberParam=0&arrayStringParam=one,two,three&arrayNumberParam=1,2,3';
     history.push(url);
 
-    const { result } = renderHook(() => useQueryParamsState(), { wrapper });
+    const { result } = renderHook(
+      () => useQueryParamsState(queryParamsStateConfig),
+      { wrapper }
+    );
     const [params] = result.current;
     expect(params.booleanParam).toBe(true);
     expect(params.stringParam).toEqual('test');
@@ -118,14 +179,18 @@ describe('With default value', () => {
 
   test('It should allow defaultValue to be a function', () => {
     let dynamicValue = 1;
-    const useQueryParamsState = createTypedQueryParamsHook({
-      numberParam: defineProp(URL_PARSERS.NUMBER, {
+    const queryParamsStateConfig = {
+      numberParam: {
+        type: PARAM_TYPES.NUMBER,
         defaultValue: () => dynamicValue,
-      }),
-      otherParam: defineProp(URL_PARSERS.STRING),
-    });
+      },
+      otherParam: { type: PARAM_TYPES.STRING },
+    };
 
-    const { result } = renderHook(() => useQueryParamsState(), { wrapper });
+    const { result } = renderHook(
+      () => useQueryParamsState(queryParamsStateConfig),
+      { wrapper }
+    );
     const [params] = result.current;
     expect(params.numberParam).toEqual(1);
 
@@ -145,14 +210,11 @@ describe('With default value', () => {
   });
 });
 
-describe('Others', () => {
+describe('Serializer', () => {
   const queryParamsStateConfig = {
-    stringParam: defineProp(URL_PARSERS.STRING),
-    stringParamEncoded: defineProp(URL_PARSERS.STRING),
+    stringParam: { type: PARAM_TYPES.STRING },
+    stringParamEncoded: { type: PARAM_TYPES.STRING },
   };
-  const useQueryParamsState = createTypedQueryParamsHook(
-    queryParamsStateConfig
-  );
 
   test("It shouldn't not interpret commas in params of type STRING as array separator.", () => {
     const url =
@@ -160,14 +222,20 @@ describe('Others', () => {
 
     history.push(url);
 
-    const { result } = renderHook(() => useQueryParamsState(), { wrapper });
+    const { result } = renderHook(
+      () => useQueryParamsState(queryParamsStateConfig),
+      { wrapper }
+    );
     const [params] = result.current;
     expect(params.stringParam).toEqual('hello,world');
     expect(params.stringParamEncoded).toEqual('hello,world');
   });
 
   test('It should double encode string with encoded values', () => {
-    const { result } = renderHook(() => useQueryParamsState(), { wrapper });
+    const { result } = renderHook(
+      () => useQueryParamsState(queryParamsStateConfig),
+      { wrapper }
+    );
     act(() => {
       const setParams = result.current[1];
       setParams({
@@ -187,6 +255,219 @@ describe('Others', () => {
   });
 });
 
-// test("It validates URL state")
+describe('query param validators', () => {
+  const lessThan10Validator = (stateValue: any) => {
+    if (stateValue >= 10) {
+      throw new QueryParamsValidationError('Invalid number');
+    }
+  };
+
+  describe('When reading the state', () => {
+    test('It should not touch the param if param is valid', () => {
+      const queryParamsStateConfig = {
+        numberParam: {
+          type: PARAM_TYPES.NUMBER,
+          defaultValue: 6,
+          validator: lessThan10Validator,
+        },
+      };
+
+      const url = '/test?numberParam=9';
+
+      history.push(url);
+
+      const { result } = renderHook(
+        () => useQueryParamsState(queryParamsStateConfig),
+        { wrapper }
+      );
+      const [params] = result.current;
+      expect(params.numberParam).toEqual(9);
+    });
+
+    test('It should use the default state if param is invalid', () => {
+      const queryParamsStateConfig = {
+        numberParam: {
+          type: PARAM_TYPES.NUMBER,
+          defaultValue: 6,
+          validator: lessThan10Validator,
+        },
+      };
+
+      const url = '/test?numberParam=12';
+
+      history.push(url);
+
+      const { result } = renderHook(
+        () => useQueryParamsState(queryParamsStateConfig),
+        { wrapper }
+      );
+      const [params] = result.current;
+      expect(params.numberParam).toEqual(6);
+    });
+
+    describe('With predefined validators', () => {
+      test('It should not touch the state if value is oneOf(..)', () => {
+        const queryParamsStateConfig = {
+          stringParam: {
+            type: PARAM_TYPES.STRING,
+            defaultValue: 'default value',
+            validator: VALIDATORS.oneOf(['default value', 'hello']),
+          },
+        };
+
+        const url = '/test?stringParam=hello';
+
+        history.push(url);
+
+        const { result } = renderHook(
+          () => useQueryParamsState(queryParamsStateConfig),
+          { wrapper }
+        );
+        const [params] = result.current;
+        expect(params.stringParam).toEqual('hello');
+      });
+
+      test('It should default the state if value is not oneOf(..)', () => {
+        const queryParamsStateConfig = {
+          stringParam: {
+            type: PARAM_TYPES.STRING,
+            defaultValue: 'default value',
+            validator: VALIDATORS.oneOf(['default value', 'hello']),
+          },
+        };
+
+        const url = '/test?stringParam=world';
+
+        history.push(url);
+
+        const { result } = renderHook(
+          () => useQueryParamsState(queryParamsStateConfig),
+          { wrapper }
+        );
+        const [params] = result.current;
+        expect(params.stringParam).toEqual('default value');
+      });
+    });
+  });
+
+  describe('When writing the state', () => {
+    test('It update param if param is valid', () => {
+      const queryParamsStateConfig = {
+        numberParam: {
+          type: PARAM_TYPES.NUMBER,
+          defaultValue: 6,
+          validator: lessThan10Validator,
+        },
+      };
+
+      const { result } = renderHook(
+        () => useQueryParamsState(queryParamsStateConfig),
+        { wrapper }
+      );
+
+      act(() => {
+        const setParams = result.current[1];
+        setParams({
+          numberParam: 5,
+        });
+      });
+
+      const [params] = result.current;
+      expect(params.numberParam).toEqual(5);
+
+      const queryString = history.location.search;
+      expect(queryString).toContain('numberParam=5');
+    });
+
+    test('It should use the default state if param is invalid', () => {
+      const queryParamsStateConfig = {
+        numberParam: {
+          type: PARAM_TYPES.NUMBER,
+          defaultValue: 6,
+          validator: lessThan10Validator,
+        },
+      };
+
+      const { result } = renderHook(
+        () => useQueryParamsState(queryParamsStateConfig),
+        { wrapper }
+      );
+      act(() => {
+        const setParams = result.current[1];
+        expect(() => {
+          setParams({
+            numberParam: 10,
+          });
+        }).toThrow();
+      });
+
+      const [params] = result.current;
+      expect(params.numberParam).toEqual(6);
+
+      const queryString = history.location.search;
+      expect(queryString).toEqual('');
+    });
+
+    describe('With predefined validators', () => {
+      test('It should set the state if value is oneOf(..)', () => {
+        const queryParamsStateConfig = {
+          stringParam: {
+            type: PARAM_TYPES.STRING,
+            defaultValue: 'default value',
+            validator: VALIDATORS.oneOf(['default value', 'hello']),
+          },
+        };
+
+        const { result } = renderHook(
+          () => useQueryParamsState(queryParamsStateConfig),
+          { wrapper }
+        );
+
+        act(() => {
+          const setParams = result.current[1];
+          setParams({
+            stringParam: 'hello',
+          });
+        });
+
+        const [params] = result.current;
+        expect(params.stringParam).toEqual('hello');
+
+        const queryString = history.location.search;
+        expect(queryString).toContain('stringParam=hello');
+      });
+
+      test('It should default the state if value is not oneOf(..)', () => {
+        const queryParamsStateConfig = {
+          stringParam: {
+            type: PARAM_TYPES.STRING,
+            defaultValue: 'default value',
+            validator: VALIDATORS.oneOf(['default value', 'hello']),
+          },
+        };
+
+        const { result } = renderHook(
+          () => useQueryParamsState(queryParamsStateConfig),
+          { wrapper }
+        );
+
+        act(() => {
+          const setParams = result.current[1];
+          expect(() =>
+            setParams({
+              stringParam: 'world',
+            }).toThrow()
+          );
+        });
+
+        const [params] = result.current;
+        expect(params.stringParam).toEqual('default value');
+
+        const queryString = history.location.search;
+        expect(queryString).toEqual('');
+      });
+    });
+  });
+});
 
 // test("It can use a custom serializer")
