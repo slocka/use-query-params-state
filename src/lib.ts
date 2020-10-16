@@ -1,4 +1,4 @@
-import { QueryParamsConfig, QueryParamsNormalizedConfig } from 'types';
+import { QueryParamsConfig, QueryParamsNormalizedConfig } from './types';
 import serializers from './serializer/serializers';
 
 export function isFunction(fn: any): boolean {
