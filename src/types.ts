@@ -1,6 +1,10 @@
 import { QueryParamDef } from './queryParamDef';
 
-export type ValidatorFunction<T> = (value: T, queryParams: object) => void;
+export type ValidatorFunction<T> = (
+  value: T,
+  queryParams: object,
+  contextData: any
+) => void;
 
 export type SerializedQueryParams = Record<string, string | null | undefined>;
 export type QueryParamsSchema = Record<string, QueryParamDef<any>>;

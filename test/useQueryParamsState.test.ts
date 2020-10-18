@@ -284,6 +284,16 @@ describe('query param validators', () => {
     }
   };
 
+  const lessThanXValidator = (
+    stateValue: number,
+    _parsedQueryParams: object,
+    contextData: any
+  ) => {
+    if (stateValue >= contextData.max) {
+      throw new QueryParamsValidationError('Invalid number');
+    }
+  };
+
   describe('When reading the state', () => {
     test('It should not touch the param if param is valid', () => {
       const queryParamsStateSchema = {
@@ -303,6 +313,24 @@ describe('query param validators', () => {
     });
 
     describe('When invalid', () => {
+      test('It should have access to context data in validator function', () => {
+        const queryParamsStateSchema = {
+          numberParam: QPARAM.number(0).validator(lessThanXValidator),
+        };
+
+        const url = '/test?numberParam=9';
+
+        history.push(url);
+
+        const contextData = { max: 5 };
+        const { result } = renderHook(
+          () => useQueryParamsState(queryParamsStateSchema, contextData),
+          { wrapper }
+        );
+        const [params] = result.current;
+        expect(params.numberParam).toEqual(0);
+      });
+
       test('It should use the default state when default is a value', () => {
         const queryParamsStateSchema = {
           numberParam: QPARAM.number(6).validator(lessThan10Validator),
@@ -409,6 +437,26 @@ describe('query param validators', () => {
     });
 
     describe('When invalid', () => {
+      test('It should have access to context data in validator function', () => {
+        const queryParamsStateSchema = {
+          numberParam: QPARAM.number(0).validator(lessThanXValidator),
+        };
+
+        const contextData = { max: 5 };
+        const { result } = renderHook(
+          () => useQueryParamsState(queryParamsStateSchema, contextData),
+          { wrapper }
+        );
+        act(() => {
+          const setParams = result.current[1];
+          expect(() => {
+            setParams({
+              numberParam: 9,
+            });
+          }).toThrow();
+        });
+      });
+
       test('It should use the default state when default is a value', () => {
         const queryParamsStateSchema = {
           numberParam: QPARAM.number(6).validator(lessThan10Validator),
@@ -434,7 +482,7 @@ describe('query param validators', () => {
         expect(queryString).toEqual('');
       });
 
-      test.only('It should use the default state when default is a function using context data', () => {
+      test('It should use the default state when default is a function using context data', () => {
         const defaultFn = (contextData: any) => contextData.defaultNumber;
 
         const queryParamsStateSchema = {

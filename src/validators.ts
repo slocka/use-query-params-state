@@ -17,7 +17,7 @@ export function runParamsValidators(
     const queryParamDef = queryParamsSchema[queryParamKey];
     const paramValue = parsedQueryParams[queryParamKey];
     try {
-      queryParamDef.runValidator(paramValue, parsedQueryParams);
+      queryParamDef.runValidator(paramValue, parsedQueryParams, contextData);
     } catch (err) {
       // Rethrow the error
       if (throwOnError) {

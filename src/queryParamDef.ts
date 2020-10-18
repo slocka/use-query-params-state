@@ -73,9 +73,13 @@ export class QueryParamDef<T> {
     return this.serializer.toUrl(value);
   };
 
-  public runValidator = (value: T, parsedQueryParams: object): void => {
+  public runValidator = (
+    value: T,
+    parsedQueryParams: object,
+    contextData?: any
+  ): void => {
     if (this.validatorFn) {
-      this.validatorFn(value, parsedQueryParams);
+      this.validatorFn(value, parsedQueryParams, contextData);
     }
   };
 }
