@@ -1,5 +1,5 @@
 import { QueryParamsConfigError, QueryParamsValidationError } from './errors';
-import { QueryParamsNormalizedConfig } from './types';
+import { QueryParamsSchema } from './types';
 
 /**
  * For each query param where a validator function was provided, run the validator function.
@@ -8,24 +8,22 @@ import { QueryParamsNormalizedConfig } from './types';
  * @param parsedQueryParams
  */
 export function runParamsValidators(
-  config: QueryParamsNormalizedConfig,
+  queryParamsSchema: QueryParamsSchema,
   parsedQueryParams: Record<string, any>,
   throwOnError: boolean = false
 ): Record<string, any> {
-  return Object.keys(config).reduce((acc, propKey) => {
-    const { validator, defaultValue } = config[propKey];
-    if (validator) {
-      const paramValue = parsedQueryParams[propKey];
-      try {
-        validator(paramValue, parsedQueryParams);
-      } catch (err) {
-        // Rethrow the error
-        if (throwOnError) {
-          throw err;
-        }
-        // The parsed value is incorrect, use the default value instead.
-        acc[propKey] = defaultValue;
+  return Object.keys(queryParamsSchema).reduce((acc, queryParamKey) => {
+    const queryParamDef = queryParamsSchema[queryParamKey];
+    const paramValue = parsedQueryParams[queryParamKey];
+    try {
+      queryParamDef.runValidator(paramValue, parsedQueryParams);
+    } catch (err) {
+      // Rethrow the error
+      if (throwOnError) {
+        throw err;
       }
+      // The parsed value is incorrect, use the default value instead.
+      acc[queryParamKey] = queryParamDef.getDefaultValue();
     }
 
     return acc;

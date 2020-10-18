@@ -11,3 +11,10 @@ export class QueryParamsConfigError extends Error {
     this.name = 'QueryParamsConfigError';
   }
 }
+
+export class QueryParamsUpdateError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'QueryParamsUpdateError';
+  }
+}

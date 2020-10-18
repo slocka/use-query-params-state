@@ -2,24 +2,25 @@ import { useCallback, useMemo } from 'react';
 import qs from 'qs';
 import { useHistory, useLocation } from 'react-router-dom';
 
-import { QueryParamsConfig, QueryParamType, ValidatorFunction } from './types';
+import { QueryParamsSchema } from './types';
+
 import {
   serializeQueryParamsValues,
   deserializeQueryParamsValues,
 } from './serializer/serialize';
 
 import { runParamsValidators } from './validators';
-import { normalizeConfig } from './lib';
 
-export function useQueryParamsState(config: QueryParamsConfig): Array<any> {
-  const normalizedConfig = useMemo(() => normalizeConfig(config), [config]);
+export function useQueryParamsState(
+  queryParamsSchema: QueryParamsSchema
+): Array<any> {
   const history = useHistory();
   const location = useLocation();
   const rawQueryParams = useReactRouterQueryParams();
 
   // Convert queryParams values from string to the type defined for each query param.
   const parsedQueryParams = deserializeQueryParamsValues(
-    normalizedConfig,
+    queryParamsSchema,
     rawQueryParams
   );
 
@@ -29,29 +30,29 @@ export function useQueryParamsState(config: QueryParamsConfig): Array<any> {
   // but we want to ignore other query strings params.
   const queryParamsState = useMemo(() => {
     // Validate each prop if a validator function has been provided.
-    return runParamsValidators(normalizedConfig, parsedQueryParams);
+    return runParamsValidators(queryParamsSchema, parsedQueryParams);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [parsedQueryParamsHash, normalizedConfig]);
+  }, [parsedQueryParamsHash, queryParamsSchema]);
 
   const setQueryParamsState = useCallback(
     newQueryParams => {
+      // Raise a JS error if we are trying to set a value that doesn't pass the validator
+      runParamsValidators(
+        queryParamsSchema,
+        newQueryParams,
+        /** throwOnError */ true
+      );
+
       const queryParams = {
         ...rawQueryParams,
         ...newQueryParams,
       };
 
-      // Raise a JS error if we are trying to set a value that doesn't pass the validator
-      runParamsValidators(
-        normalizedConfig,
-        newQueryParams,
-        /** throwOnError */ true
-      );
-
       /** TODO: Shall we push param if value is equal to the default value? */
 
       const serializedQueryParams = {
         ...queryParams,
-        ...serializeQueryParamsValues(normalizedConfig, newQueryParams),
+        ...serializeQueryParamsValues(queryParamsSchema, newQueryParams),
       };
 
       const newQueryString = qs.stringify(serializedQueryParams);
@@ -63,31 +64,12 @@ export function useQueryParamsState(config: QueryParamsConfig): Array<any> {
 
       history.push(newLocation);
     },
-    [history, location, rawQueryParams, normalizedConfig]
+    [history, location, rawQueryParams, queryParamsSchema]
   );
 
-  return [queryParamsState, setQueryParamsState, normalizedConfig];
+  return [queryParamsState, setQueryParamsState];
 }
 
-export function useQueryParam(
-  paramName: string,
-  type?: QueryParamType,
-  defaultValue?: any,
-  validator?: ValidatorFunction
-) {
-  const [params, setParams] = useQueryParamsState({
-    [paramName]: { type, defaultValue, validator },
-  });
-
-  const setParam = useCallback(
-    value => {
-      setParams({ [paramName]: value });
-    },
-    [setParams, paramName]
-  );
-
-  return [params[paramName], setParam];
-}
 /**
  * Extract parameters from query string and return
  * them in the shape of a key/value object.

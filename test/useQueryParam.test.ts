@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 
 import { getAppWrapper } from './getAppWrapper';
 
-import { useQueryParam, PARAM_TYPES } from '../src/index';
+import { useQueryParam, QPARAM } from '../src/index';
 import { QueryParamsValidationError } from '../src/errors';
 
 let history: MemoryHistory;
@@ -23,7 +23,7 @@ describe('Basic tests', () => {
     history.push(url);
 
     const { result } = renderHook(
-      () => useQueryParam('booleanParam', PARAM_TYPES.BOOLEAN),
+      () => useQueryParam('booleanParam', QPARAM.boolean()),
       { wrapper }
     );
     const [booleanParam] = result.current;
@@ -33,7 +33,7 @@ describe('Basic tests', () => {
 
   test('It updates the URL with the correct value', () => {
     const { result } = renderHook(
-      () => useQueryParam('stringParam', PARAM_TYPES.STRING),
+      () => useQueryParam('stringParam', QPARAM.string()),
       { wrapper }
     );
     act(() => {
@@ -66,10 +66,10 @@ describe('With default value', () => {
   test('It should use the default value if param is not defined in the URL', () => {
     const { result } = renderHook(
       () =>
-        useQueryParam('arrayStringParam', PARAM_TYPES.ARRAY__STRINGS, [
-          'check',
-          'check',
-        ]),
+        useQueryParam(
+          'arrayStringParam',
+          QPARAM.arrayOfStrings(['check', 'check'])
+        ),
       { wrapper }
     );
     const [arrayStringParam] = result.current;
@@ -81,7 +81,7 @@ describe('With default value', () => {
     history.push(url);
 
     const { result } = renderHook(
-      () => useQueryParam('arrayNumberParam', PARAM_TYPES.ARRAY__NUMBERS, []),
+      () => useQueryParam('arrayNumberParam', QPARAM.arrayOfNumbers([])),
       { wrapper }
     );
     const [arrayNumberParam] = result.current;
@@ -93,12 +93,15 @@ describe('With default value', () => {
 
     const { result } = renderHook(
       () =>
-        useQueryParam('numberParam', PARAM_TYPES.NUMBER, () => dynamicValue),
+        useQueryParam(
+          'numberParam',
+          QPARAM.number(() => dynamicValue)
+        ),
       { wrapper }
     );
 
     const { result: resultOtherParam } = renderHook(
-      () => useQueryParam('otherParam', PARAM_TYPES.STRING),
+      () => useQueryParam('otherParam', QPARAM.string()),
       { wrapper }
     );
 
@@ -137,9 +140,7 @@ describe('With validator function', () => {
       () =>
         useQueryParam(
           'numberParam',
-          PARAM_TYPES.NUMBER,
-          6,
-          lessThan10Validator
+          QPARAM.number(6).validator(lessThan10Validator)
         ),
       { wrapper }
     );
@@ -156,9 +157,7 @@ describe('With validator function', () => {
       () =>
         useQueryParam(
           'numberParam',
-          PARAM_TYPES.NUMBER,
-          6,
-          lessThan10Validator
+          QPARAM.number(6).validator(lessThan10Validator)
         ),
       { wrapper }
     );
