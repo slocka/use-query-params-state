@@ -10,6 +10,7 @@ import { QueryParamsSchema } from './types';
 export function runParamsValidators(
   queryParamsSchema: QueryParamsSchema,
   parsedQueryParams: Record<string, any>,
+  contextData?: any,
   throwOnError: boolean = false
 ): Record<string, any> {
   return Object.keys(queryParamsSchema).reduce((acc, queryParamKey) => {
@@ -23,7 +24,7 @@ export function runParamsValidators(
         throw err;
       }
       // The parsed value is incorrect, use the default value instead.
-      acc[queryParamKey] = queryParamDef.getDefaultValue();
+      acc[queryParamKey] = queryParamDef.getDefaultValue(contextData);
     }
 
     return acc;

@@ -4,11 +4,17 @@ import '@testing-library/jest-dom';
 
 import { getAppWrapper } from './getAppWrapper';
 
-import { useQueryParamsState, QPARAM, VALIDATORS } from '../src/index';
+import {
+  useQueryParamsState,
+  QPARAM,
+  VALIDATORS,
+  createUseQueryParamsStateHook,
+} from '../src/index';
 import { QueryParamsValidationError } from '../src/errors';
 
 let history: MemoryHistory;
 let wrapper: React.ComponentType;
+
 beforeEach(() => {
   history = createMemoryHistory();
   wrapper = getAppWrapper(history);
@@ -23,7 +29,7 @@ describe('Basic tests', () => {
     arrayNumberParam: QPARAM.arrayOfNumbers(),
   };
 
-  test('It initialize with the state from the URL', () => {
+  test('It initializes with the state from the URL', () => {
     const url =
       '/test?booleanParam=true&stringParam=test&numberParam=0&arrayStringParam=one,two,three&arrayNumberParam=1,2,3';
 
@@ -105,6 +111,26 @@ describe('Basic tests', () => {
     expect(queryString).toContain('arrayStringParam=one%2Ctwo');
   });
 
+  test('It throws an error if trying to update a param that is not part of the schema', () => {
+    const { result } = renderHook(
+      () => useQueryParamsState(queryParamsStateSchema),
+      { wrapper }
+    );
+
+    act(() => {
+      const setParams = result.current[1];
+
+      expect(() => {
+        setParams({
+          booleanParam: false,
+          somethingNotInTheSchema: true,
+        });
+      }).toThrow(
+        '"somethingNotInTheSchema" is not defined in queryParams Schema'
+      );
+    });
+  });
+
   test.skip("It doesn't change the query params reference", () => {});
 });
 
@@ -174,6 +200,35 @@ describe('With default value', () => {
 
     const [paramsAfterUpdate] = result.current;
     expect(paramsAfterUpdate.numberParam).toEqual(2);
+  });
+
+  describe('Using context data', () => {
+    let useMyQueryParams: (contextData?: any) => any[];
+    // Emulated hook created somewhere where contextData is not available.
+    beforeAll(() => {
+      const defaultFunction = (contextData: any): string => {
+        return contextData.availableOptions[0];
+      };
+
+      const queryParamsStateSchema = {
+        selectedOption: QPARAM.string(defaultFunction),
+      };
+      useMyQueryParams = createUseQueryParamsStateHook(queryParamsStateSchema);
+    });
+
+    // Component using hook can provide context data that will be used in the default function.
+    test('It should allow to access context data in default function', () => {
+      const contextData = {
+        availableOptions: ['Option B', 'Option E'],
+      };
+
+      const { result } = renderHook(() => useMyQueryParams(contextData), {
+        wrapper,
+      });
+
+      const [params] = result.current;
+      expect(params.selectedOption).toEqual('Option B');
+    });
   });
 });
 
@@ -247,21 +302,44 @@ describe('query param validators', () => {
       expect(params.numberParam).toEqual(9);
     });
 
-    test('It should use the default state if param is invalid', () => {
-      const queryParamsStateSchema = {
-        numberParam: QPARAM.number(6).validator(lessThan10Validator),
-      };
+    describe('When invalid', () => {
+      test('It should use the default state when default is a value', () => {
+        const queryParamsStateSchema = {
+          numberParam: QPARAM.number(6).validator(lessThan10Validator),
+        };
 
-      const url = '/test?numberParam=12';
+        const url = '/test?numberParam=12';
 
-      history.push(url);
+        history.push(url);
 
-      const { result } = renderHook(
-        () => useQueryParamsState(queryParamsStateSchema),
-        { wrapper }
-      );
-      const [params] = result.current;
-      expect(params.numberParam).toEqual(6);
+        const { result } = renderHook(
+          () => useQueryParamsState(queryParamsStateSchema),
+          { wrapper }
+        );
+        const [params] = result.current;
+        expect(params.numberParam).toEqual(6);
+      });
+
+      test('It should use the default state when default is a function using context data', () => {
+        const defaultFn = (contextData: any) => contextData.defaultNumber;
+        const queryParamsStateSchema = {
+          numberParam: QPARAM.number(defaultFn).validator(lessThan10Validator),
+        };
+
+        const url = '/test?numberParam=12';
+
+        history.push(url);
+
+        const contextData = {
+          defaultNumber: 2,
+        };
+        const { result } = renderHook(
+          () => useQueryParamsState(queryParamsStateSchema, contextData),
+          { wrapper }
+        );
+        const [params] = result.current;
+        expect(params.numberParam).toEqual(2);
+      });
     });
 
     describe('With predefined validators', () => {
@@ -330,29 +408,62 @@ describe('query param validators', () => {
       expect(queryString).toContain('numberParam=5');
     });
 
-    test('It should use the default state if param is invalid', () => {
-      const queryParamsStateSchema = {
-        numberParam: QPARAM.number(6).validator(lessThan10Validator),
-      };
+    describe('When invalid', () => {
+      test('It should use the default state when default is a value', () => {
+        const queryParamsStateSchema = {
+          numberParam: QPARAM.number(6).validator(lessThan10Validator),
+        };
 
-      const { result } = renderHook(
-        () => useQueryParamsState(queryParamsStateSchema),
-        { wrapper }
-      );
-      act(() => {
-        const setParams = result.current[1];
-        expect(() => {
-          setParams({
-            numberParam: 10,
-          });
-        }).toThrow();
+        const { result } = renderHook(
+          () => useQueryParamsState(queryParamsStateSchema),
+          { wrapper }
+        );
+        act(() => {
+          const setParams = result.current[1];
+          expect(() => {
+            setParams({
+              numberParam: 10,
+            });
+          }).toThrow();
+        });
+
+        const [params] = result.current;
+        expect(params.numberParam).toEqual(6);
+
+        const queryString = history.location.search;
+        expect(queryString).toEqual('');
       });
 
-      const [params] = result.current;
-      expect(params.numberParam).toEqual(6);
+      test.only('It should use the default state when default is a function using context data', () => {
+        const defaultFn = (contextData: any) => contextData.defaultNumber;
 
-      const queryString = history.location.search;
-      expect(queryString).toEqual('');
+        const queryParamsStateSchema = {
+          numberParam: QPARAM.number(defaultFn).validator(lessThan10Validator),
+        };
+
+        const contextData = {
+          defaultNumber: 2,
+        };
+
+        const { result } = renderHook(
+          () => useQueryParamsState(queryParamsStateSchema, contextData),
+          { wrapper }
+        );
+        act(() => {
+          const setParams = result.current[1];
+          expect(() => {
+            setParams({
+              numberParam: 10,
+            });
+          }).toThrow();
+        });
+
+        const [params] = result.current;
+        expect(params.numberParam).toEqual(2);
+
+        const queryString = history.location.search;
+        expect(queryString).toEqual('');
+      });
     });
 
     describe('With predefined validators', () => {

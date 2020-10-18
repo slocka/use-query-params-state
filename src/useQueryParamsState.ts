@@ -12,7 +12,8 @@ import {
 import { runParamsValidators } from './validators';
 
 export function useQueryParamsState(
-  queryParamsSchema: QueryParamsSchema
+  queryParamsSchema: QueryParamsSchema,
+  contextData?: any
 ): Array<any> {
   const history = useHistory();
   const location = useLocation();
@@ -21,7 +22,8 @@ export function useQueryParamsState(
   // Convert queryParams values from string to the type defined for each query param.
   const parsedQueryParams = deserializeQueryParamsValues(
     queryParamsSchema,
-    rawQueryParams
+    rawQueryParams,
+    contextData
   );
 
   const parsedQueryParamsHash = JSON.stringify(parsedQueryParams);
@@ -30,7 +32,11 @@ export function useQueryParamsState(
   // but we want to ignore other query strings params.
   const queryParamsState = useMemo(() => {
     // Validate each prop if a validator function has been provided.
-    return runParamsValidators(queryParamsSchema, parsedQueryParams);
+    return runParamsValidators(
+      queryParamsSchema,
+      parsedQueryParams,
+      contextData
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [parsedQueryParamsHash, queryParamsSchema]);
 
@@ -40,6 +46,7 @@ export function useQueryParamsState(
       runParamsValidators(
         queryParamsSchema,
         newQueryParams,
+        contextData,
         /** throwOnError */ true
       );
 

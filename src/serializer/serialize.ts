@@ -17,12 +17,14 @@ import { QueryParamsUpdateError } from '../errors';
  */
 export function deserializeQueryParamsValues(
   queryParamsSchema: QueryParamsSchema,
-  serializedQueryParams: SerializedQueryParams
+  serializedQueryParams: SerializedQueryParams,
+  contextData?: any
 ): QueryParams {
   return Object.keys(queryParamsSchema).reduce((acc, queryParamKey) => {
     const queryParamDef = queryParamsSchema[queryParamKey];
     acc[queryParamKey] = queryParamDef.fromURL(
-      serializedQueryParams[queryParamKey]
+      serializedQueryParams[queryParamKey],
+      contextData
     );
 
     return acc;

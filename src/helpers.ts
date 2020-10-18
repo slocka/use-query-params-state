@@ -25,7 +25,7 @@ import { useQueryParamsState } from './useQueryParamsState';
 export function createUseQueryParamsStateHook(
   queryParamsSchena: QueryParamsSchema
 ) {
-  return () => {
-    return useQueryParamsState(queryParamsSchena);
+  return (contextData?: any) => {
+    return useQueryParamsState(queryParamsSchena, contextData);
   };
 }
