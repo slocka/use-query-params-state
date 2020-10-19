@@ -9,10 +9,17 @@ export function isFunction(fn: any): boolean {
   return Object.prototype.toString.call(fn) === '[object Function]';
 }
 
-export function isUndefined(obj: any): boolean {
-  return typeof obj === 'undefined';
+export function isUndefined(value: any): value is undefined {
+  return typeof value === 'undefined';
 }
 
-export function isNumber(value: any): boolean {
+export function isNumber(value: any): value is number {
   return typeof value === 'number';
+}
+
+/**
+ * Returns true if null or undefined
+ */
+export function isNil(value: any): value is undefined | null {
+  return isUndefined(value) || value === null;
 }
