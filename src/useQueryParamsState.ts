@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import qs from 'qs';
+import { parseQueryString, createQueryString } from './lib';
 import { useHistory, useLocation } from 'react-router-dom';
 
 import { QueryParamsSchema } from './types';
@@ -62,7 +62,7 @@ export function useQueryParamsState(
         ...serializeQueryParamsValues(queryParamsSchema, newQueryParams),
       };
 
-      const newQueryString = qs.stringify(serializedQueryParams);
+      const newQueryString = createQueryString(serializedQueryParams);
 
       const newLocation = {
         ...location,
@@ -81,9 +81,9 @@ export function useQueryParamsState(
  * Extract parameters from query string and return
  * them in the shape of a key/value object.
  */
-function useReactRouterQueryParams(): Record<string, string> {
+function useReactRouterQueryParams(): Record<string, string | null> {
   const location = useLocation();
   const queryString = location.search.replace(/^\?/, '');
 
-  return qs.parse(queryString);
+  return parseQueryString(queryString);
 }
