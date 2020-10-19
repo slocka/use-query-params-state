@@ -71,7 +71,7 @@ export function useQueryParamsState(
 
       history.push(newLocation);
     },
-    [history, location, rawQueryParams, queryParamsSchema]
+    [history, location, rawQueryParams, queryParamsSchema, contextData]
   );
 
   return [queryParamsState, setQueryParamsState];
