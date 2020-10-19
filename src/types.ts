@@ -23,5 +23,7 @@ export type Serializer<T> = {
   fromUrl: SerializerFromUrlFunction<T>;
 };
 
+export type ParamTypeToSerializerMap = Record<string, Serializer<any>>;
+
 export type DefaultValueFunction<T> = (context?: any) => T;
 export type DefaultValue<T> = T | DefaultValueFunction<T> | undefined;

@@ -1,6 +1,7 @@
 import { isNumber } from '../lib';
+import { ParamTypeToSerializerMap } from '../types';
 
-const serializers = {
+const serializers: ParamTypeToSerializerMap = {
   ARRAY__STRINGS: {
     toUrl(array?: Array<string> | null): string | null | undefined {
       if (typeof array === 'undefined' || array === null) {
