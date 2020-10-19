@@ -1,78 +1,116 @@
-import { isNumber } from '../lib';
+import { isNumber, isNil } from '../lib';
 import { ParamTypeToSerializerMap } from '../types';
+
+const ARRAY_DELIMITER = ',';
 
 const serializers: ParamTypeToSerializerMap = {
   ARRAY__STRINGS: {
-    toUrl(array?: Array<string> | null): string | null | undefined {
-      if (typeof array === 'undefined' || array === null) {
-        return array;
-      }
-
-      return array.join(',');
-    },
     fromUrl(str?: string | null): Array<string> | null | undefined {
-      if (typeof str === 'undefined' || str === null) {
+      if (isNil(str)) {
         return str;
       }
 
-      return str.split(',');
+      if (str.length === 0) {
+        return [];
+      }
+
+      return str.split(ARRAY_DELIMITER);
+    },
+    toUrl(array?: Array<string> | null): string | null | undefined {
+      if (isNil(array)) {
+        return array;
+      }
+
+      if (!Array.isArray(array)) {
+        return undefined;
+      }
+
+      return array.join(ARRAY_DELIMITER);
     },
   },
   ARRAY__NUMBERS: {
-    toUrl(array?: Array<number> | null): string | null | undefined {
-      if (typeof array === 'undefined' || array === null) {
-        return array;
-      }
-
-      return array.join(',');
-    },
     fromUrl(str?: string | null): Array<number> | null | undefined {
-      if (typeof str === 'undefined' || str === null) {
+      if (isNil(str)) {
         return str;
       }
 
-      return str.split(',').map(Number);
+      if (str.length === 0) {
+        return [];
+      }
+
+      return str.split(ARRAY_DELIMITER).map(Number);
+    },
+    toUrl(array?: Array<number> | null): string | null | undefined {
+      if (isNil(array)) {
+        return array;
+      }
+
+      if (!Array.isArray(array)) {
+        return undefined;
+      }
+
+      return array.join(ARRAY_DELIMITER);
     },
   },
   STRING: {
-    toUrl: (str?: string | null): string | null | undefined => {
+    fromUrl: (str?: string | null): string | null | undefined => {
       return str;
     },
-    fromUrl: (str?: string | null): string | null | undefined => {
+    toUrl: (str?: string | null): string | null | undefined => {
+      if (isNil(str)) {
+        return str;
+      }
+
+      if (typeof str !== 'string') {
+        return undefined;
+      }
+
       return str;
     },
   },
   BOOLEAN: {
+    fromUrl: (str?: string | null): boolean | null | undefined => {
+      if (isNil(str)) {
+        return str;
+      }
+
+      if (str === 'true') {
+        return true;
+      }
+
+      if (str === 'false') {
+        return false;
+      }
+
+      return undefined;
+    },
     toUrl: (bool?: boolean | null): string | null | undefined => {
-      if (typeof bool === 'undefined' || bool === null) {
+      if (isNil(bool)) {
         return bool;
+      }
+
+      if (typeof bool !== 'boolean') {
+        return undefined;
       }
 
       return bool.toString();
     },
-    fromUrl: (str?: string | null): boolean | null | undefined => {
-      if (typeof str === 'undefined' || str === null) {
-        return str;
-      }
-
-      return str === 'true';
-    },
   },
   NUMBER: {
-    toUrl: (number?: number | null): string | null | undefined => {
-      if (typeof number === 'undefined' || number === null) {
-        return number;
-      }
-
-      return isNumber(number) ? number.toString() : undefined;
-    },
     fromUrl: (str?: string | null): number | null | undefined => {
-      if (typeof str === 'undefined' || str === null) {
+      if (isNil(str)) {
         return str;
       }
 
       const number = parseFloat(str);
       return !Number.isNaN(number) ? number : undefined;
+    },
+    toUrl: (number?: number | null): string | null | undefined => {
+      if (isNil(number)) {
+        return number;
+      }
+
+      return isNumber(number) ? number.toString() : undefined;
     },
   },
 };
