@@ -44,13 +44,17 @@ describe('Boolean serializer', () => {
       expect(serializers.BOOLEAN.fromUrl('false')).toBe(false);
     });
 
+    /** This is the scenario where we have `?flag`, flag value is an empty string */
+    test('It should decode the empty string as true', () => {
+      expect(serializers.BOOLEAN.fromUrl('')).toBe(true);
+    });
+
     test('It should decode invalid boolean values as undefined', () => {
       expect(serializers.BOOLEAN.fromUrl('something')).toBe(undefined);
     });
 
     test('It should decode falsy values as undefined', () => {
       expect(serializers.BOOLEAN.fromUrl('0')).toBe(undefined);
-      expect(serializers.BOOLEAN.fromUrl('')).toBe(undefined);
     });
   });
 

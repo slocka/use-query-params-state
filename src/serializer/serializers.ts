@@ -82,6 +82,12 @@ const serializers: ParamTypeToSerializerMap = {
         return false;
       }
 
+      // This is the scenario where we have `?flag`,
+      // flag value is an empty string.
+      if (str === '') {
+        return true;
+      }
+
       return undefined;
     },
     toUrl: (bool?: boolean | null): string | null | undefined => {

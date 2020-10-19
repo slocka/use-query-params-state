@@ -270,7 +270,7 @@ describe('Serializer', () => {
     const queryString = history.location.search;
 
     expect(params.stringParam).toEqual('Hello World');
-    expect(queryString).toContain('stringParam=Hello%20World');
+    expect(queryString).toContain('stringParam=Hello+World');
 
     expect(params.stringParamEncoded).toEqual('Hello%20World');
     expect(queryString).toContain('stringParamEncoded=Hello%2520World');
