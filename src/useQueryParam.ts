@@ -7,11 +7,15 @@ import { QPARAMS } from './qparams';
 
 export function useQueryParam(
   paramName: string,
-  queryParamDef: QueryParamDef<any> = QPARAMS.string()
+  queryParamDef: QueryParamDef<any> = QPARAMS.string(),
+  contextData?: any
 ) {
-  const [params, setParams] = useQueryParamsState({
-    [paramName]: queryParamDef,
-  });
+  const [params, setParams] = useQueryParamsState(
+    {
+      [paramName]: queryParamDef,
+    },
+    contextData
+  );
 
   const setParam = useCallback(
     value => {
