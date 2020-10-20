@@ -2,7 +2,12 @@ import { useCallback, useMemo } from 'react';
 import { parseQueryString, createQueryString } from './lib';
 import { useHistory, useLocation } from 'react-router-dom';
 
-import { QueryParamsSchema } from './types';
+import {
+  IQueryParamsSchema,
+  QueryParams,
+  QueryParamsSetter,
+  RawQueryParams,
+} from './types';
 
 import {
   serializeQueryParamsValues,
@@ -11,32 +16,30 @@ import {
 
 import { runParamsValidators } from './validators';
 
-export function useQueryParamsState(
+export function useQueryParamsState<
+  QueryParamsSchema extends IQueryParamsSchema
+>(
   queryParamsSchema: QueryParamsSchema,
   contextData?: any
-): Array<any> {
+): [QueryParams<QueryParamsSchema>, QueryParamsSetter<QueryParamsSchema>] {
   const history = useHistory();
   const location = useLocation();
-  const rawQueryParams = useReactRouterQueryParams();
+  const rawQueryParams = useRawQueryParamsFromUrl(queryParamsSchema);
 
   // Convert queryParams values from string to the type defined for each query param.
-  const parsedQueryParams = deserializeQueryParamsValues(
+  const queryParams = deserializeQueryParamsValues(
     queryParamsSchema,
     rawQueryParams,
     contextData
   );
 
-  const parsedQueryParamsHash = JSON.stringify(parsedQueryParams);
+  const parsedQueryParamsHash = JSON.stringify(queryParams);
   // Keep the same object reference as long as the hash stays the same.
   // We could have used rawQueryParams instead of the hash of parsedQueryParams,
   // but we want to ignore other query strings params.
   const queryParamsState = useMemo(() => {
     // Validate each prop if a validator function has been provided.
-    return runParamsValidators(
-      queryParamsSchema,
-      parsedQueryParams,
-      contextData
-    );
+    return runParamsValidators(queryParamsSchema, queryParams, contextData);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [parsedQueryParamsHash, queryParamsSchema]);
 
@@ -79,11 +82,25 @@ export function useQueryParamsState(
 
 /**
  * Extract parameters from query string and return
- * them in the shape of a key/value object.
+ * the ones that are contained in the schema in the shape
+ * of a key/value object.
+ * The current implementation is tight to React-router.
  */
-function useReactRouterQueryParams(): Record<string, string | null> {
+function useRawQueryParamsFromUrl<QueryParamsSchema extends IQueryParamsSchema>(
+  schema: QueryParamsSchema
+): RawQueryParams<QueryParamsSchema> {
   const location = useLocation();
   const queryString = location.search.replace(/^\?/, '');
 
-  return parseQueryString(queryString);
+  const queryStringParams = parseQueryString(queryString);
+  return Object.keys(queryStringParams).reduce(
+    (acc, queryStringKey: string) => {
+      if (schema.hasOwnProperty(queryStringKey)) {
+        acc[queryStringKey as keyof QueryParamsSchema] =
+          queryStringParams[queryStringKey];
+      }
+      return acc;
+    },
+    {} as RawQueryParams<QueryParamsSchema>
+  );
 }

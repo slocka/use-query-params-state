@@ -1,9 +1,5 @@
 import { isUndefined } from '../lib';
-import {
-  QueryParams,
-  SerializedQueryParams,
-  QueryParamsSchema,
-} from '../types';
+import { QueryParams, RawQueryParams, IQueryParamsSchema } from '../types';
 
 import { QueryParamsUpdateError } from '../errors';
 
@@ -15,41 +11,51 @@ import { QueryParamsUpdateError } from '../errors';
  * @param config
  * @param queryParams - Raw query params extracted from the URL but not parsed.
  */
-export function deserializeQueryParamsValues(
+export function deserializeQueryParamsValues<
+  QueryParamsSchema extends IQueryParamsSchema
+>(
   queryParamsSchema: QueryParamsSchema,
-  serializedQueryParams: SerializedQueryParams,
+  rawQueryParams: RawQueryParams<QueryParamsSchema>,
   contextData?: any
-): QueryParams {
-  return Object.keys(queryParamsSchema).reduce((acc, queryParamKey) => {
-    const queryParamDef = queryParamsSchema[queryParamKey];
-    acc[queryParamKey] = queryParamDef.fromURL(
-      serializedQueryParams[queryParamKey],
-      contextData
-    );
+): QueryParams<QueryParamsSchema> {
+  return Object.keys(queryParamsSchema).reduce(
+    (acc, queryParamKey: keyof QueryParamsSchema) => {
+      const queryParamDef = queryParamsSchema[queryParamKey];
+      acc[queryParamKey] = queryParamDef.fromURL(
+        rawQueryParams[queryParamKey],
+        contextData
+      );
 
-    return acc;
-  }, {} as QueryParams);
+      return acc;
+    },
+    {} as QueryParams<QueryParamsSchema>
+  );
 }
 
-export function serializeQueryParamsValues(
+export function serializeQueryParamsValues<
+  QueryParamsSchema extends IQueryParamsSchema
+>(
   queryParamsSchema: QueryParamsSchema,
-  queryParams: QueryParams
-): SerializedQueryParams {
-  return Object.keys(queryParams).reduce((acc, queryParamKey) => {
-    const queryParamDef = queryParamsSchema[queryParamKey];
-    if (!queryParamDef) {
-      const availableQueryParamsKeys = Object.keys(queryParamsSchema);
-      throw new QueryParamsUpdateError(
-        `"${queryParamKey}" is not defined in queryParams Schema. Defined query params are: ${JSON.stringify(
-          availableQueryParamsKeys
-        )}.`
-      );
-    }
-    let value = queryParamDef.toURL(queryParams[queryParamKey]);
-    if (!isUndefined(value)) {
-      acc[queryParamKey] = value;
-    }
+  queryParams: QueryParams<QueryParamsSchema>
+): RawQueryParams<QueryParamsSchema> {
+  return Object.keys(queryParams).reduce(
+    (acc, queryParamKey: keyof QueryParamsSchema) => {
+      const queryParamDef = queryParamsSchema[queryParamKey];
+      if (!queryParamDef) {
+        const availableQueryParamsKeys = Object.keys(queryParamsSchema);
+        throw new QueryParamsUpdateError(
+          `"${queryParamKey}" is not defined in queryParams Schema. Defined query params are: ${JSON.stringify(
+            availableQueryParamsKeys
+          )}.`
+        );
+      }
+      let value = queryParamDef.toURL(queryParams[queryParamKey]);
+      if (!isUndefined(value)) {
+        acc[queryParamKey] = value;
+      }
 
-    return acc;
-  }, {} as SerializedQueryParams);
+      return acc;
+    },
+    {} as RawQueryParams<QueryParamsSchema>
+  );
 }

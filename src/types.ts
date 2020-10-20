@@ -6,9 +6,15 @@ export type ValidatorFunction<T> = (
   contextData: any
 ) => void;
 
-export type SerializedQueryParams = Record<string, string | null | undefined>;
-export type QueryParamsSchema = Record<string, QueryParamDef<any>>;
-export type QueryParams = Record<string, any>;
+export type IQueryParamsSchema = Record<string, QueryParamDef<any>>;
+export type QueryParams<S extends IQueryParamsSchema> = Record<keyof S, any>;
+export type QueryParamsSetter<T extends IQueryParamsSchema> = (
+  newQueryParams: Partial<QueryParams<T>>
+) => void;
+export type RawQueryParams<S extends IQueryParamsSchema> = Record<
+  keyof S,
+  string | null | undefined
+>;
 
 export type SerializerToUrlFunction<T> = (
   param?: T | null

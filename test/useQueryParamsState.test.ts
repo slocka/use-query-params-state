@@ -123,6 +123,7 @@ describe('Basic tests', () => {
       expect(() => {
         setParams({
           booleanParam: false,
+          // @ts-ignore
           somethingNotInTheSchema: true,
         });
       }).toThrow(
@@ -558,8 +559,8 @@ describe('query param validators', () => {
           expect(() =>
             setParams({
               stringParam: 'world',
-            }).toThrow()
-          );
+            })
+          ).toThrow();
         });
 
         const [params] = result.current;
