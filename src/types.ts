@@ -1,29 +1,35 @@
-/**
- * Config object to define :
- *  - Which params can be read/updated from the URL
- *  - How to serialize/deserialize each param.
- *  - Validate the params.
- *  - A default value
- */
-export type QueryParamsConfig = Record<string, Partial<QueryParamOptions>>;
-export type QueryParamsNormalizedConfig = Record<string, QueryParamOptions>;
+import { QueryParamDef } from './queryParamDef';
 
-export type ValidatorFunction = (value: any, queryParams: object) => void;
+export type ValidatorFunction<T> = (
+  value: T,
+  queryParams: object,
+  contextData: any
+) => void;
 
-/**
- * Object containing two function
- * used to serialize/deserialize the query parameters.
- */
-export interface QueryParamType {
-  toUrl: (param: any) => string | null | undefined;
-  fromUrl: (url?: string | null) => any;
-}
+export type IQueryParamsSchema = Record<string, QueryParamDef<any>>;
+export type QueryParams<S extends IQueryParamsSchema> = Record<keyof S, any>;
+export type QueryParamsSetter<T extends IQueryParamsSchema> = (
+  newQueryParams: Partial<QueryParams<T>>
+) => void;
+export type RawQueryParams<S extends IQueryParamsSchema> = Record<
+  keyof S,
+  string | null | undefined
+>;
 
-export interface QueryParamOptions {
-  type: QueryParamType;
-  defaultValue?: any;
-  validator?: ValidatorFunction;
-}
+export type SerializerToUrlFunction<T> = (
+  param?: T | null
+) => string | null | undefined;
 
-export type SerializedQueryParams = Record<string, string | null | undefined>;
-export type QueryParams = Record<string, any>;
+export type SerializerFromUrlFunction<T> = (
+  param?: string | null
+) => T | null | undefined;
+
+export type Serializer<T> = {
+  toUrl: SerializerToUrlFunction<T>;
+  fromUrl: SerializerFromUrlFunction<T>;
+};
+
+export type ParamTypeToSerializerMap = Record<string, Serializer<any>>;
+
+export type DefaultValueFunction<T> = (context?: any) => T;
+export type DefaultValue<T> = T | DefaultValueFunction<T> | undefined;
