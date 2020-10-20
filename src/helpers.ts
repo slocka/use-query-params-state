@@ -1,4 +1,4 @@
-import { QueryParamsSchema } from './types';
+import { IQueryParamsSchema } from './types';
 
 import { useQueryParamsState } from './useQueryParamsState';
 
@@ -22,9 +22,9 @@ import { useQueryParamsState } from './useQueryParamsState';
  * queryParamsConfig.
  * @param queryParamsConfig
  */
-export function createUseQueryParamsStateHook(
-  queryParamsSchena: QueryParamsSchema
-) {
+export function createUseQueryParamsStateHook<
+  QueryParamsSchema extends IQueryParamsSchema
+>(queryParamsSchena: QueryParamsSchema) {
   return (contextData?: any) => {
     return useQueryParamsState(queryParamsSchena, contextData);
   };
