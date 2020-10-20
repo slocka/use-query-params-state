@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 
 import { getAppWrapper } from './getAppWrapper';
 
-import { useQueryParam, QPARAM } from '../src/index';
+import { useQueryParam, QPARAMS } from '../src/index';
 import { QueryParamsValidationError } from '../src/errors';
 
 let history: MemoryHistory;
@@ -23,7 +23,7 @@ describe('Basic tests', () => {
     history.push(url);
 
     const { result } = renderHook(
-      () => useQueryParam('booleanParam', QPARAM.boolean()),
+      () => useQueryParam('booleanParam', QPARAMS.boolean()),
       { wrapper }
     );
     const [booleanParam] = result.current;
@@ -33,7 +33,7 @@ describe('Basic tests', () => {
 
   test('It updates the URL with the correct value', () => {
     const { result } = renderHook(
-      () => useQueryParam('stringParam', QPARAM.string()),
+      () => useQueryParam('stringParam', QPARAMS.string()),
       { wrapper }
     );
     act(() => {
@@ -68,7 +68,7 @@ describe('With default value', () => {
       () =>
         useQueryParam(
           'arrayStringParam',
-          QPARAM.arrayOfStrings(['check', 'check'])
+          QPARAMS.arrayOfStrings(['check', 'check'])
         ),
       { wrapper }
     );
@@ -81,7 +81,7 @@ describe('With default value', () => {
     history.push(url);
 
     const { result } = renderHook(
-      () => useQueryParam('arrayNumberParam', QPARAM.arrayOfNumbers([])),
+      () => useQueryParam('arrayNumberParam', QPARAMS.arrayOfNumbers([])),
       { wrapper }
     );
     const [arrayNumberParam] = result.current;
@@ -95,13 +95,13 @@ describe('With default value', () => {
       () =>
         useQueryParam(
           'numberParam',
-          QPARAM.number(() => dynamicValue)
+          QPARAMS.number(() => dynamicValue)
         ),
       { wrapper }
     );
 
     const { result: resultOtherParam } = renderHook(
-      () => useQueryParam('otherParam', QPARAM.string()),
+      () => useQueryParam('otherParam', QPARAMS.string()),
       { wrapper }
     );
 
@@ -140,7 +140,7 @@ describe('With validator function', () => {
       () =>
         useQueryParam(
           'numberParam',
-          QPARAM.number(6).validator(lessThan10Validator)
+          QPARAMS.number(6).validator(lessThan10Validator)
         ),
       { wrapper }
     );
@@ -157,7 +157,7 @@ describe('With validator function', () => {
       () =>
         useQueryParam(
           'numberParam',
-          QPARAM.number(6).validator(lessThan10Validator)
+          QPARAMS.number(6).validator(lessThan10Validator)
         ),
       { wrapper }
     );

@@ -6,7 +6,7 @@ import { getAppWrapper } from './getAppWrapper';
 
 import {
   useQueryParamsState,
-  QPARAM,
+  QPARAMS,
   VALIDATORS,
   createUseQueryParamsStateHook,
 } from '../src/index';
@@ -22,11 +22,11 @@ beforeEach(() => {
 
 describe('Basic tests', () => {
   const queryParamsStateSchema = {
-    booleanParam: QPARAM.boolean(),
-    stringParam: QPARAM.string(),
-    numberParam: QPARAM.number(),
-    arrayStringParam: QPARAM.arrayOfStrings(),
-    arrayNumberParam: QPARAM.arrayOfNumbers(),
+    booleanParam: QPARAMS.boolean(),
+    stringParam: QPARAMS.string(),
+    numberParam: QPARAMS.number(),
+    arrayStringParam: QPARAMS.arrayOfStrings(),
+    arrayNumberParam: QPARAMS.arrayOfNumbers(),
   };
 
   test('It initializes with the state from the URL', () => {
@@ -137,11 +137,11 @@ describe('Basic tests', () => {
 
 describe('With default value', () => {
   const queryParamsStateSchema = {
-    booleanParam: QPARAM.boolean(false),
-    stringParam: QPARAM.string('default'),
-    numberParam: QPARAM.number(6),
-    arrayStringParam: QPARAM.arrayOfStrings(['check', 'check']),
-    arrayNumberParam: QPARAM.arrayOfNumbers([]),
+    booleanParam: QPARAMS.boolean(false),
+    stringParam: QPARAMS.string('default'),
+    numberParam: QPARAMS.number(6),
+    arrayStringParam: QPARAMS.arrayOfStrings(['check', 'check']),
+    arrayNumberParam: QPARAMS.arrayOfNumbers([]),
   };
 
   test('It should use the default value if param is not defined in the URL', () => {
@@ -177,8 +177,8 @@ describe('With default value', () => {
   test('It should allow defaultValue to be a function', () => {
     let dynamicValue = 1;
     const queryParamsStateSchema = {
-      numberParam: QPARAM.number(() => dynamicValue),
-      otherParam: QPARAM.string(),
+      numberParam: QPARAMS.number(() => dynamicValue),
+      otherParam: QPARAMS.string(),
     };
 
     const { result } = renderHook(
@@ -212,7 +212,7 @@ describe('With default value', () => {
       };
 
       const queryParamsStateSchema = {
-        selectedOption: QPARAM.string(defaultFunction),
+        selectedOption: QPARAMS.string(defaultFunction),
       };
       useMyQueryParams = createUseQueryParamsStateHook(queryParamsStateSchema);
     });
@@ -235,8 +235,8 @@ describe('With default value', () => {
 
 describe('Serializer', () => {
   const queryParamsStateSchema = {
-    stringParam: QPARAM.string(),
-    stringParamEncoded: QPARAM.string(),
+    stringParam: QPARAMS.string(),
+    stringParamEncoded: QPARAMS.string(),
   };
 
   test("It shouldn't not interpret commas in params of type STRING as array separator.", () => {
@@ -298,7 +298,7 @@ describe('query param validators', () => {
   describe('When reading the state', () => {
     test('It should not touch the param if param is valid', () => {
       const queryParamsStateSchema = {
-        numberParam: QPARAM.number(6).validator(lessThan10Validator),
+        numberParam: QPARAMS.number(6).validator(lessThan10Validator),
       };
 
       const url = '/test?numberParam=9';
@@ -316,7 +316,7 @@ describe('query param validators', () => {
     describe('When invalid', () => {
       test('It should have access to context data in validator function', () => {
         const queryParamsStateSchema = {
-          numberParam: QPARAM.number(0).validator(lessThanXValidator),
+          numberParam: QPARAMS.number(0).validator(lessThanXValidator),
         };
 
         const url = '/test?numberParam=9';
@@ -334,7 +334,7 @@ describe('query param validators', () => {
 
       test('It should use the default state when default is a value', () => {
         const queryParamsStateSchema = {
-          numberParam: QPARAM.number(6).validator(lessThan10Validator),
+          numberParam: QPARAMS.number(6).validator(lessThan10Validator),
         };
 
         const url = '/test?numberParam=12';
@@ -352,7 +352,7 @@ describe('query param validators', () => {
       test('It should use the default state when default is a function using context data', () => {
         const defaultFn = (contextData: any) => contextData.defaultNumber;
         const queryParamsStateSchema = {
-          numberParam: QPARAM.number(defaultFn).validator(lessThan10Validator),
+          numberParam: QPARAMS.number(defaultFn).validator(lessThan10Validator),
         };
 
         const url = '/test?numberParam=12';
@@ -374,7 +374,7 @@ describe('query param validators', () => {
     describe('With predefined validators', () => {
       test('It should not touch the state if value is oneOf(..)', () => {
         const queryParamsStateSchema = {
-          stringParam: QPARAM.string('default value').validator(
+          stringParam: QPARAMS.string('default value').validator(
             VALIDATORS.oneOf(['default value', 'hello'])
           ),
         };
@@ -393,7 +393,7 @@ describe('query param validators', () => {
 
       test('It should default the state if value is not oneOf(..)', () => {
         const queryParamsStateSchema = {
-          stringParam: QPARAM.string('default value').validator(
+          stringParam: QPARAMS.string('default value').validator(
             VALIDATORS.oneOf(['default value', 'hello'])
           ),
         };
@@ -415,7 +415,7 @@ describe('query param validators', () => {
   describe('When writing the state', () => {
     test('It update param if param is valid', () => {
       const queryParamsStateSchema = {
-        numberParam: QPARAM.number(6).validator(lessThan10Validator),
+        numberParam: QPARAMS.number(6).validator(lessThan10Validator),
       };
 
       const { result } = renderHook(
@@ -440,7 +440,7 @@ describe('query param validators', () => {
     describe('When invalid', () => {
       test('It should have access to context data in validator function', () => {
         const queryParamsStateSchema = {
-          numberParam: QPARAM.number(0).validator(lessThanXValidator),
+          numberParam: QPARAMS.number(0).validator(lessThanXValidator),
         };
 
         const contextData = { max: 5 };
@@ -460,7 +460,7 @@ describe('query param validators', () => {
 
       test('It should use the default state when default is a value', () => {
         const queryParamsStateSchema = {
-          numberParam: QPARAM.number(6).validator(lessThan10Validator),
+          numberParam: QPARAMS.number(6).validator(lessThan10Validator),
         };
 
         const { result } = renderHook(
@@ -487,7 +487,7 @@ describe('query param validators', () => {
         const defaultFn = (contextData: any) => contextData.defaultNumber;
 
         const queryParamsStateSchema = {
-          numberParam: QPARAM.number(defaultFn).validator(lessThan10Validator),
+          numberParam: QPARAMS.number(defaultFn).validator(lessThan10Validator),
         };
 
         const contextData = {
@@ -518,7 +518,7 @@ describe('query param validators', () => {
     describe('With predefined validators', () => {
       test('It should set the state if value is oneOf(..)', () => {
         const queryParamsStateSchema = {
-          stringParam: QPARAM.string('default value').validator(
+          stringParam: QPARAMS.string('default value').validator(
             VALIDATORS.oneOf(['default value', 'hello'])
           ),
         };
@@ -544,7 +544,7 @@ describe('query param validators', () => {
 
       test('It should default the state if value is not oneOf(..)', () => {
         const queryParamsStateSchema = {
-          stringParam: QPARAM.string('default value').validator(
+          stringParam: QPARAMS.string('default value').validator(
             VALIDATORS.oneOf(['default value', 'hello'])
           ),
         };

@@ -2,7 +2,7 @@ import { DefaultValue } from './types';
 import { QueryParamDef } from './queryParamDef';
 import serializers from './serializer/serializers';
 
-export const QPARAM = {
+export const QPARAMS = {
   number: (defaultValue?: DefaultValue<number>) => {
     return new QueryParamDef<number>(serializers.NUMBER, defaultValue);
   },

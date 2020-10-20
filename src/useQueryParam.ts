@@ -3,11 +3,11 @@ import { useCallback } from 'react';
 import { QueryParamDef } from './queryParamDef';
 
 import { useQueryParamsState } from './useQueryParamsState';
-import { QPARAM } from './qparam';
+import { QPARAMS } from './qparams';
 
 export function useQueryParam(
   paramName: string,
-  queryParamDef: QueryParamDef<any> = QPARAM.string()
+  queryParamDef: QueryParamDef<any> = QPARAMS.string()
 ) {
   const [params, setParams] = useQueryParamsState({
     [paramName]: queryParamDef,
