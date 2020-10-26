@@ -6,6 +6,7 @@ import {
 } from './helpers';
 import {
   IQueryParamsSchema,
+  QS_BUILD_STRATEGY,
   QueryParams,
   QueryParamsSetter,
   RawQueryParams,
@@ -76,7 +77,9 @@ function useSetQueryParamsState<QueryParamsSchema extends IQueryParamsSchema>(
         location,
         queryParamsSchema,
         newQueryParams,
-        isPartialUpdate,
+        isPartialUpdate
+          ? QS_BUILD_STRATEGY.PRESERVE_CURRENT_ALL
+          : QS_BUILD_STRATEGY.PRESERVE_CURRENT_EXTERNAL,
         contextData
       );
       const newLocation = {
