@@ -1,10 +1,8 @@
-import serializers from './serializer/serializers';
 import validators from './validators';
 
-export const PARAM_TYPES = serializers;
 export const VALIDATORS = validators;
 
-export { createUseQueryParamsStateHook } from './helpers';
+export { createUseQueryParamsStateHook } from './createUseQueryParamsStateHook';
 
 export { useQueryParam } from './useQueryParam';
 export { useQueryParamsState } from './useQueryParamsState';

@@ -1,5 +1,5 @@
-import { IQueryParamsSchema } from '../types';
-import { useQueryParamsState } from '../useQueryParamsState';
+import { IQueryParamsSchema } from './types';
+import { useQueryParamsState } from './useQueryParamsState';
 
 /**
  * Create a hook to read your query params as defined in the provided
