@@ -1,10 +1,8 @@
 import { useCallback, useMemo } from 'react';
-import { createQueryString } from './lib';
 import { useHistory, useLocation } from 'react-router-dom';
 import {
-  getAllRawQueryParamsFromURL,
   getRawQueryParamsInSchemaFromURL,
-  getExternalQueryParamsFromURL,
+  buildQueryStringFromCurrentState,
 } from './helpers';
 import {
   IQueryParamsSchema,
@@ -13,12 +11,9 @@ import {
   RawQueryParams,
 } from './types';
 
-import {
-  serializeQueryParamsValues,
-  deserializeQueryParamsValues,
-} from './serializer/serialize';
+import { deserializeQueryParamsValues } from './serializer/serialize';
 
-import { runParamsValidators, runParamsValidatorsPartial } from './validators';
+import { runParamsValidators } from './validators';
 
 export function useQueryParamsState<
   QueryParamsSchema extends IQueryParamsSchema
@@ -74,33 +69,16 @@ function useSetQueryParamsState<QueryParamsSchema extends IQueryParamsSchema>(
 ): QueryParamsSetter<QueryParamsSchema> {
   const history = useHistory();
   const location = useLocation();
-  const allRawQueryParams = getAllRawQueryParamsFromURL(location);
-  const externalQueryParams = getExternalQueryParamsFromURL(
-    location,
-    queryParamsSchema
-  );
 
   return useCallback(
     (newQueryParams, isPartialUpdate = true) => {
-      const rawQueryParamsMergeDestination = isPartialUpdate
-        ? { ...allRawQueryParams }
-        : { ...externalQueryParams };
-
-      // Raise a JS error if we are trying to set a value that doesn't pass the validator
-      runParamsValidatorsPartial(
+      const newQueryString = buildQueryStringFromCurrentState(
+        location,
         queryParamsSchema,
         newQueryParams,
-        contextData,
-        /** throwOnError */ true
+        isPartialUpdate,
+        contextData
       );
-
-      const serializedQueryParams = {
-        ...rawQueryParamsMergeDestination,
-        ...serializeQueryParamsValues(queryParamsSchema, newQueryParams),
-      };
-
-      const newQueryString = createQueryString(serializedQueryParams);
-
       const newLocation = {
         ...location,
         search: `?${newQueryString}`,
@@ -108,13 +86,6 @@ function useSetQueryParamsState<QueryParamsSchema extends IQueryParamsSchema>(
 
       history.push(newLocation);
     },
-    [
-      history,
-      location,
-      allRawQueryParams,
-      externalQueryParams,
-      queryParamsSchema,
-      contextData,
-    ]
+    [history, location, queryParamsSchema, contextData]
   );
 }
