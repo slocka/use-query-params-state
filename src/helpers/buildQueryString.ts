@@ -12,15 +12,13 @@ import { serializeQueryParamsValues } from '../serializer/serialize';
 import { getDefaultQueryParamsState } from './getDefaultQueryParamsState';
 import { createQueryString } from '../lib';
 
-export function buildQueryStringFromCurrentState<
-  QueryParamsSchema extends IQueryParamsSchema
->(
+export function buildQueryString<QueryParamsSchema extends IQueryParamsSchema>(
   location: ReturnType<typeof useLocation>,
   queryParamsSchema: QueryParamsSchema,
   newQueryParams: Partial<QueryParams<QueryParamsSchema>> = {},
   buildStrategy: QS_BUILD_STRATEGY = QS_BUILD_STRATEGY.NEW,
   contextData?: any
-) {
+): string {
   const rawQueryParamsMergeDestination = getMergeDestination(
     location,
     queryParamsSchema,
@@ -44,8 +42,8 @@ export function buildQueryStringFromCurrentState<
 }
 
 /**
- * Get object in which the new query params are gonna be merged into.
- * The returned object has its valued already stringified
+ * Get object in which the new query params are going be merged into.
+ * The returned object has its valued already stringified.
  */
 function getMergeDestination<QueryParamsSchema extends IQueryParamsSchema>(
   location: ReturnType<typeof useLocation>,

@@ -8,7 +8,7 @@ import {
 } from './types';
 
 import { useQueryParamsState } from './useQueryParamsState';
-import { useGetBuildQueryString } from './useGetBuildQueryString';
+import { useBuildQueryString } from './useBuildQueryString';
 
 export type withQueryParamsProps<T extends IQueryParamsSchema> = {
   queryParams: QueryParams<T>;
@@ -29,7 +29,7 @@ export function withQueryParamsState<
       const [queryParams, setQueryParams] = useQueryParamsState(
         queryParamsSchema
       );
-      const buildQueryString = useGetBuildQueryString(queryParamsSchema);
+      const buildQueryString = useBuildQueryString(queryParamsSchema);
 
       return (
         <WrappedComponent
