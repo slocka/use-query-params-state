@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
-import { parseQueryString, createQueryString } from './lib';
+import { createQueryString } from './lib';
 import { useHistory, useLocation } from 'react-router-dom';
-
+import { getRawQueryParamsInSchemaFromURL } from './helpers';
 import {
   IQueryParamsSchema,
   QueryParams,
@@ -61,9 +61,8 @@ function useRawQueryParamsFromUrl<QueryParamsSchema extends IQueryParamsSchema>(
   schema: QueryParamsSchema
 ): RawQueryParams<QueryParamsSchema> {
   const location = useLocation();
-  const queryString = location.search.replace(/^\?/, '');
+  const queryStringParams = getRawQueryParamsInSchemaFromURL(location, schema);
 
-  const queryStringParams = parseQueryString(queryString);
   return Object.keys(queryStringParams).reduce(
     (acc, queryStringKey: string) => {
       if (schema.hasOwnProperty(queryStringKey)) {
@@ -109,7 +108,7 @@ function useSetQueryParamsState<QueryParamsSchema extends IQueryParamsSchema>(
         ...serializeQueryParamsValues(queryParamsSchema, newQueryParamsState),
       };
 
-      /** TODO: We shouldn't remove exsiting query params outside of the schema */
+      /** TODO: We shouldn't remove existing query params outside of the schema */
       const newQueryString = createQueryString(serializedQueryParams);
 
       const newLocation = {
