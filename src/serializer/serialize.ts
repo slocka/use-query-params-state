@@ -49,11 +49,16 @@ export function serializeQueryParamsValues<
           )}.`
         );
       }
-      let value = queryParamDef.toURL(queryParams[queryParamKey]);
-      if (!isUndefined(value)) {
-        acc[queryParamKey] = value;
+      try {
+        let value = queryParamDef.toURL(queryParams[queryParamKey]);
+        if (!isUndefined(value)) {
+          acc[queryParamKey] = value;
+        }
+      } catch (error) {
+        // Add query param name information to the error
+        error.message = `${queryParamKey} ${error.message}`;
+        throw error;
       }
-
       return acc;
     },
     {} as RawQueryParams<QueryParamsSchema>

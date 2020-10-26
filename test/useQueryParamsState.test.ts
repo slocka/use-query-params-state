@@ -210,6 +210,26 @@ describe('Basic tests', () => {
     });
   });
 
+  test('It throws an error if trying to update a param with the wrong type', () => {
+    const { result } = renderHook(
+      () => useQueryParamsState(queryParamsStateSchema),
+      { wrapper }
+    );
+
+    act(() => {
+      const setParams = result.current[1];
+
+      expect(() => {
+        setParams({
+          // TODO: Typescript should catch that
+          booleanParam: 'true',
+        });
+      }).toThrow(
+        /^booleanParam was expecting a boolean but received a string.$/
+      );
+    });
+  });
+
   test.skip("It doesn't change the query params reference", () => {});
 });
 

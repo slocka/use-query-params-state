@@ -1,5 +1,6 @@
 import { isNumber, isNil } from '../lib';
 import { ParamTypeToSerializerMap } from '../types';
+import { QueryParamsUpdateError } from '../errors';
 
 const ARRAY_DELIMITER = ',';
 
@@ -22,7 +23,9 @@ const serializers: ParamTypeToSerializerMap = {
       }
 
       if (!Array.isArray(array)) {
-        return undefined;
+        throw new QueryParamsUpdateError(
+          `was expecting an array but received a ${typeof array}.`
+        );
       }
 
       return array.join(ARRAY_DELIMITER);
@@ -46,7 +49,9 @@ const serializers: ParamTypeToSerializerMap = {
       }
 
       if (!Array.isArray(array)) {
-        return undefined;
+        throw new QueryParamsUpdateError(
+          `was expecting an array but received a ${typeof array}.`
+        );
       }
 
       return array.join(ARRAY_DELIMITER);
@@ -62,7 +67,9 @@ const serializers: ParamTypeToSerializerMap = {
       }
 
       if (typeof str !== 'string') {
-        return undefined;
+        throw new QueryParamsUpdateError(
+          `was expecting a string but received a ${typeof str}.`
+        );
       }
 
       return str;
@@ -96,7 +103,9 @@ const serializers: ParamTypeToSerializerMap = {
       }
 
       if (typeof bool !== 'boolean') {
-        return undefined;
+        throw new QueryParamsUpdateError(
+          `was expecting a boolean but received a ${typeof bool}.`
+        );
       }
 
       return bool.toString();
@@ -116,7 +125,13 @@ const serializers: ParamTypeToSerializerMap = {
         return number;
       }
 
-      return isNumber(number) ? number.toString() : undefined;
+      if (!isNumber(number)) {
+        throw new QueryParamsUpdateError(
+          `was expecting a number but received a ${typeof number}.`
+        );
+      }
+
+      return number.toString();
     },
   },
 };

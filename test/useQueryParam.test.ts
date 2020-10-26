@@ -114,9 +114,7 @@ describe('With default value', () => {
     // Trigger a re-render by updating using the other param
     act(() => {
       const setOtherParam = resultOtherParam.current[1];
-      setOtherParam({
-        otherParam: 'something new',
-      });
+      setOtherParam('something new');
     });
 
     const [numberParamAfterUpdate] = result.current;
