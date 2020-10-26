@@ -9,7 +9,8 @@ export type ValidatorFunction<T> = (
 export type IQueryParamsSchema = Record<string, QueryParamDef<any>>;
 export type QueryParams<S extends IQueryParamsSchema> = Record<keyof S, any>;
 export type QueryParamsSetter<T extends IQueryParamsSchema> = (
-  newQueryParams: Partial<QueryParams<T>>
+  newQueryParams: Partial<QueryParams<T>>,
+  isPartialUpdate?: boolean
 ) => void;
 export type RawQueryParams<S extends IQueryParamsSchema> = Record<
   keyof S,
