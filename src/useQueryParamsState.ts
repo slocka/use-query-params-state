@@ -1,7 +1,11 @@
 import { useCallback, useMemo } from 'react';
 import { createQueryString } from './lib';
 import { useHistory, useLocation } from 'react-router-dom';
-import { getRawQueryParamsInSchemaFromURL } from './helpers';
+import {
+  getAllRawQueryParamsFromURL,
+  getRawQueryParamsInSchemaFromURL,
+  getExternalQueryParamsFromURL,
+} from './helpers';
 import {
   IQueryParamsSchema,
   QueryParams,
@@ -14,8 +18,7 @@ import {
   deserializeQueryParamsValues,
 } from './serializer/serialize';
 
-import { runParamsValidators } from './validators';
-import { getDefaultQueryParamsState } from './helpers';
+import { runParamsValidators, runParamsValidatorsPartial } from './validators';
 
 export function useQueryParamsState<
   QueryParamsSchema extends IQueryParamsSchema
@@ -44,7 +47,6 @@ export function useQueryParamsState<
 
   const setQueryParamsState = useSetQueryParamsState(
     queryParamsSchema,
-    queryParamsState,
     contextData
   );
 
@@ -59,56 +61,44 @@ export function useQueryParamsState<
  */
 function useRawQueryParamsFromUrl<QueryParamsSchema extends IQueryParamsSchema>(
   schema: QueryParamsSchema
-): RawQueryParams<QueryParamsSchema> {
+): Partial<RawQueryParams<QueryParamsSchema>> {
   const location = useLocation();
   const queryStringParams = getRawQueryParamsInSchemaFromURL(location, schema);
 
-  return Object.keys(queryStringParams).reduce(
-    (acc, queryStringKey: string) => {
-      if (schema.hasOwnProperty(queryStringKey)) {
-        acc[queryStringKey as keyof QueryParamsSchema] =
-          queryStringParams[queryStringKey];
-      }
-      return acc;
-    },
-    {} as RawQueryParams<QueryParamsSchema>
-  );
+  return queryStringParams;
 }
 
 function useSetQueryParamsState<QueryParamsSchema extends IQueryParamsSchema>(
   queryParamsSchema: QueryParamsSchema,
-  queryParamsState: QueryParams<QueryParamsSchema>,
   contextData?: any
 ): QueryParamsSetter<QueryParamsSchema> {
   const history = useHistory();
   const location = useLocation();
+  const allRawQueryParams = getAllRawQueryParamsFromURL(location);
+  const externalQueryParams = getExternalQueryParamsFromURL(
+    location,
+    queryParamsSchema
+  );
 
   return useCallback(
     (newQueryParams, isPartialUpdate = true) => {
-      const queryParamsStateMergeDestination = isPartialUpdate
-        ? { ...queryParamsState }
-        : getDefaultQueryParamsState(queryParamsSchema, contextData);
-
-      let newQueryParamsState = {
-        ...queryParamsStateMergeDestination,
-        ...newQueryParams,
-      };
+      const rawQueryParamsMergeDestination = isPartialUpdate
+        ? { ...allRawQueryParams }
+        : { ...externalQueryParams };
 
       // Raise a JS error if we are trying to set a value that doesn't pass the validator
-      runParamsValidators(
+      runParamsValidatorsPartial(
         queryParamsSchema,
-        newQueryParamsState,
+        newQueryParams,
         contextData,
         /** throwOnError */ true
       );
 
-      /** TODO: Shall we push param if value is equal to the default value? */
-
       const serializedQueryParams = {
-        ...serializeQueryParamsValues(queryParamsSchema, newQueryParamsState),
+        ...rawQueryParamsMergeDestination,
+        ...serializeQueryParamsValues(queryParamsSchema, newQueryParams),
       };
 
-      /** TODO: We shouldn't remove existing query params outside of the schema */
       const newQueryString = createQueryString(serializedQueryParams);
 
       const newLocation = {
@@ -118,6 +108,13 @@ function useSetQueryParamsState<QueryParamsSchema extends IQueryParamsSchema>(
 
       history.push(newLocation);
     },
-    [history, location, queryParamsState, queryParamsSchema, contextData]
+    [
+      history,
+      location,
+      allRawQueryParams,
+      externalQueryParams,
+      queryParamsSchema,
+      contextData,
+    ]
   );
 }

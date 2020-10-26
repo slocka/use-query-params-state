@@ -34,3 +34,22 @@ export function getRawQueryParamsInSchemaFromURL<
     {}
   );
 }
+
+export function getExternalQueryParamsFromURL<
+  QueryParamsSchema extends IQueryParamsSchema
+>(
+  location: ReturnType<typeof useLocation>,
+  schema: QueryParamsSchema
+): Record<string, string | null> {
+  const allRawQueryParams = getAllRawQueryParamsFromURL(location);
+
+  return Object.keys(allRawQueryParams).reduce(
+    (acc: Record<string, string | null>, queryParamKey: string) => {
+      if (!schema.hasOwnProperty(queryParamKey)) {
+        acc[queryParamKey] = allRawQueryParams[queryParamKey];
+      }
+      return acc;
+    },
+    {}
+  );
+}

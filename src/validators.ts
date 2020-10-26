@@ -34,6 +34,43 @@ export function runParamsValidators<
   );
 }
 
+export function runParamsValidatorsPartial<
+  QueryParamsSchema extends IQueryParamsSchema
+>(
+  queryParamsSchema: QueryParamsSchema,
+  queryParams: Partial<QueryParams<QueryParamsSchema>>,
+  contextData?: any,
+  throwOnError: boolean = false
+): Partial<QueryParams<QueryParamsSchema>> {
+  return Object.keys(queryParams).reduce(
+    (
+      acc: Partial<QueryParams<QueryParamsSchema>>,
+      queryParamKey: keyof QueryParamsSchema
+    ) => {
+      const queryParamDef = queryParamsSchema[queryParamKey];
+      if (!queryParamDef) {
+        // We could raise an error here, but we will ignore it and let
+        // the error be raised by serializeQueryParamsValues instead.
+        return acc;
+      }
+      const paramValue = queryParams[queryParamKey];
+      try {
+        queryParamDef.runValidator(paramValue, queryParams, contextData);
+      } catch (err) {
+        // Rethrow the error
+        if (throwOnError) {
+          throw err;
+        }
+        // The parsed value is incorrect, use the default value instead.
+        acc[queryParamKey] = queryParamDef.getDefaultValue(contextData);
+      }
+
+      return acc;
+    },
+    {}
+  );
+}
+
 export const paramValidators = {
   oneOf: (possibleValues: Array<any>) => {
     if (!possibleValues || !Array.isArray(possibleValues)) {
