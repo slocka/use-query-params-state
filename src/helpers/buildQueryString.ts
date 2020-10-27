@@ -76,7 +76,7 @@ function getMergeDestination<QueryParamsSchema extends IQueryParamsSchema>(
     );
 
     return {
-      ...serializeQueryParamsValues(defaultParams, queryParamsSchema),
+      ...serializeQueryParamsValues(queryParamsSchema, defaultParams),
       ...allRawQueryParams,
     };
   }
