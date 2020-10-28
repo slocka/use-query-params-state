@@ -111,6 +111,24 @@ describe('Basic tests', () => {
     expect(queryString).toContain('arrayStringParam=one%2Ctwo');
   });
 
+  test('It can apply updates with null values', () => {
+    const { result } = renderHook(
+      () => useQueryParamsState(queryParamsStateSchema),
+      { wrapper }
+    );
+
+    act(() => {
+      const setParams = result.current[1];
+      setParams({
+        numberParam: null,
+      });
+    });
+
+    const [params] = result.current;
+
+    expect(params.numberParam).toBe(null);
+  });
+
   test('It can apply full updates with partial query params (reset of other query params)', () => {
     const url = '/test?booleanParam=true&stringParam=test&numberParam=0';
 
