@@ -18,7 +18,7 @@ export function useBuildQueryStringFromCurrentURL<
 
   function buildQueryString(
     newQueryParams?: Partial<QueryParams<QueryParamsSchema>>,
-    buildStrategy: QS_BUILD_STRATEGY = QS_BUILD_STRATEGY.NEW,
+    buildStrategy: QS_BUILD_STRATEGY = QS_BUILD_STRATEGY.PRESERVE_ALL,
     contextData?: any
   ): string {
     return buildQueryStringFromCurrentURL(

@@ -44,7 +44,7 @@ describe('withQueryParams', () => {
 
     const queryString = buildQueryStringFromCurrentURL(
       {},
-      QS_BUILD_STRATEGY.PRESERVE_CURRENT_ALL
+      QS_BUILD_STRATEGY.PRESERVE_ALL
     );
 
     return (

@@ -18,7 +18,7 @@ export function buildQueryStringFromCurrentURL<
   location: ReturnType<typeof useLocation>,
   queryParamsSchema: QueryParamsSchema,
   newQueryParams: Partial<QueryParams<QueryParamsSchema>> = {},
-  buildStrategy: QS_BUILD_STRATEGY = QS_BUILD_STRATEGY.NEW,
+  buildStrategy: QS_BUILD_STRATEGY = QS_BUILD_STRATEGY.PRESERVE_ALL,
   contextData?: any
 ): string {
   const rawQueryParamsMergeDestination = getMergeDestination(
@@ -75,19 +75,19 @@ function getMergeDestination<QueryParamsSchema extends IQueryParamsSchema>(
     queryParamsSchema
   );
 
-  if (buildStrategy === QS_BUILD_STRATEGY.PRESERVE_CURRENT_ALL) {
+  if (buildStrategy === QS_BUILD_STRATEGY.PRESERVE_ALL) {
     return allRawQueryParams;
   }
 
-  if (buildStrategy === QS_BUILD_STRATEGY.PRESERVE_CURRENT_EXTERNAL) {
+  if (buildStrategy === QS_BUILD_STRATEGY.PRESERVE_EXTERNAL_ONLY) {
     return externalQueryParams;
   }
 
-  if (buildStrategy === QS_BUILD_STRATEGY.NEW) {
+  if (buildStrategy === QS_BUILD_STRATEGY.PRESERVE_NONE) {
     return {};
   }
 
-  if (buildStrategy === QS_BUILD_STRATEGY.PRESERVE_CURRENT_ALL_WITH_DEFAULT) {
+  if (buildStrategy === QS_BUILD_STRATEGY.PRESERVE_ALL_WITH_DEFAULT) {
     const defaultParams = getDefaultQueryParamsState(
       queryParamsSchema,
       contextData

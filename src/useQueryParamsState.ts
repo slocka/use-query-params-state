@@ -78,8 +78,8 @@ function useSetQueryParamsState<QueryParamsSchema extends IQueryParamsSchema>(
         queryParamsSchema,
         newQueryParams,
         isPartialUpdate
-          ? QS_BUILD_STRATEGY.PRESERVE_CURRENT_ALL
-          : QS_BUILD_STRATEGY.PRESERVE_CURRENT_EXTERNAL,
+          ? QS_BUILD_STRATEGY.PRESERVE_ALL
+          : QS_BUILD_STRATEGY.PRESERVE_EXTERNAL_ONLY,
         contextData
       );
       const newLocation = {

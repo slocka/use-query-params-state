@@ -1,10 +1,10 @@
 import { QueryParamDef } from './queryParamDef';
 
 export enum QS_BUILD_STRATEGY {
-  NEW,
-  PRESERVE_CURRENT_ALL,
-  PRESERVE_CURRENT_EXTERNAL,
-  PRESERVE_CURRENT_ALL_WITH_DEFAULT,
+  PRESERVE_ALL,
+  PRESERVE_EXTERNAL_ONLY,
+  PRESERVE_ALL_WITH_DEFAULT,
+  PRESERVE_NONE,
 }
 
 export type ValidatorFunction<T> = (

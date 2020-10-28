@@ -67,24 +67,7 @@ describe('Basic functionalities', () => {
     );
   });
 
-  describe('With "NEW" build stratgy', () => {
-    test('The build function should build with the "NEW" strategy by default', () => {
-      const url =
-        '/test?booleanParam=true&stringParam=test&numberParam=0&arrayStringParam=one,two,three&arrayNumberParam=1,2,3';
-      history.push(url);
-
-      const { result } = renderHook(
-        () => useBuildQueryStringFromCurrentURL(queryParamsStateSchema),
-        { wrapper }
-      );
-
-      const buildQueryString = result.current;
-
-      expect(buildQueryString({ booleanParam: false })).toEqual(
-        'booleanParam=false'
-      );
-    });
-
+  describe('With "PRESERVE_NONE" build strategy', () => {
     test('It should ignore all existing params', () => {
       const url =
         '/test?booleanParam=true&stringParam=test&numberParam=0&arrayStringParam=one,two,three&arrayNumberParam=1,2,3';
@@ -98,7 +81,10 @@ describe('Basic functionalities', () => {
       const buildQueryString = result.current;
 
       expect(
-        buildQueryString({ booleanParam: false }, QS_BUILD_STRATEGY.NEW)
+        buildQueryString(
+          { booleanParam: false },
+          QS_BUILD_STRATEGY.PRESERVE_NONE
+        )
       ).toEqual('booleanParam=false');
     });
 
@@ -114,12 +100,32 @@ describe('Basic functionalities', () => {
       const buildQueryString = result.current;
 
       expect(
-        buildQueryString({ booleanParam: false }, QS_BUILD_STRATEGY.NEW)
+        buildQueryString(
+          { booleanParam: false },
+          QS_BUILD_STRATEGY.PRESERVE_NONE
+        )
       ).toEqual('booleanParam=false');
     });
   });
 
-  describe('With "PRESERVE_CURRENT_ALL" build strategy ', () => {
+  describe('With "PRESERVE_ALL" build strategy ', () => {
+    test('The build function should build with the "PRESERVE_ALL" strategy by default', () => {
+      const url =
+        '/test?booleanParam=true&stringParam=test&numberParam=0&arrayStringParam=one,two,three&arrayNumberParam=1,2,3';
+      history.push(url);
+
+      const { result } = renderHook(
+        () => useBuildQueryStringFromCurrentURL(queryParamsStateSchema),
+        { wrapper }
+      );
+
+      const buildQueryString = result.current;
+
+      expect(buildQueryString({ booleanParam: false })).toEqual(
+        'booleanParam=false&stringParam=test&numberParam=0&arrayStringParam=one%2Ctwo%2Cthree&arrayNumberParam=1%2C2%2C3'
+      );
+    });
+
     test('It should keep all the current params', () => {
       const url =
         '/test?booleanParam=true&stringParam=test&numberParam=0&arrayStringParam=one,two,three&arrayNumberParam=1,2,3';
@@ -132,9 +138,7 @@ describe('Basic functionalities', () => {
 
       const buildQueryString = result.current;
 
-      expect(
-        buildQueryString({}, QS_BUILD_STRATEGY.PRESERVE_CURRENT_ALL)
-      ).toEqual(
+      expect(buildQueryString({}, QS_BUILD_STRATEGY.PRESERVE_ALL)).toEqual(
         // Comma array separator is automatically encoded.
         'booleanParam=true&stringParam=test&numberParam=0&arrayStringParam=one%2Ctwo%2Cthree&arrayNumberParam=1%2C2%2C3'
       );
@@ -155,7 +159,7 @@ describe('Basic functionalities', () => {
       expect(
         buildQueryString(
           { stringParam: 'hello', numberParam: 6 },
-          QS_BUILD_STRATEGY.PRESERVE_CURRENT_ALL
+          QS_BUILD_STRATEGY.PRESERVE_ALL
         )
       ).toEqual(
         // Comma array separator is automatically encoded.
@@ -177,7 +181,7 @@ describe('Basic functionalities', () => {
       expect(
         buildQueryString(
           { stringParam: 'hello', numberParam: 6 },
-          QS_BUILD_STRATEGY.PRESERVE_CURRENT_ALL
+          QS_BUILD_STRATEGY.PRESERVE_ALL
         )
       ).toEqual(
         // Comma array separator is automatically encoded.
@@ -186,7 +190,7 @@ describe('Basic functionalities', () => {
     });
   });
 
-  describe('With "PRESERVE_CURRENT_EXTERNAL" build strategy ', () => {
+  describe('With "PRESERVE_EXTERNAL_ONLY" build strategy ', () => {
     test('It should keep only the external params', () => {
       const url =
         '/test?booleanParam=true&stringParam=test&numberParam=0&arrayStringParam=one,two,three&arrayNumberParam=1,2,3&utm_source=Google';
@@ -200,7 +204,7 @@ describe('Basic functionalities', () => {
       const buildQueryString = result.current;
 
       expect(
-        buildQueryString({}, QS_BUILD_STRATEGY.PRESERVE_CURRENT_EXTERNAL)
+        buildQueryString({}, QS_BUILD_STRATEGY.PRESERVE_EXTERNAL_ONLY)
       ).toEqual('utm_source=Google');
     });
 
@@ -219,13 +223,13 @@ describe('Basic functionalities', () => {
       expect(
         buildQueryString(
           { stringParam: 'hello', numberParam: 6 },
-          QS_BUILD_STRATEGY.PRESERVE_CURRENT_EXTERNAL
+          QS_BUILD_STRATEGY.PRESERVE_EXTERNAL_ONLY
         )
       ).toEqual('utm_source=Google&stringParam=hello&numberParam=6');
     });
   });
 
-  describe('With "PRESERVE_CURRENT_ALL_WITH_DEFAULT" build strategy ', () => {
+  describe('With "PRESERVE_ALL_WITH_DEFAULT" build strategy ', () => {
     const queryParamsStateSchema = {
       booleanParam: QPARAMS.boolean(false),
       stringParam: QPARAMS.string('default'),
@@ -247,10 +251,7 @@ describe('Basic functionalities', () => {
       const buildQueryString = result.current;
 
       expect(
-        buildQueryString(
-          {},
-          QS_BUILD_STRATEGY.PRESERVE_CURRENT_ALL_WITH_DEFAULT
-        )
+        buildQueryString({}, QS_BUILD_STRATEGY.PRESERVE_ALL_WITH_DEFAULT)
       ).toEqual(
         'booleanParam=false&stringParam=default&arrayStringParam=one%2Ctwo%2Cthree&arrayNumberParam=1%2C2%2C3&utm_source=Google'
       );
@@ -271,7 +272,7 @@ describe('Basic functionalities', () => {
       expect(
         buildQueryString(
           { booleanParam: true },
-          QS_BUILD_STRATEGY.PRESERVE_CURRENT_ALL_WITH_DEFAULT
+          QS_BUILD_STRATEGY.PRESERVE_ALL_WITH_DEFAULT
         )
       ).toEqual(
         'booleanParam=true&stringParam=default&numberParam=6&utm_source=Google'
