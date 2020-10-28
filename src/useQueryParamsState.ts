@@ -1,6 +1,9 @@
 import { useCallback, useMemo } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { getRawQueryParamsInSchemaFromURL, buildQueryString } from './helpers';
+import {
+  getRawQueryParamsInSchemaFromURL,
+  buildQueryStringFromCurrentURL,
+} from './helpers';
 import {
   IQueryParamsSchema,
   QS_BUILD_STRATEGY,
@@ -70,7 +73,7 @@ function useSetQueryParamsState<QueryParamsSchema extends IQueryParamsSchema>(
 
   return useCallback(
     (newQueryParams, isPartialUpdate = true) => {
-      const newQueryString = buildQueryString(
+      const newQueryString = buildQueryStringFromCurrentURL(
         location,
         queryParamsSchema,
         newQueryParams,

@@ -7,9 +7,9 @@ import {
   QS_BUILD_STRATEGY,
 } from './types';
 
-import { buildQueryString as buildQueryStringHelper } from './helpers';
+import { buildQueryStringFromCurrentURL } from './helpers';
 
-export function useBuildQueryString<
+export function useBuildQueryStringFromCurrentURL<
   QueryParamsSchema extends IQueryParamsSchema
 >(
   queryParamsSchema: QueryParamsSchema
@@ -21,7 +21,7 @@ export function useBuildQueryString<
     buildStrategy: QS_BUILD_STRATEGY = QS_BUILD_STRATEGY.NEW,
     contextData?: any
   ): string {
-    return buildQueryStringHelper(
+    return buildQueryStringFromCurrentURL(
       location,
       queryParamsSchema,
       newQueryParams,

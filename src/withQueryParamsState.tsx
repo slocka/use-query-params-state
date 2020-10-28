@@ -8,12 +8,12 @@ import {
 } from './types';
 
 import { useQueryParamsState } from './useQueryParamsState';
-import { useBuildQueryString } from './useBuildQueryString';
+import { useBuildQueryStringFromCurrentURL } from './useBuildQueryStringFromCurrentURL';
 
 export type withQueryParamsProps<T extends IQueryParamsSchema> = {
   queryParams: QueryParams<T>;
   setQueryParams: QueryParamsSetter<T>;
-  buildQueryString: QueryStringBuilderFunction<T>;
+  buildQueryStringFromCurrentURL: QueryStringBuilderFunction<T>;
 };
 
 export function withQueryParamsState<
@@ -29,14 +29,16 @@ export function withQueryParamsState<
       const [queryParams, setQueryParams] = useQueryParamsState(
         queryParamsSchema
       );
-      const buildQueryString = useBuildQueryString(queryParamsSchema);
+      const buildQueryStringFromCurrentURL = useBuildQueryStringFromCurrentURL(
+        queryParamsSchema
+      );
 
       return (
         <WrappedComponent
           {...props}
           queryParams={queryParams}
           setQueryParams={setQueryParams}
-          buildQueryString={buildQueryString}
+          buildQueryStringFromCurrentURL={buildQueryStringFromCurrentURL}
         />
       );
     };

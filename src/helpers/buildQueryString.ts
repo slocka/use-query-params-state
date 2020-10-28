@@ -12,7 +12,9 @@ import { serializeQueryParamsValues } from '../serializer/serialize';
 import { getDefaultQueryParamsState } from './getDefaultQueryParamsState';
 import { createQueryString } from '../lib';
 
-export function buildQueryString<QueryParamsSchema extends IQueryParamsSchema>(
+export function buildQueryStringFromCurrentURL<
+  QueryParamsSchema extends IQueryParamsSchema
+>(
   location: ReturnType<typeof useLocation>,
   queryParamsSchema: QueryParamsSchema,
   newQueryParams: Partial<QueryParams<QueryParamsSchema>> = {},
@@ -25,6 +27,22 @@ export function buildQueryString<QueryParamsSchema extends IQueryParamsSchema>(
     buildStrategy,
     contextData
   );
+
+  return buildQueryString(
+    queryParamsSchema,
+    newQueryParams,
+    contextData,
+    rawQueryParamsMergeDestination
+  );
+}
+
+export function buildQueryString<QueryParamsSchema extends IQueryParamsSchema>(
+  queryParamsSchema: QueryParamsSchema,
+  newQueryParams: Partial<QueryParams<QueryParamsSchema>> = {},
+  contextData?: any,
+  // Other params that won't be validated nor transformed.
+  otherRawParams?: Record<string, string | null | undefined>
+) {
   // Raise a JS error if we are trying to set a value that doesn't pass the validator
   runParamsValidatorsPartial(
     queryParamsSchema,
@@ -34,7 +52,7 @@ export function buildQueryString<QueryParamsSchema extends IQueryParamsSchema>(
   );
 
   const serializedQueryParams = {
-    ...rawQueryParamsMergeDestination,
+    ...otherRawParams,
     ...serializeQueryParamsValues(queryParamsSchema, newQueryParams),
   };
 

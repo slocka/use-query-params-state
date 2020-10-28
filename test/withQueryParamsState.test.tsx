@@ -36,13 +36,13 @@ describe('withQueryParams', () => {
   const WrappedComponent: React.FC<withQueryParamsProps<QueryParamsSchema>> = ({
     queryParams,
     setQueryParams,
-    buildQueryString,
+    buildQueryStringFromCurrentURL,
   }) => {
     const onClick = () => {
       setQueryParams({ numberParam: 3, stringParam: 'new value' });
     };
 
-    const queryString = buildQueryString(
+    const queryString = buildQueryStringFromCurrentURL(
       {},
       QS_BUILD_STRATEGY.PRESERVE_CURRENT_ALL
     );
@@ -85,7 +85,7 @@ describe('withQueryParams', () => {
     expect(getByTestId('number-param')).toHaveTextContent(/^3$/);
   });
 
-  it('Should inject the buildQueryString prop', () => {
+  it('Should inject the buildQueryStringFromCurrentURL prop', () => {
     const url = '/test?booleanParam=true&stringParam=test&utm_source=Google';
     history.push(url);
 

@@ -4,7 +4,11 @@ import '@testing-library/jest-dom';
 
 import { getAppWrapper } from './getAppWrapper';
 
-import { useBuildQueryString, QPARAMS, QS_BUILD_STRATEGY } from '../src/index';
+import {
+  useBuildQueryStringFromCurrentURL,
+  QPARAMS,
+  QS_BUILD_STRATEGY,
+} from '../src/index';
 
 let history: MemoryHistory;
 let wrapper: React.ComponentType;
@@ -25,7 +29,7 @@ describe('Basic functionalities', () => {
 
   test('The hook should return a function', () => {
     const { result } = renderHook(
-      () => useBuildQueryString(queryParamsStateSchema),
+      () => useBuildQueryStringFromCurrentURL(queryParamsStateSchema),
       { wrapper }
     );
 
@@ -36,7 +40,7 @@ describe('Basic functionalities', () => {
 
   test('It should throw an error if query params does not exist', () => {
     const { result } = renderHook(
-      () => useBuildQueryString(queryParamsStateSchema),
+      () => useBuildQueryStringFromCurrentURL(queryParamsStateSchema),
       { wrapper }
     );
 
@@ -52,7 +56,7 @@ describe('Basic functionalities', () => {
 
   test('It should throw an error if query params is of the wrong type', () => {
     const { result } = renderHook(
-      () => useBuildQueryString(queryParamsStateSchema),
+      () => useBuildQueryStringFromCurrentURL(queryParamsStateSchema),
       { wrapper }
     );
 
@@ -70,7 +74,7 @@ describe('Basic functionalities', () => {
       history.push(url);
 
       const { result } = renderHook(
-        () => useBuildQueryString(queryParamsStateSchema),
+        () => useBuildQueryStringFromCurrentURL(queryParamsStateSchema),
         { wrapper }
       );
 
@@ -87,7 +91,7 @@ describe('Basic functionalities', () => {
       history.push(url);
 
       const { result } = renderHook(
-        () => useBuildQueryString(queryParamsStateSchema),
+        () => useBuildQueryStringFromCurrentURL(queryParamsStateSchema),
         { wrapper }
       );
 
@@ -103,7 +107,7 @@ describe('Basic functionalities', () => {
       history.push(url);
 
       const { result } = renderHook(
-        () => useBuildQueryString(queryParamsStateSchema),
+        () => useBuildQueryStringFromCurrentURL(queryParamsStateSchema),
         { wrapper }
       );
 
@@ -122,7 +126,7 @@ describe('Basic functionalities', () => {
       history.push(url);
 
       const { result } = renderHook(
-        () => useBuildQueryString(queryParamsStateSchema),
+        () => useBuildQueryStringFromCurrentURL(queryParamsStateSchema),
         { wrapper }
       );
 
@@ -142,7 +146,7 @@ describe('Basic functionalities', () => {
       history.push(url);
 
       const { result } = renderHook(
-        () => useBuildQueryString(queryParamsStateSchema),
+        () => useBuildQueryStringFromCurrentURL(queryParamsStateSchema),
         { wrapper }
       );
 
@@ -164,7 +168,7 @@ describe('Basic functionalities', () => {
       history.push(url);
 
       const { result } = renderHook(
-        () => useBuildQueryString(queryParamsStateSchema),
+        () => useBuildQueryStringFromCurrentURL(queryParamsStateSchema),
         { wrapper }
       );
 
@@ -189,7 +193,7 @@ describe('Basic functionalities', () => {
       history.push(url);
 
       const { result } = renderHook(
-        () => useBuildQueryString(queryParamsStateSchema),
+        () => useBuildQueryStringFromCurrentURL(queryParamsStateSchema),
         { wrapper }
       );
 
@@ -206,7 +210,7 @@ describe('Basic functionalities', () => {
       history.push(url);
 
       const { result } = renderHook(
-        () => useBuildQueryString(queryParamsStateSchema),
+        () => useBuildQueryStringFromCurrentURL(queryParamsStateSchema),
         { wrapper }
       );
 
@@ -236,7 +240,7 @@ describe('Basic functionalities', () => {
       history.push(url);
 
       const { result } = renderHook(
-        () => useBuildQueryString(queryParamsStateSchema),
+        () => useBuildQueryStringFromCurrentURL(queryParamsStateSchema),
         { wrapper }
       );
 
@@ -258,7 +262,7 @@ describe('Basic functionalities', () => {
       history.push(url);
 
       const { result } = renderHook(
-        () => useBuildQueryString(queryParamsStateSchema),
+        () => useBuildQueryStringFromCurrentURL(queryParamsStateSchema),
         { wrapper }
       );
 
