@@ -27,9 +27,13 @@ describe('String serializer', () => {
       expect(serializers.STRING.toUrl('')).toBe('');
     });
 
-    test('It should encode an invalid input type as undefined', () => {
-      expect(serializers.STRING.toUrl(3)).toBe(undefined);
-      expect(serializers.STRING.toUrl(false)).toBe(undefined);
+    test('It should throw an error when encoding invalid input', () => {
+      expect(() => serializers.STRING.toUrl(3)).toThrow(
+        /^was expecting a string but received a number.$/
+      );
+      expect(() => serializers.STRING.toUrl(false)).toThrow(
+        /^was expecting a string but received a boolean.$/
+      );
     });
   });
 });
@@ -67,14 +71,20 @@ describe('Boolean serializer', () => {
       expect(serializers.BOOLEAN.toUrl(false)).toBe('false');
     });
 
-    test('It should encode an invalid value as undefined', () => {
-      expect(serializers.BOOLEAN.toUrl('true')).toBe(undefined);
-      expect(serializers.BOOLEAN.toUrl('something')).toBe(undefined);
-    });
+    test('It should throw an error when encoding invalid input', () => {
+      expect(() => serializers.BOOLEAN.toUrl('true')).toThrow(
+        /^was expecting a boolean but received a string.$/
+      );
+      expect(() => serializers.BOOLEAN.toUrl('something')).toThrow(
+        /^was expecting a boolean but received a string.$/
+      );
 
-    test('It should encode a falsy value as undefined', () => {
-      expect(serializers.BOOLEAN.toUrl('')).toBe(undefined);
-      expect(serializers.BOOLEAN.toUrl(0)).toBe(undefined);
+      expect(() => serializers.BOOLEAN.toUrl('')).toThrow(
+        /^was expecting a boolean but received a string.$/
+      );
+      expect(() => serializers.BOOLEAN.toUrl(0)).toThrow(
+        /^was expecting a boolean but received a number.$/
+      );
     });
   });
 });
@@ -124,12 +134,13 @@ describe('Number serializer', () => {
       expect(serializers.NUMBER.toUrl(-30.30043013101)).toBe('-30.30043013101');
     });
 
-    test('It should encode an invalid value as undefined', () => {
-      expect(serializers.NUMBER.toUrl('something')).toBe(undefined);
-    });
-
-    test('It should encode a stringified number as undefined', () => {
-      expect(serializers.NUMBER.toUrl('6')).toBe(undefined);
+    test('It should throw an error when encoding invalid input', () => {
+      expect(() => serializers.NUMBER.toUrl('something')).toThrow(
+        /^was expecting a number but received a string.$/
+      );
+      expect(() => serializers.NUMBER.toUrl('6')).toThrow(
+        /^was expecting a number but received a string.$/
+      );
     });
   });
 });
@@ -166,9 +177,13 @@ describe('Array string serializer', () => {
       expect(serializers.ARRAY__STRINGS.toUrl([])).toBe('');
     });
 
-    test('It should encode an invalid input type as undefined', () => {
-      expect(serializers.ARRAY__STRINGS.toUrl(3)).toBe(undefined);
-      expect(serializers.ARRAY__STRINGS.toUrl(false)).toBe(undefined);
+    test('It should throw an error when encoding invalid input', () => {
+      expect(() => serializers.ARRAY__STRINGS.toUrl(3)).toThrow(
+        /^was expecting an array but received a number.$/
+      );
+      expect(() => serializers.ARRAY__STRINGS.toUrl(false)).toThrow(
+        /^was expecting an array but received a boolean.$/
+      );
     });
 
     /**
@@ -215,10 +230,16 @@ describe('Array number serializer', () => {
       expect(serializers.ARRAY__NUMBERS.toUrl([])).toBe('');
     });
 
-    test('It should encode an invalid input type as undefined', () => {
-      expect(serializers.ARRAY__NUMBERS.toUrl(3)).toBe(undefined);
-      expect(serializers.ARRAY__NUMBERS.toUrl(false)).toBe(undefined);
-      expect(serializers.ARRAY__NUMBERS.toUrl('[]')).toBe(undefined);
+    test('It should throw an error when encoding invalid input', () => {
+      expect(() => serializers.ARRAY__NUMBERS.toUrl(3)).toThrow(
+        /^was expecting an array but received a number.$/
+      );
+      expect(() => serializers.ARRAY__NUMBERS.toUrl(false)).toThrow(
+        /^was expecting an array but received a boolean.$/
+      );
+      expect(() => serializers.ARRAY__NUMBERS.toUrl('[]')).toThrow(
+        /^was expecting an array but received a string.$/
+      );
     });
 
     /**

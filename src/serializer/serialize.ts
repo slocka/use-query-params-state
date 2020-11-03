@@ -15,7 +15,7 @@ export function deserializeQueryParamsValues<
   QueryParamsSchema extends IQueryParamsSchema
 >(
   queryParamsSchema: QueryParamsSchema,
-  rawQueryParams: RawQueryParams<QueryParamsSchema>,
+  rawQueryParams: Partial<RawQueryParams<QueryParamsSchema>>,
   contextData?: any
 ): QueryParams<QueryParamsSchema> {
   return Object.keys(queryParamsSchema).reduce(
@@ -36,7 +36,7 @@ export function serializeQueryParamsValues<
   QueryParamsSchema extends IQueryParamsSchema
 >(
   queryParamsSchema: QueryParamsSchema,
-  queryParams: QueryParams<QueryParamsSchema>
+  queryParams: Partial<QueryParams<QueryParamsSchema>>
 ): RawQueryParams<QueryParamsSchema> {
   return Object.keys(queryParams).reduce(
     (acc, queryParamKey: keyof QueryParamsSchema) => {
@@ -49,11 +49,16 @@ export function serializeQueryParamsValues<
           )}.`
         );
       }
-      let value = queryParamDef.toURL(queryParams[queryParamKey]);
-      if (!isUndefined(value)) {
-        acc[queryParamKey] = value;
+      try {
+        let value = queryParamDef.toURL(queryParams[queryParamKey]);
+        if (!isUndefined(value)) {
+          acc[queryParamKey] = value;
+        }
+      } catch (error) {
+        // Add query param name information to the error
+        error.message = `${queryParamKey} ${error.message}`;
+        throw error;
       }
-
       return acc;
     },
     {} as RawQueryParams<QueryParamsSchema>

@@ -6,6 +6,7 @@ import {
   QPARAMS,
   withQueryParamsState,
   withQueryParamsProps,
+  QS_BUILD_STRATEGY,
 } from '../src/index';
 import { getAppWrapper } from './getAppWrapper';
 
@@ -35,15 +36,22 @@ describe('withQueryParams', () => {
   const WrappedComponent: React.FC<withQueryParamsProps<QueryParamsSchema>> = ({
     queryParams,
     setQueryParams,
+    buildQueryStringFromCurrentURL,
   }) => {
     const onClick = () => {
       setQueryParams({ numberParam: 3, stringParam: 'new value' });
     };
 
+    const queryString = buildQueryStringFromCurrentURL(
+      {},
+      QS_BUILD_STRATEGY.PRESERVE_ALL
+    );
+
     return (
       <div>
         <div data-testid="string-param"> {queryParams.stringParam}</div>
         <div data-testid="number-param"> {queryParams.numberParam}</div>
+        <div data-testid="querystring"> {queryString}</div>
         <button data-testid="button" onClick={onClick}>
           update
         </button>
@@ -75,5 +83,21 @@ describe('withQueryParams', () => {
 
     expect(getByTestId('string-param')).toHaveTextContent(/^new value$/);
     expect(getByTestId('number-param')).toHaveTextContent(/^3$/);
+  });
+
+  it('Should inject the buildQueryStringFromCurrentURL prop', () => {
+    const url = '/test?booleanParam=true&stringParam=test&utm_source=Google';
+    history.push(url);
+
+    const TestedComponent = withQueryParamsState(queryParamsStateSchema)(
+      WrappedComponent
+    );
+    const { getByTestId } = render(<TestedComponent />, {
+      wrapper,
+    });
+
+    expect(getByTestId('querystring')).toHaveTextContent(
+      /^booleanParam=true&stringParam=test&utm_source=Google$/
+    );
   });
 });

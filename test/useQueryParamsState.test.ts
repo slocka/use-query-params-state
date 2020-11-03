@@ -111,6 +111,102 @@ describe('Basic tests', () => {
     expect(queryString).toContain('arrayStringParam=one%2Ctwo');
   });
 
+  test('It can apply updates with null values', () => {
+    const { result } = renderHook(
+      () => useQueryParamsState(queryParamsStateSchema),
+      { wrapper }
+    );
+
+    act(() => {
+      const setParams = result.current[1];
+      setParams({
+        numberParam: null,
+      });
+    });
+
+    const [params] = result.current;
+
+    expect(params.numberParam).toBe(null);
+  });
+
+  test('It can apply full updates with partial query params (reset of other query params)', () => {
+    const url = '/test?booleanParam=true&stringParam=test&numberParam=0';
+
+    history.push(url);
+
+    const { result } = renderHook(
+      () =>
+        useQueryParamsState({
+          booleanParam: QPARAMS.boolean(),
+          stringParam: QPARAMS.string('default value'),
+          numberParam: QPARAMS.number(),
+        }),
+      { wrapper }
+    );
+
+    const [paramsBeforeUpdate] = result.current;
+
+    expect(paramsBeforeUpdate.numberParam).toBe(0);
+    // All the other params should have been reset to their default value
+    expect(paramsBeforeUpdate.booleanParam).toBe(true);
+    expect(paramsBeforeUpdate.stringParam).toBe('test');
+
+    act(() => {
+      const setParams = result.current[1];
+      setParams(
+        {
+          numberParam: 5,
+        },
+        false /** isPartialUpdate */
+      );
+    });
+
+    const [paramsAfterUpdate] = result.current;
+
+    expect(history.location.search).toEqual('?numberParam=5');
+    expect(paramsAfterUpdate.numberParam).toEqual(5);
+    // All the other params should have been reset to their default value
+    expect(paramsAfterUpdate.booleanParam).toBeUndefined();
+    expect(paramsAfterUpdate.stringParam).toEqual('default value');
+  });
+
+  test('It can reset all the params to their default value', () => {
+    const url = '/test?booleanParam=true&stringParam=test&numberParam=0';
+
+    history.push(url);
+
+    const { result } = renderHook(
+      () =>
+        useQueryParamsState({
+          booleanParam: QPARAMS.boolean(),
+          stringParam: QPARAMS.string('default value'),
+          numberParam: QPARAMS.number(),
+        }),
+      { wrapper }
+    );
+
+    const [paramsBeforeUpdate] = result.current;
+
+    expect(paramsBeforeUpdate.numberParam).toBe(0);
+    // All the other params should have been reset to their default value
+    expect(paramsBeforeUpdate.booleanParam).toBe(true);
+    expect(paramsBeforeUpdate.stringParam).toBe('test');
+
+    act(() => {
+      const setParams = result.current[1];
+      // Complete reset
+      setParams({}, false /** isPartialUpdate */);
+    });
+
+    const [paramsAfterUpdate] = result.current;
+
+    expect(history.location.search).toEqual('?');
+    expect(paramsAfterUpdate.numberParam).toBeUndefined();
+    // All the other params should have been reset to their default value
+    expect(paramsAfterUpdate.booleanParam).toBeUndefined();
+    expect(paramsAfterUpdate.stringParam).toBe('default value');
+  });
+
   test('It throws an error if trying to update a param that is not part of the schema', () => {
     const { result } = renderHook(
       () => useQueryParamsState(queryParamsStateSchema),
@@ -128,6 +224,26 @@ describe('Basic tests', () => {
         });
       }).toThrow(
         '"somethingNotInTheSchema" is not defined in queryParams Schema'
+      );
+    });
+  });
+
+  test('It throws an error if trying to update a param with the wrong type', () => {
+    const { result } = renderHook(
+      () => useQueryParamsState(queryParamsStateSchema),
+      { wrapper }
+    );
+
+    act(() => {
+      const setParams = result.current[1];
+
+      expect(() => {
+        setParams({
+          // TODO: Typescript should catch that
+          booleanParam: 'true',
+        });
+      }).toThrow(
+        /^booleanParam was expecting a boolean but received a string.$/
       );
     });
   });
@@ -570,5 +686,72 @@ describe('query param validators', () => {
         expect(queryString).toEqual('');
       });
     });
+  });
+});
+
+describe('With other query params outside of the schema', () => {
+  const queryParamsStateSchema = {
+    booleanParam: QPARAMS.boolean(),
+    stringParam: QPARAMS.string(),
+  };
+  test('It should not set them in the queryParamsState', () => {
+    const url = '/test?booleanParam=true&stringParam=test&utm_source=Google';
+    history.push(url);
+
+    const { result } = renderHook(
+      () => useQueryParamsState(queryParamsStateSchema),
+      { wrapper }
+    );
+
+    const [params] = result.current;
+    expect(params.booleanParam).toBe(true);
+    expect(params.stringParam).toEqual('test');
+    //@ts-expect-error
+    expect(params.utm_source).toBeUndefined();
+  });
+
+  test("It doesn't remove query params outside the schema when making a partial update", () => {
+    const url = '/test?booleanParam=true&stringParam=test&utm_source=Google';
+    history.push(url);
+
+    const { result } = renderHook(
+      () => useQueryParamsState(queryParamsStateSchema),
+      { wrapper }
+    );
+
+    act(() => {
+      const setParams = result.current[1];
+      setParams({
+        stringParam: 'hello',
+      });
+    });
+
+    expect(history.location.search).toEqual(
+      '?booleanParam=true&stringParam=hello&utm_source=Google'
+    );
+  });
+
+  test("It doesn't remove query params outside the schema when making a full update", () => {
+    const url = '/test?utm_source=Google&booleanParam=true&stringParam=test';
+    history.push(url);
+
+    const { result } = renderHook(
+      () => useQueryParamsState(queryParamsStateSchema),
+      { wrapper }
+    );
+
+    act(() => {
+      const setParams = result.current[1];
+      setParams(
+        {
+          stringParam: 'hello',
+        },
+        false /* Partial update */
+      );
+    });
+
+    expect(history.location.search).toEqual(
+      '?utm_source=Google&stringParam=hello'
+    );
   });
 });

@@ -17,12 +17,12 @@ export function useQueryParam(
     contextData
   );
 
-  const setParam = useCallback(
+  const setSingleParam = useCallback(
     value => {
       setParams({ [paramName]: value });
     },
     [setParams, paramName]
   );
 
-  return [params[paramName], setParam];
+  return [params[paramName], setSingleParam];
 }

@@ -1,12 +1,19 @@
 import React from 'react';
 
-import { IQueryParamsSchema, QueryParams, QueryParamsSetter } from './types';
+import {
+  IQueryParamsSchema,
+  QueryParams,
+  QueryParamsSetter,
+  QueryStringBuilderFunction,
+} from './types';
 
 import { useQueryParamsState } from './useQueryParamsState';
+import { useBuildQueryStringFromCurrentURL } from './useBuildQueryStringFromCurrentURL';
 
 export type withQueryParamsProps<T extends IQueryParamsSchema> = {
   queryParams: QueryParams<T>;
   setQueryParams: QueryParamsSetter<T>;
+  buildQueryStringFromCurrentURL: QueryStringBuilderFunction<T>;
 };
 
 export function withQueryParamsState<
@@ -22,12 +29,16 @@ export function withQueryParamsState<
       const [queryParams, setQueryParams] = useQueryParamsState(
         queryParamsSchema
       );
+      const buildQueryStringFromCurrentURL = useBuildQueryStringFromCurrentURL(
+        queryParamsSchema
+      );
 
       return (
         <WrappedComponent
           {...props}
           queryParams={queryParams}
           setQueryParams={setQueryParams}
+          buildQueryStringFromCurrentURL={buildQueryStringFromCurrentURL}
         />
       );
     };

@@ -59,7 +59,7 @@ export class QueryParamDef<T> {
     const parsedValue = this.serializer.fromUrl(value);
 
     // Value not found in the URL
-    if (isUndefined(parsedValue) || parsedValue === null) {
+    if (isUndefined(parsedValue)) {
       return this.getDefaultValue(contextData);
     }
 
