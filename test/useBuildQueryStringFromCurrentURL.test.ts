@@ -62,6 +62,7 @@ describe('Basic functionalities', () => {
 
     const buildQueryString = result.current;
 
+    // @ts-expect-error
     expect(() => buildQueryString({ booleanParam: 'false' })).toThrow(
       'booleanParam was expecting a boolean but received a string.'
     );

@@ -1,18 +1,5 @@
 import { QueryParamDef } from './queryParamDef';
 
-export interface ScalarTypeMapping {
-  NUMBER: number;
-  STRING: string;
-  BOOLEAN: boolean;
-  ARRAY__NUMBERS: number[];
-  ARRAY__STRINGS: string[];
-}
-export type Scalar = keyof ScalarTypeMapping;
-export type ScalarTypeToSerializerMap = {
-  [S in Scalar]: Serializer<GetTsTypeFromScalar<S>>;
-};
-export type GetTsTypeFromScalar<T extends Scalar> = ScalarTypeMapping[T];
-
 export enum QS_BUILD_STRATEGY {
   PRESERVE_ALL,
   PRESERVE_EXTERNAL_ONLY,
@@ -26,10 +13,12 @@ export type ValidatorFunction<T> = (
   contextData: any
 ) => void;
 
+export type QueryParamType<T> = T | string | boolean; //null | undefined | T;
 export type IQueryParamsSchema = Record<string, QueryParamDef<any>>;
-// export type QueryParams<S extends IQueryParamsSchema> = Record<keyof S, any>;
 export type QueryParams<S extends IQueryParamsSchema> = {
-  [K: keyof S]: S['type'];
+  [K in keyof S]: S[K] extends QueryParamDef<infer T>
+    ? T | null | undefined
+    : never;
 };
 
 export type QueryParamsSetter<T extends IQueryParamsSchema> = (
@@ -64,4 +53,4 @@ export type Serializer<T> = {
 export type ParamTypeToSerializerMap = Record<string, Serializer<any>>;
 
 export type DefaultValueFunction<T> = (context?: any) => T;
-export type DefaultValue<T> = T | DefaultValueFunction<T> | undefined;
+export type DefaultValue<T> = T | DefaultValueFunction<T> | undefined | null;

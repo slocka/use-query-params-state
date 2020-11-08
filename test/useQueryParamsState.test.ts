@@ -1,3 +1,5 @@
+import { expectType } from 'ts-expect';
+
 import { createMemoryHistory, MemoryHistory } from 'history';
 import { renderHook, act } from '@testing-library/react-hooks';
 import '@testing-library/jest-dom';
@@ -10,6 +12,7 @@ import {
   VALIDATORS,
   createUseQueryParamsStateHook,
 } from '../src/index';
+
 import { QueryParamsValidationError } from '../src/errors';
 
 let history: MemoryHistory;
@@ -28,6 +31,54 @@ describe('Basic tests', () => {
     arrayStringParam: QPARAMS.arrayOfStrings(),
     arrayNumberParam: QPARAMS.arrayOfNumbers(),
   };
+
+  /**
+   * Special test to verify that the TS types are correct.
+   * This test will always return true at runtime but should
+   * raise compile errors if TS types break.
+   */
+  test('Typescript types', () => {
+    const { result } = renderHook(
+      () => useQueryParamsState(queryParamsStateSchema),
+      { wrapper }
+    );
+    const [params] = result.current;
+
+    /** Verify the type of each param */
+    expectType<boolean | null | undefined>(params.booleanParam);
+    expectType<number | null | undefined>(params.numberParam);
+    expectType<string | null | undefined>(params.stringParam);
+    expectType<string[] | null | undefined>(params.arrayStringParam);
+    expectType<number[] | null | undefined>(params.arrayNumberParam);
+
+    act(() => {
+      const setParams = result.current[1];
+
+      /** Verify the TS type when setting a param*/
+      try {
+        setParams({
+          // @ts-expect-error
+          booleanParam: 'true',
+          // @ts-expect-error
+          stringParam: 4,
+          // @ts-expect-error
+          numberParam: '3',
+          // @ts-expect-error
+          arrayStringParam: [3, 'test'],
+          // @ts-expect-error
+          arrayNumberParam: ['3'],
+        });
+      } catch (err) {}
+
+      /** Verify that setting param outside the schema will raise a TS error. */
+      try {
+        setParams({
+          // @ts-expect-error
+          inexistingParam: true,
+        });
+      } catch (err) {}
+    });
+  });
 
   test('It initializes with the state from the URL', () => {
     const url =
@@ -80,23 +131,6 @@ describe('Basic tests', () => {
 
     expect(params.arrayNumberParam).toEqual([1, 2]);
     expect(queryString).toContain('arrayNumberParam=1%2C2');
-  });
-
-  test.only('It updates the URL with the correct value', () => {
-    const { result } = renderHook(
-      () => useQueryParamsState(queryParamsStateSchema),
-      { wrapper }
-    );
-    const [params] = result.current;
-    const test = params.booleanParam;
-    console.log('test', test);
-
-    act(() => {
-      const setParams = result.current[1];
-      setParams({
-        booleanParam: 'false',
-      });
-    });
   });
 
   test('It can apply partial updates', () => {
@@ -256,7 +290,7 @@ describe('Basic tests', () => {
 
       expect(() => {
         setParams({
-          // TODO: Typescript should catch that
+          // @ts-expect-error
           booleanParam: 'true',
         });
       }).toThrow(

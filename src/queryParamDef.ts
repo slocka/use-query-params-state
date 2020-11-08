@@ -1,27 +1,20 @@
 import { isUndefined, isFunction } from './lib';
-import serializers from './serializer/serializers';
 
 import {
   Serializer,
-  SerializerFromUrlFunction,
   SerializerToUrlFunction,
   DefaultValue,
   DefaultValueFunction,
   ValidatorFunction,
-  Scalar,
-  GetTsTypeFromScalar,
-  ScalarTypeToSerializerMap,
 } from './types';
 
-export class QueryParamDef<S extends Scalar, TsType = GetTsTypeFromScalar<S>> {
-  private defaultValue?: DefaultValue<TsType>;
-  private validatorFn?: ValidatorFunction<TsType>;
-  private serializer: ScalarTypeToSerializerMap[S];
-  private type: S;
+export class QueryParamDef<T> {
+  private defaultValue?: DefaultValue<T>;
+  private validatorFn?: ValidatorFunction<T>;
+  private serializer: Serializer<T>;
 
-  constructor(scalarType: S, defaultValue?: DefaultValue<TsType>) {
-    this.type = scalarType;
-    this.serializer = serializers[scalarType];
+  constructor(serializer: Serializer<T>, defaultValue?: DefaultValue<T>) {
+    this.serializer = serializer;
     this.defaultValue = defaultValue;
   }
 
@@ -30,8 +23,8 @@ export class QueryParamDef<S extends Scalar, TsType = GetTsTypeFromScalar<S>> {
    * calculating the default value
    */
   private isDefaultValueFunction(
-    defaultValue: DefaultValue<TsType>
-  ): defaultValue is DefaultValueFunction<TsType> {
+    defaultValue: DefaultValue<T>
+  ): defaultValue is DefaultValueFunction<T> {
     return isFunction(defaultValue);
   }
 
@@ -39,7 +32,7 @@ export class QueryParamDef<S extends Scalar, TsType = GetTsTypeFromScalar<S>> {
    * Get the default static value or run defaultValue function to get it.
    * @param contextData
    */
-  public getDefaultValue = (contextData?: any): TsType | undefined => {
+  public getDefaultValue = (contextData?: any): T | null | undefined => {
     if (this.isDefaultValueFunction(this.defaultValue)) {
       return this.defaultValue(contextData);
     }
@@ -50,7 +43,7 @@ export class QueryParamDef<S extends Scalar, TsType = GetTsTypeFromScalar<S>> {
   /**
    * Set Validator
    */
-  public validator = (validatorFn: ValidatorFunction<TsType>) => {
+  public validator = (validatorFn: ValidatorFunction<T>) => {
     this.validatorFn = validatorFn;
     return this;
   };
@@ -61,7 +54,7 @@ export class QueryParamDef<S extends Scalar, TsType = GetTsTypeFromScalar<S>> {
   public fromURL = (
     value?: string | null,
     contextData?: any
-  ): GetTsTypeFromScalar<S> => {
+  ): T | null | undefined => {
     const parsedValue = this.serializer.fromUrl(value);
 
     // Value not found in the URL
@@ -75,7 +68,7 @@ export class QueryParamDef<S extends Scalar, TsType = GetTsTypeFromScalar<S>> {
   /**
    * Serialized the query param from the defined query param type to string
    */
-  public toURL: SerializerToUrlFunction<TsType> = value => {
+  public toURL: SerializerToUrlFunction<T> = value => {
     return this.serializer.toUrl(value);
   };
 
@@ -87,9 +80,5 @@ export class QueryParamDef<S extends Scalar, TsType = GetTsTypeFromScalar<S>> {
     if (this.validatorFn) {
       this.validatorFn(value, parsedQueryParams, contextData);
     }
-  };
-
-  public getType = (): T => {
-    return this.type;
   };
 }
