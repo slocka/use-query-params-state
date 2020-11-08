@@ -1,5 +1,18 @@
 import { QueryParamDef } from './queryParamDef';
 
+export interface ScalarTypeMapping {
+  NUMBER: number;
+  STRING: string;
+  BOOLEAN: boolean;
+  ARRAY__NUMBERS: number[];
+  ARRAY__STRINGS: string[];
+}
+export type Scalar = keyof ScalarTypeMapping;
+export type ScalarTypeToSerializerMap = {
+  [S in Scalar]: Serializer<GetTsTypeFromScalar<S>>;
+};
+export type GetTsTypeFromScalar<T extends Scalar> = ScalarTypeMapping[T];
+
 export enum QS_BUILD_STRATEGY {
   PRESERVE_ALL,
   PRESERVE_EXTERNAL_ONLY,
@@ -14,7 +27,11 @@ export type ValidatorFunction<T> = (
 ) => void;
 
 export type IQueryParamsSchema = Record<string, QueryParamDef<any>>;
-export type QueryParams<S extends IQueryParamsSchema> = Record<keyof S, any>;
+// export type QueryParams<S extends IQueryParamsSchema> = Record<keyof S, any>;
+export type QueryParams<S extends IQueryParamsSchema> = {
+  [K: keyof S]: S['type'];
+};
+
 export type QueryParamsSetter<T extends IQueryParamsSchema> = (
   newQueryParams: Partial<QueryParams<T>>,
   fromCurrent?: boolean

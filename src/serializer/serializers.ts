@@ -1,10 +1,10 @@
 import { isNumber, isNil } from '../lib';
-import { ParamTypeToSerializerMap } from '../types';
+import { ScalarTypeToSerializerMap } from '../types';
 import { QueryParamsUpdateError } from '../errors';
 
 const ARRAY_DELIMITER = ',';
 
-const serializers: ParamTypeToSerializerMap = {
+const serializers: ScalarTypeToSerializerMap = {
   ARRAY__STRINGS: {
     fromUrl(str?: string | null): Array<string> | null | undefined {
       if (isNil(str)) {

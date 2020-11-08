@@ -82,6 +82,23 @@ describe('Basic tests', () => {
     expect(queryString).toContain('arrayNumberParam=1%2C2');
   });
 
+  test.only('It updates the URL with the correct value', () => {
+    const { result } = renderHook(
+      () => useQueryParamsState(queryParamsStateSchema),
+      { wrapper }
+    );
+    const [params] = result.current;
+    const test = params.booleanParam;
+    console.log('test', test);
+
+    act(() => {
+      const setParams = result.current[1];
+      setParams({
+        booleanParam: 'false',
+      });
+    });
+  });
+
   test('It can apply partial updates', () => {
     const { result } = renderHook(
       () => useQueryParamsState(queryParamsStateSchema),
