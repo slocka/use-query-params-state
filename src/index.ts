@@ -8,7 +8,6 @@ export { useQueryParam } from './useQueryParam';
 export { useQueryParamsState } from './useQueryParamsState';
 
 export * from './qparams';
-export * from './withQueryParamsState';
 export * from './helpers';
 export * from './useBuildQueryStringFromCurrentURL';
 
