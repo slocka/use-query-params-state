@@ -13,7 +13,6 @@ export type ValidatorFunction<T> = (
   contextData: any
 ) => void;
 
-export type QueryParamType<T> = T | string | boolean; //null | undefined | T;
 export type IQueryParamsSchema = Record<string, QueryParamDef<any>>;
 export type QueryParams<S extends IQueryParamsSchema> = {
   [K in keyof S]: S[K] extends QueryParamDef<infer T>
