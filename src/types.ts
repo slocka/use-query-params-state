@@ -14,7 +14,12 @@ export type ValidatorFunction<T> = (
 ) => void;
 
 export type IQueryParamsSchema = Record<string, QueryParamDef<any>>;
-export type QueryParams<S extends IQueryParamsSchema> = Record<keyof S, any>;
+export type QueryParams<S extends IQueryParamsSchema> = {
+  [K in keyof S]: S[K] extends QueryParamDef<infer T>
+    ? T | null | undefined
+    : never;
+};
+
 export type QueryParamsSetter<T extends IQueryParamsSchema> = (
   newQueryParams: Partial<QueryParams<T>>,
   fromCurrent?: boolean
@@ -44,7 +49,5 @@ export type Serializer<T> = {
   fromUrl: SerializerFromUrlFunction<T>;
 };
 
-export type ParamTypeToSerializerMap = Record<string, Serializer<any>>;
-
 export type DefaultValueFunction<T> = (context?: any) => T;
-export type DefaultValue<T> = T | DefaultValueFunction<T> | undefined;
+export type DefaultValue<T> = T | DefaultValueFunction<T> | undefined | null;

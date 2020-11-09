@@ -2,7 +2,6 @@ import { isUndefined, isFunction } from './lib';
 
 import {
   Serializer,
-  SerializerFromUrlFunction,
   SerializerToUrlFunction,
   DefaultValue,
   DefaultValueFunction,
@@ -33,7 +32,7 @@ export class QueryParamDef<T> {
    * Get the default static value or run defaultValue function to get it.
    * @param contextData
    */
-  public getDefaultValue = (contextData?: any): T | undefined => {
+  public getDefaultValue = (contextData?: any): T | null | undefined => {
     if (this.isDefaultValueFunction(this.defaultValue)) {
       return this.defaultValue(contextData);
     }
@@ -55,7 +54,7 @@ export class QueryParamDef<T> {
   public fromURL = (
     value?: string | null,
     contextData?: any
-  ): ReturnType<SerializerFromUrlFunction<T>> => {
+  ): T | null | undefined => {
     const parsedValue = this.serializer.fromUrl(value);
 
     // Value not found in the URL

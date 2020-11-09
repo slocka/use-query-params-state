@@ -28,9 +28,11 @@ describe('String serializer', () => {
     });
 
     test('It should throw an error when encoding invalid input', () => {
+      // @ts-expect-error
       expect(() => serializers.STRING.toUrl(3)).toThrow(
         /^was expecting a string but received a number.$/
       );
+      // @ts-expect-error
       expect(() => serializers.STRING.toUrl(false)).toThrow(
         /^was expecting a string but received a boolean.$/
       );
@@ -72,16 +74,19 @@ describe('Boolean serializer', () => {
     });
 
     test('It should throw an error when encoding invalid input', () => {
+      // @ts-expect-error
       expect(() => serializers.BOOLEAN.toUrl('true')).toThrow(
         /^was expecting a boolean but received a string.$/
       );
+      // @ts-expect-error
       expect(() => serializers.BOOLEAN.toUrl('something')).toThrow(
         /^was expecting a boolean but received a string.$/
       );
-
+      // @ts-expect-error
       expect(() => serializers.BOOLEAN.toUrl('')).toThrow(
         /^was expecting a boolean but received a string.$/
       );
+      // @ts-expect-error
       expect(() => serializers.BOOLEAN.toUrl(0)).toThrow(
         /^was expecting a boolean but received a number.$/
       );
@@ -135,9 +140,11 @@ describe('Number serializer', () => {
     });
 
     test('It should throw an error when encoding invalid input', () => {
+      // @ts-expect-error
       expect(() => serializers.NUMBER.toUrl('something')).toThrow(
         /^was expecting a number but received a string.$/
       );
+      // @ts-expect-error
       expect(() => serializers.NUMBER.toUrl('6')).toThrow(
         /^was expecting a number but received a string.$/
       );
@@ -178,9 +185,11 @@ describe('Array string serializer', () => {
     });
 
     test('It should throw an error when encoding invalid input', () => {
+      // @ts-expect-error
       expect(() => serializers.ARRAY__STRINGS.toUrl(3)).toThrow(
         /^was expecting an array but received a number.$/
       );
+      // @ts-expect-error
       expect(() => serializers.ARRAY__STRINGS.toUrl(false)).toThrow(
         /^was expecting an array but received a boolean.$/
       );
@@ -190,6 +199,7 @@ describe('Array string serializer', () => {
      * @TODO: Decide what should be the behavior of this scenario.
      */
     test('It should encode array of invalid types as string', () => {
+      // @ts-expect-error
       expect(serializers.ARRAY__STRINGS.toUrl([3, false, 'hello'])).toBe(
         '3,false,hello'
       );
@@ -231,12 +241,15 @@ describe('Array number serializer', () => {
     });
 
     test('It should throw an error when encoding invalid input', () => {
+      // @ts-expect-error
       expect(() => serializers.ARRAY__NUMBERS.toUrl(3)).toThrow(
         /^was expecting an array but received a number.$/
       );
+      // @ts-expect-error
       expect(() => serializers.ARRAY__NUMBERS.toUrl(false)).toThrow(
         /^was expecting an array but received a boolean.$/
       );
+      // @ts-expect-error
       expect(() => serializers.ARRAY__NUMBERS.toUrl('[]')).toThrow(
         /^was expecting an array but received a string.$/
       );
@@ -246,6 +259,7 @@ describe('Array number serializer', () => {
      * @TODO: Decide what should be the behavior of this scenario.
      */
     test('It should encode array of invalid types as string', () => {
+      // @ts-expect-error
       expect(serializers.ARRAY__NUMBERS.toUrl([3, false, 'hello'])).toBe(
         '3,false,hello'
       );
@@ -258,7 +272,10 @@ describe('Handling of undefined and null values', () => {
   const serializerList: Array<[string, Serializer<any>]> = Object.keys(
     serializers
   ).map(serializerType => {
-    return [serializerType, serializers[serializerType]];
+    return [
+      serializerType,
+      serializers[serializerType as keyof typeof serializers],
+    ];
   });
 
   describe.each(serializerList)('%s', (_serializerType, serializer) => {

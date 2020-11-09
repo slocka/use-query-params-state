@@ -1,3 +1,5 @@
+import { expectType, TypeEqual } from 'ts-expect';
+
 import { createMemoryHistory, MemoryHistory } from 'history';
 import { renderHook, act } from '@testing-library/react-hooks';
 import '@testing-library/jest-dom';
@@ -16,6 +18,36 @@ beforeEach(() => {
 });
 
 describe('Basic tests', () => {
+  /**
+   * Special test to verify that the TS types are correct.
+   * This test will always return true at runtime but should
+   * raise compile errors if TS types break.
+   */
+  test('Typescript types', () => {
+    const { result } = renderHook(
+      () => useQueryParam('booleanParam', QPARAMS.boolean()),
+      {
+        wrapper,
+      }
+    );
+    const [booleanParam] = result.current;
+
+    /** Verify the type of the param */
+    expectType<TypeEqual<boolean | null | undefined, typeof booleanParam>>(
+      true
+    );
+
+    act(() => {
+      const setParam = result.current[1];
+
+      /** Verify the TS type when setting a param*/
+      try {
+        // @ts-expect-error
+        setParam('true');
+      } catch (err) {}
+    });
+  });
+
   test('It initialize with the state from the URL', () => {
     const url =
       '/test?booleanParam=true&stringParam=test&numberParam=0&arrayStringParam=one,two,three&arrayNumberParam=1,2,3';
