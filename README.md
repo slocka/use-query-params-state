@@ -203,3 +203,28 @@ function MyComponent1(props) {
 #### Validator
 
 @TODO
+
+## use-query-params-state with class components
+
+use-query-params-state solution is based on [React hooks](https://reactjs.org/docs/hooks-reference.html) and requires a version of React that support them (16.8+).
+
+If your version of React is compatible but you prefer to use class components, use-query-params-state hooks can easily be converted into high order components using the [hocify](https://github.com/ricokahler/hocify) package.
+
+```js
+import hocify from "hocify"
+import { QPARAMS, useQueryParamsState } from "use-query-params-state"
+
+const queryParamsSchema = {
+    sortBy: QPARAMS.string("myDefaultValue")
+}
+
+export const withQueryParams = hocify(() => {
+    const [queryParams, setQueryParams] = useQueryParamsState(queryParamsSchema)
+
+    return {
+        queryParams,
+        setQueryParams
+    }
+})
+```
+
