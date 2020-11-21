@@ -1,47 +1,52 @@
 # use-query-params-state (BETA)
 
-React hooks to manage your application state using the URL query parameters.
-The current version is only compatible with React-router.
+React hooks to manage your application state using the URL query string ([search params](https://developer.mozilla.org/en-US/docs/Web/API/URL/searchParams)).
 
 ## Why use-query-params-state?
-Very often a page uses some parameters to control the state of your application. Using the URL
-to manage some parts of the state offers multiple advantages:
-- Your application content becomes easy to share across the web.
-- Users can access a specific state of your application through a hyperlink.
-- Users can undo/redo their actions through the browser history.
-- Users can easily come back later on the same or different device with your application in the same state as they left it.
 
-Example of url using use-query-params-state: 
+use-query-params-state aims to improve the developer experience and indirectly the user experience, by making URL state management easy, reliable and type safe.
+
+Example of URL state using use-query-params-state: 
 ```js
 "/products-search?search=red+bike&page=10&pageSize=20&minRating=20&free_delivery=true"
 ```
 
-On the other hand, managing your state through the URL can be challenging and tedious as there are multiple things to manage:
-- Keeping the URL in sync with your application state.
-- Decoding the query string to your URLs state when reading from the URL.
-- Encoding your javascript state to its query string representation when writing into the URL.
-- Converting each param into the correct javascript type during encoding/decoding phase (everything in the URL is a string).
+### A better user experience
+
+It is a common pattern for modern web applications to use the URL search query string to control the state of the current page. This pattern enables multiple things:
+- Your application content can easily be shared across the web.
+- Users can directly access a specific state of your application through a hyperlink.
+- Users can undo/redo their actions through the browser history.
+- Users can easily bookmark the page and come back later on the same or different device with the application in the same state as it was when saving it.
+- 
+### A better developer experience
+
+If managing your state through the URL can improve the user experience, the developer experience can quickly suffer from it. Implementing this pattern from scratch can be challenging and tedious as there are multiple things to manage:
+- Keeping the URL and your React state in sync.
+- Convert the query string to your React state when reading from the URL.
+- Convert your React state to its query string representation when writing to the URL.
+- Keeping track of the correct type of each param during encoding/decoding phase (everything in the URL is a string).
 - Making sure the state defined by the URL hasn't been wrongly altered by the user or isn't corrupted.
 
+use-query-params handles all those problems for you and offers a solution similar to how you would use `useState` for local state management.
 
 ## Features
-- Always keep your React application state in sync with the URL query parameters.
-- Auto serialization/de-serialization of the query string to the correct Javascript types based on your configuration.
-- Use a default value if the query parameter is not present in the URL query string. The default value can also be dynamically computed at execution time.
-- Query params validation to verify that the URL is not corrupted or that the value of the query parameter is valid.
-  - Validate the query parameter type.
-  - Validate the param based on the value of other query params.
-  - Validate the param based on other data provided at execution time.
-- Customize the serialization to handle more complex param types.
-- Typescript support.
 
+- Typescript support.
+- Always keep your React application state in sync with the URL query string.
+- Auto serialization/de-serialization of the query string to the correct Javascript types based on defined schema.
+- Use a default value when the query parameter is not present in the URL query string. The default value can also be dynamically computed at execution time.
+- Validate the URL search parameters to verify that the URL is not corrupted or that the value of the query parameter is valid.
+- Customize the serialization to handle more complex param types.
 
 ## Getting started
 
 ---
 **WARNING**
 
-This is still work in progress and the library is not yet stable. Please do not use in production.
+- This is still work in progress and the library is not yet stable. Please do not use in production.
+
+- The current version is only compatible with React-router.
 
 ---
 
@@ -93,11 +98,11 @@ function MyComponent(props) {
 
 #### createUseQueryParamsStateHook(queryParamsSchema)
 
-If you want to call useQueryParamsState in different components and want to avoid having to specify the config
+If you want to call useQueryParamsState in multiple components and want to avoid having to specify the config
 everywhere, you can use the createUseQueryParamsStateHook factory to create a hook with an embeded config.
 
 ```js
-import { createUseQueryParamsStateHook, PARAM_TYPES, VALIDATORS } from "use-query-params-state"
+import { createUseQueryParamsStateHook, QPARAMS, VALIDATORS } from "use-query-params-state"
 
 const queryParamsSchema = {
     "search": QPARAMS.string(),
