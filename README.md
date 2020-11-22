@@ -17,7 +17,7 @@ It is a common pattern for modern web applications to use the URL search query s
 - Your application content can easily be shared across the web.
 - Users can directly access a specific state of your application through a hyperlink.
 - Users can undo/redo their actions through the browser history.
-- Users can easily bookmark the page and come back later on the same or different device with the application in the same state as it was when saving it.
+- Users can bookmark the page and come back later on the same or different device with the application in the state it was left in.
 - 
 ### A better developer experience
 
@@ -28,7 +28,7 @@ If managing your state through the URL can improve the user experience, the deve
 - Keeping track of the correct type of each param during encoding/decoding phase (everything in the URL is a string).
 - Making sure the state defined by the URL hasn't been wrongly altered by the user or isn't corrupted.
 
-use-query-params handles all those problems for you and offers a solution similar to how you would use `useState` for local state management.
+use-query-params-state handles all those problems for you and offers a solution similar to the React `useState` hook.
 
 ## Features
 
@@ -37,7 +37,7 @@ use-query-params handles all those problems for you and offers a solution simila
 - Auto serialization/de-serialization of the query string to the correct Javascript types based on defined schema.
 - Use a default value when the query parameter is not present in the URL query string. The default value can also be dynamically computed at execution time.
 - Validate the URL search parameters to verify that the URL is not corrupted or that the value of the query parameter is valid.
-- Customize the serialization to handle more complex param types.
+- Customize the serialization to handle more complex or custom param types.
 
 ## Getting started
 
@@ -83,7 +83,7 @@ const queryParamsSchema = {
 }
 
 function MyComponent() {
-    const [queryParamsState, setQueryParamsState] = useQueryParamsState(config)
+    const [queryParamsState, setQueryParamsState] = useQueryParamsState(queryParamsSchema)
 }
 ```
 Note: If you need to dynamically change your config base on your component props, you can also do it.
@@ -142,19 +142,6 @@ function MyComponent() {
 The QueryParamsSchema is a map between the name of the parameter and its definition (type, default value, validator). It is used to define what parameters are part of the state, and how to serialize/deserialize each of them.
 
 #### Query parameters definition
-
-QPARAMS contains a factory function for each type:
-```js
-QPARAMS.number()
-QPARAMS.string()
-QPARAMS.boolean()
-QPARAMS.arrayOfStrings()
-QPARAMS.arrayOfNumbers()
-QPARAMS.date() // not yet available!
-QPARAMS.object() // not yet available!
-
-// Note: All those types also accept `undefined` and `null` as a value.
-```
 
 #### Default value
 Each parameter definition factory function can receive a default value as the first argument.
