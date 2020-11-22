@@ -183,3 +183,4 @@ export const withQueryParams = hocify(() => {
 })
 ```
 
+[See the API_REFERENCE page for more documentation](API_REFERENCE.md)
