@@ -125,18 +125,6 @@ function MyComponent2() {
 }
 ```
 
-#### useQueryParam()
-
-Sometimes it's just easier to treat each query param as an independent state, you can achieve that using `useQueryParam`.
-
-
-```js
-function MyComponent() {
-    const [minRating, setMinRating] = useQueryParam("minRating", QPARAMS.number(0))
-    const [search, setSearch] = useQueryParam("search")
-}
-```
-
 ### Defining your query params schema.
 
 The QueryParamsSchema is a map between the name of the parameter and its definition (type, default value, validator). It is used to define what parameters are part of the state, and how to serialize/deserialize each of them.
@@ -170,31 +158,6 @@ function MyComponent() {
     })
 }
 ```
-
-You can also access "context data" inside your default value function:
-
-```js
-const queryParamsSchema = {
-    "sortBy": QPARAMS.string((contextData) => {
-        contextData.defaultSortBy
-    }),
-}
-
-const useProductSearchFilters = createUseQueryParamsStateHook(queryParamsSchema)
-
-function MyComponent1(props) {
-    const contextData = {
-        defaultSortBy: props.defaultSortBy
-    }
-    // Context data will be available inside the function calculating
-    // the default value of the "sortBy" query param.
-    const [filters] = useProductSearchFilters(contextData)
-}
-```
-
-#### Validator
-
-@TODO
 
 ## use-query-params-state with class components
 
