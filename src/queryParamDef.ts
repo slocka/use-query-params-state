@@ -1,4 +1,4 @@
-import { isUndefined, isFunction } from './lib';
+import { isUndefined, isFunction } from './internal/typeChecking';
 
 import {
   Serializer,

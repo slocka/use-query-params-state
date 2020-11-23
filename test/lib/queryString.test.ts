@@ -1,4 +1,7 @@
-import { parseQueryString, createQueryString } from '../../src/lib';
+import {
+  parseQueryString,
+  createQueryString,
+} from '../../src/internal/queryString';
 
 describe('QueryString', () => {
   describe('parseQueryString', () => {

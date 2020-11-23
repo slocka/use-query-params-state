@@ -1,4 +1,4 @@
-import { isUndefined } from '../lib';
+import { isUndefined } from '../internal/typeChecking';
 import { QueryParams, RawQueryParams, IQueryParamsSchema } from '../types';
 
 import { Errors } from '../errors';

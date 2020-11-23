@@ -10,7 +10,7 @@ import {
 import { runParamsValidatorsPartial } from '../validators';
 import { serializeQueryParamsValues } from '../serializer/serialize';
 import { getDefaultQueryParamsState } from './getDefaultQueryParamsState';
-import { createQueryString } from '../lib';
+import { createQueryString } from '../internal/queryString';
 
 export function buildQueryStringFromCurrentURL<
   QueryParamsSchema extends IQueryParamsSchema

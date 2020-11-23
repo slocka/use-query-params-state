@@ -1,4 +1,4 @@
-import { isNumber, isNil } from '../lib';
+import { isNumber, isNil } from '../internal/typeChecking';
 import { Serializer } from '../types';
 import { Errors } from '../errors';
 
