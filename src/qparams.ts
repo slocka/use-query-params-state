@@ -1,5 +1,5 @@
 import { DefaultValue } from './types';
-import { QueryParamDef } from './queryParamDef';
+import { QueryParamDef } from './internal/queryParamDef';
 
 import serializers from './internal/serializer/serializers';
 

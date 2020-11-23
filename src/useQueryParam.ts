@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { QPARAMS } from './qparams';
 
-import { QueryParamDef } from './queryParamDef';
+import { QueryParamDef } from './internal/queryParamDef';
 
 import { useQueryParamsState } from './useQueryParamsState';
 

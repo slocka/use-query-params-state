@@ -1,4 +1,4 @@
-import { QueryParamDef } from './queryParamDef';
+import { QueryParamDef } from './internal/queryParamDef';
 
 export enum QS_BUILD_STRATEGY {
   /**
