@@ -18,7 +18,7 @@ Each factory follow the same function signature:
 *Note: `T` represent the actual type of the value (number | string | boolean | string[] | number[]), depending on the factory function used.*
 
 ### Arguments
- - **defaultValue? (T | DefaultValueFunction<T> | null | undefined)**: Serve as a substitute to the param value when the param is not present in the query string. When defaultValue is a function, the provided function will be executed each time we need to read the state and its return value will be used as a default value
+ - **defaultValue? (T | DefaultValueFunction<T> | null | undefined)**: Serve as a substitute to the param value when the param is not present in the query string. When defaultValue is a function, the provided function will be executed each time we need to read the state and its return value will be used as a default value.
 
 ### Returns
 - **(QueryParamDef<T>)**: A QueryParamDef instance is defining what type the associated parameter should be. This is necessary to automatically stringify/parse the parameter to/from the URL and perform some type checking (Typescript + Javascript) when getting/setting the param . `QueryParamDef<T>` will only accept the value to be set to `T | null | undefined`.
@@ -72,16 +72,16 @@ Hook to manipulate your query params state.
 #### QueryParams
 Object following the shape defined in your schema representing the current state. The key is the name of your parameter and the value is the current value of the parameter. When one parameter does not currently exist in the query string, its value will be `undefined` or the default value you potentially provided when creating the schema. 
 
-### QueryParamsSetter
+#### QueryParamsSetter
 Function to call when updating the state of your query parameters. Calling that function will update the current URL query string and will automatically re-render your components with the new query params state.
 
 The function has the following signature:
 
 #### Arguments
 - **newQueryParams (Partial<QueryParams>)**: Object with the query params key/value you want to update.
-- **isPartialUpdate? (boolean)**: Define if the update should be applied on top of the current query params state or not. Default to true
-  - If true, the new query params will be applied on top of the current query params state (i.e: `const newState = { ...oldState, ...newQueryParams }`.
-  - If false, the new query params will be applied on top of an empty object, (i.e: `const newState = { ...newQueryParams }`). This can also be used to reset the state.
+- **isPartialUpdate? (boolean)**: Define if the update should be applied on top of the current query params state or not. Default to `true`.
+  - If `true`, the new query params will be applied on top of the current query params state (i.e: `const newState = { ...oldState, ...newQueryParams }`.
+  - If `false`, the new query params will be applied on top of an empty object, (i.e: `const newState = { ...newQueryParams }`). This can also be used to reset the state.
 
 
 ### Example
@@ -115,7 +115,7 @@ function MyComponent() {
 }
 ```
 
-If you need to dynamically change your config base on your component props, you can also do it.
+*Note: If you need to dynamically change your config base on your component props, you can also do it.*
 
 ```js
 function MyComponent(props) {
@@ -135,7 +135,7 @@ Sometimes it's just easier to treat each query param as an independent state, yo
 - **contextData?** (any): The context data
 
 ### Returns
-- **([T | null | undefined, (value?: T | null | undefined) => void)**: Tuple where the first index is the value of the query param and the second one is the function to set a new value to the parameter.
+- **(T | null | undefined, (value?: T | null | undefined) => void)**: Tuple where the first index is the value of the query param and the second one is the function to set a new value to the parameter.
 
 ### Example
 ```js
@@ -180,6 +180,10 @@ const queryParamsSchema = {
     ...
 }
 const useProductSearchFilters = createUseQueryParamsStateHook(queryParamsSchema)
+
+function MyComponent() {
+    const [productFilters, setProductFilters] = useProductSearchFilters()
+}
 ``` 
 
 The snippet above is basically equivalent to:
@@ -194,13 +198,15 @@ const queryParamsSchema = {
 const useProductSearchFilters = () => {
     return useQueryParamsState(queryParamsSchema)
 }
+
+function MyComponent() {
+    const [productFilters, setProductFilters] = useProductSearchFilters()
+}
 ```
-
-
 
 ## buildQueryString
 
-Create a new query string based on the provided schema and a matching query params state object. 
+Helper function to create a new query string based on the provided schema and a matching query params state object. 
 An error will be thrown if the param does not match the type defined in the schema.
 
 ### Arguments
@@ -293,7 +299,7 @@ const buildQueryStringFromURL = useBuildQueryStringFromCurrentURL(queryParamsSta
 /** Using QS_BUILD_STRATEGY.PRESERVE_ALL by default */
 const queryStringPreserveAll = buildQueryStringFromURL(
     { stringParam: "hello world" }
-) // => "booleanParam=true&stringParam=hello+world&&utm_source=facebook"
+) // => "booleanParam=true&stringParam=hello+world&utm_source=facebook"
 
 const queryStringPreserveExternalOnly = buildQueryStringFromURL(
     { stringParam: "hello world" },

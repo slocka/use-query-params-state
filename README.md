@@ -6,7 +6,7 @@ React hooks to manage your application state using the URL query string ([search
 
 use-query-params-state aims to improve the end user experience by providing a solution helping developers creating more shareable React web application. It is doing so by making URL state management easy, reliable and type safe and therefore encouraging developers to use the URL query string more often.
 
-Note: Not all the states of your application can/should be stored in the URL. use-query-params-state is typically suited to manage states corresponding to parameters manipulated by the user that influences the current page.
+**Note:** Not all the states of your application can/should be stored in the URL. use-query-params-state is typically suited to manage states corresponding to parameters manipulated by the user that influence the current page.
 
 Example of URL state using use-query-params-state: 
 ```js
@@ -174,7 +174,7 @@ Note: When updating the query params state, the change is automatically reflecte
 
 ### Usage of useQueryParamsState across multiple components
 
-If you want to call useQueryParamsState in multiple components and want to avoid having to specify the schema each time,
+If you want to call useQueryParamsState in multiple components and want to avoid having to pass the schema each time,
 you can use the [createUseQueryParamsStateHook](doc/API_REFERENCE.md#createUseQueryParamsStateHook) factory.
 
 ```js
