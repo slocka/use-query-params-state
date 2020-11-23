@@ -3,6 +3,10 @@ import { QueryParamDef } from './internal/queryParamDef';
 
 import serializers from './internal/serializer/serializers';
 
+/**
+ * Object used to build your query params state schema.
+ * It contains a factory function for each param type.
+ */
 export const QPARAMS = {
   number: (defaultValue?: DefaultValue<number>) => {
     return new QueryParamDef(serializers.NUMBER, defaultValue);

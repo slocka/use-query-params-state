@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { buildQueryStringFromCurrentURL } from './helpers';
+import { buildQueryStringFromCurrentURL } from './internal/buildQueryStringFromCurrentURL';
 import { getRawQueryParamsInSchemaFromURL } from './internal/getQueryParamsFromURL';
 
 import {
