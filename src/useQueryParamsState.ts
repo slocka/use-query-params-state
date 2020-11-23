@@ -1,9 +1,8 @@
 import { useCallback, useMemo } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import {
-  getRawQueryParamsInSchemaFromURL,
-  buildQueryStringFromCurrentURL,
-} from './helpers';
+import { buildQueryStringFromCurrentURL } from './helpers';
+import { getRawQueryParamsInSchemaFromURL } from './internal/getQueryParamsFromURL';
+
 import {
   IQueryParamsSchema,
   QS_BUILD_STRATEGY,

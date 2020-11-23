@@ -5,11 +5,11 @@ import { IQueryParamsSchema, QueryParams, QS_BUILD_STRATEGY } from '../types';
 import {
   getAllRawQueryParamsFromURL,
   getExternalQueryParamsFromURL,
-} from './getQueryParamsFromURL';
+} from '../internal/getQueryParamsFromURL';
 
 import { runParamsValidatorsPartial } from '../validators';
 import { serializeQueryParamsValues } from '../internal/serializer/serialize';
-import { getDefaultQueryParamsState } from './getDefaultQueryParamsState';
+import { getDefaultQueryParamsState } from '../internal/getDefaultQueryParamsState';
 import { createQueryString } from '../internal/queryString';
 
 export function buildQueryStringFromCurrentURL<
