@@ -34,7 +34,7 @@ export type QueryParams<S extends IQueryParamsStateSchema> = {
     : never;
 };
 
-export type QueryParamsSetter<T extends IQueryParamsStateSchema> = (
+export type SetQueryParamsState<T extends IQueryParamsStateSchema> = (
   newQueryParams: Partial<QueryParams<T>>,
   fromCurrent?: boolean
 ) => void;
