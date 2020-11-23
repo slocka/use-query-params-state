@@ -29,6 +29,7 @@ Each factory follow the same function signature:
 const schema = {
     numberParam: QPARAMS.number(0 /* default value*/),
     stringParam: QPARAMS.string(),
+    // The default value can be a function that will be executed each time the query param state needs to be re-evaluated.
     booleanParam: QPARAMS.boolean(() => JSON.parse(localStorage.getItem("isTrue")),
     arrayOfStringsParam: QPARAMS.arrayOfStrings(),
     arrayOfNumbersParam: QPARAMS.arrayOfNumbers(null),

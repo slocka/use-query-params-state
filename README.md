@@ -4,13 +4,14 @@ React hooks to manage your application state using the URL query string ([search
 
 ## Why use-query-params-state?
 
-use-query-params-state aims to improve the developer experience and indirectly the user experience, by making URL state management easy, reliable and type safe.
+use-query-params-state aims to improve the end user experience by providing a solution helping developers creating more shareable React web application. It is doing so by making URL state management easy, reliable and type safe and therefore encouraging developers to use the URL query string more often.
+
+Note: Not all the states of your application can/should be stored in the URL. use-query-params-state is typically suited to manage states corresponding to parameters manipulated by the user that influences the current page.
 
 Example of URL state using use-query-params-state: 
 ```js
 "/products-search?search=red+bike&page=10&pageSize=20&minRating=20&free_delivery=true"
 ```
-
 ### A better user experience
 
 It is a common pattern for modern web applications to use the URL search query string to control the state of the current page. This pattern enables multiple things:
@@ -18,7 +19,7 @@ It is a common pattern for modern web applications to use the URL search query s
 - Users can directly access a specific state of your application through a hyperlink.
 - Users can undo/redo their actions through the browser history.
 - Users can bookmark the page and come back later on the same or different device with the application in the state it was left in.
-- 
+ 
 ### A better developer experience
 
 If managing your state through the URL can improve the user experience, the developer experience can quickly suffer from it. Implementing this pattern from scratch can be challenging and tedious as there are multiple things to manage:
@@ -28,7 +29,10 @@ If managing your state through the URL can improve the user experience, the deve
 - Keeping track of the correct type of each param during encoding/decoding phase (everything in the URL is a string).
 - Making sure the state defined by the URL hasn't been wrongly altered by the user or isn't corrupted.
 
-use-query-params-state handles all those problems for you and offers a solution similar to the React `useState` hook.
+use-query-params-state handles all those problems for you and offers a React hook solution similar to React `useState`.
+
+### Other benefits
+- SEO: By making the different states of your application accessible directly by a simple link, you are working towards making your content more discoverable by search engine crawlers and therefore potentially more optimized for SEO ranking.
 
 ## Features
 
@@ -38,6 +42,7 @@ use-query-params-state handles all those problems for you and offers a solution 
 - Use a default value when the query parameter is not present in the URL query string. The default value can also be dynamically computed at execution time.
 - Validate the URL search parameters to verify that the URL is not corrupted or that the value of the query parameter is valid.
 - Customize the serialization to handle more complex or custom param types.
+- Offers some helper functions to create new query string for your internal hyperlinks.
 
 ## Getting started
 
@@ -63,7 +68,7 @@ npm install use-query-params-state
 
 ### Defining your query params schema.
 
-use-query-params-state relies on schema definition to automatically transform the URL query string to its React state and vice versa. 
+use-query-params-state relies on a schema definition defined by the developer to automatically transform the URL query string to its React state and vice versa. 
 
 The QueryParamsSchema is a map between the name of the parameter and its definition (type, default value, validator). It is used to define what parameters are part of the state, and how to serialize/deserialize each of them.
 
@@ -99,7 +104,7 @@ QPARAMS object exposes the following factory functions to define each query para
 | .arrayOfStrings()     | string[] \| null \| undefined | ?sizes=S,M,L           | { sizes: ["S", "M", "L"] } |
 | .arrayOfNumbers()     | number[] \| null \| undefined | ?sizes=9,10,11         | { sizes: [9,10,11] }       |
 
-Each factory function can accept a default value. See [API reference guide](API_REFERENCE.md#QPARAMS) to learn more about it.
+Each factory function can accept a default value. See [API reference guide](doc/API_REFERENCE.md#QPARAMS) to learn more about it.
 
 ### Read the query params state
 
@@ -122,6 +127,20 @@ const queryParamsSchema = {
 function MyComponent() {
     // queryParamsState is the React state directly derived from the URL query string based on the provided schema.
     const [queryParamsState] = useQueryParamsState(queryParamsSchema)
+
+    /**
+     * In this example, if the URL is "/products-search?search=red+bike&brands=loulou&sortDirection=desc"
+     * queryParamsState object will be:
+     * {
+     *  search: "red bike",
+     *  minRating: 0,
+     *  sizes: undefined,
+     *  brands: ["loulou"],
+     *  sortDirection: "desc",
+     *  sortBy: "price",
+     *  newOnly: false
+     * }
+     */
 }
 ```
 
@@ -151,7 +170,7 @@ function MyComponent() {
 }
 ```
 
-Note: When updating the query params state, the change is automatically reflected in the URL query string. In fact, use-query-params-state does not create any local state, it uses the URL as the unique source of truth and derives the query params state from the current query string and the provided schema.
+Note: When updating the query params state, the change is automatically reflected in the URL query string. In fact, use-query-params-state does not create any local state, it uses the URL as the only source of truth and derives the query params state from the current query string and the provided schema.
 
 ### Usage of useQueryParamsState across multiple components
 
@@ -206,4 +225,6 @@ export const withQueryParams = hocify(() => {
 })
 ```
 
-[See the API_REFERENCE page for more documentation](API_REFERENCE.md)
+## API REFERENCE
+
+[See the API_REFERENCE page for more information](doc/API_REFERENCE.md)
