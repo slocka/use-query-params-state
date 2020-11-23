@@ -1,4 +1,4 @@
-import { pickQueryParamsMatchingSchema } from '../src/pickQueryParamsMatchingSchema';
+import { pickQueryParamsMatchingSchema } from '../src/index';
 import { QPARAMS } from '../src/index';
 
 const queryParamsStateSchema = {
