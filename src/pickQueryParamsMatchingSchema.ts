@@ -1,4 +1,4 @@
-import { QueryParams, IQueryParamsStateSchema } from './types';
+import { QueryParamsState, IQueryParamsStateSchema } from './types';
 
 /**
  * Take an object as input and return a new object keeping only
@@ -20,13 +20,13 @@ export function pickQueryParamsMatchingSchema<
 >(
   queryParamsSchema: QueryParamsSchema,
   queryParams: Record<string, any>
-): Partial<QueryParams<QueryParamsSchema>> {
+): Partial<QueryParamsState<QueryParamsSchema>> {
   if (!queryParams) {
     return {};
   }
   return Object.keys(queryParamsSchema).reduce(
     (
-      acc: Partial<QueryParams<QueryParamsSchema>>,
+      acc: Partial<QueryParamsState<QueryParamsSchema>>,
       queryParamsKey: keyof QueryParamsSchema
     ) => {
       if (queryParams.hasOwnProperty(queryParamsKey)) {

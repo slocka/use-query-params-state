@@ -1,6 +1,6 @@
 import { isUndefined } from '../typeChecking';
 import {
-  QueryParams,
+  QueryParamsState,
   RawQueryParams,
   IQueryParamsStateSchema,
 } from '../../types';
@@ -21,7 +21,7 @@ export function deserializeQueryParamsValues<
   queryParamsSchema: QueryParamsSchema,
   rawQueryParams: Partial<RawQueryParams<QueryParamsSchema>>,
   contextData?: any
-): QueryParams<QueryParamsSchema> {
+): QueryParamsState<QueryParamsSchema> {
   return Object.keys(queryParamsSchema).reduce(
     (acc, queryParamKey: keyof QueryParamsSchema) => {
       const queryParamDef = queryParamsSchema[queryParamKey];
@@ -32,7 +32,7 @@ export function deserializeQueryParamsValues<
 
       return acc;
     },
-    {} as QueryParams<QueryParamsSchema>
+    {} as QueryParamsState<QueryParamsSchema>
   );
 }
 
@@ -40,7 +40,7 @@ export function serializeQueryParamsValues<
   QueryParamsSchema extends IQueryParamsStateSchema
 >(
   queryParamsSchema: QueryParamsSchema,
-  queryParams: Partial<QueryParams<QueryParamsSchema>>
+  queryParams: Partial<QueryParamsState<QueryParamsSchema>>
 ): RawQueryParams<QueryParamsSchema> {
   return Object.keys(queryParams).reduce(
     (acc, queryParamKey: keyof QueryParamsSchema) => {

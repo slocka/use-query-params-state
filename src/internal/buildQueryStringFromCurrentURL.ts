@@ -2,7 +2,7 @@ import { useLocation } from 'react-router-dom';
 
 import {
   IQueryParamsStateSchema,
-  QueryParams,
+  QueryParamsState,
   QS_BUILD_STRATEGY,
 } from '../types';
 
@@ -23,7 +23,7 @@ export function buildQueryStringFromCurrentURL<
 >(
   location: ReturnType<typeof useLocation>,
   queryParamsSchema: QueryParamsSchema,
-  newQueryParams: Partial<QueryParams<QueryParamsSchema>> = {},
+  newQueryParams: Partial<QueryParamsState<QueryParamsSchema>> = {},
   buildStrategy: QS_BUILD_STRATEGY = QS_BUILD_STRATEGY.PRESERVE_ALL,
   contextData?: any
 ): string {

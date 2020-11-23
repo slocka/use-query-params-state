@@ -1,4 +1,4 @@
-import { IQueryParamsStateSchema, QueryParams } from '../types';
+import { IQueryParamsStateSchema, QueryParamsState } from '../types';
 
 /**
  * @internal
@@ -8,13 +8,13 @@ export function getDefaultQueryParamsState<
 >(
   queryParamsSchema: QueryParamsSchema,
   contextData?: any
-): QueryParams<QueryParamsSchema> {
+): QueryParamsState<QueryParamsSchema> {
   return Object.keys(queryParamsSchema).reduce(
     (acc, queryParamKey: keyof QueryParamsSchema) => {
       const queryParamDef = queryParamsSchema[queryParamKey];
       acc[queryParamKey] = queryParamDef.getDefaultValue(contextData);
       return acc;
     },
-    {} as QueryParams<QueryParamsSchema>
+    {} as QueryParamsState<QueryParamsSchema>
   );
 }

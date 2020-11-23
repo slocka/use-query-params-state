@@ -1,4 +1,4 @@
-import { IQueryParamsStateSchema, QueryParams } from './types';
+import { IQueryParamsStateSchema, QueryParamsState } from './types';
 
 import { runParamsValidatorsPartial } from './validators';
 import { serializeQueryParamsValues } from './internal/serializer/serialize';
@@ -19,7 +19,7 @@ export function buildQueryString<
    * The query parameters you want to add to the query string and belong
    * to the schema.
    */
-  newQueryParams: Partial<QueryParams<QueryParamsSchema>> = {},
+  newQueryParams: Partial<QueryParamsState<QueryParamsSchema>> = {},
   contextData?: any,
   /**
    * The query parameters you want to add to the query string but don't

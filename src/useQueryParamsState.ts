@@ -6,7 +6,7 @@ import { getRawQueryParamsInSchemaFromURL } from './internal/getQueryParamsFromU
 import {
   IQueryParamsStateSchema,
   QS_BUILD_STRATEGY,
-  QueryParams,
+  QueryParamsState,
   SetQueryParamsState,
   RawQueryParams,
 } from './types';
@@ -20,7 +20,10 @@ export function useQueryParamsState<
 >(
   queryParamsSchema: QueryParamsSchema,
   contextData?: any
-): [QueryParams<QueryParamsSchema>, SetQueryParamsState<QueryParamsSchema>] {
+): [
+  QueryParamsState<QueryParamsSchema>,
+  SetQueryParamsState<QueryParamsSchema>
+] {
   const rawQueryParams = useRawQueryParamsFromUrl(queryParamsSchema);
 
   // Convert queryParams values from string to the type defined for each query param.
