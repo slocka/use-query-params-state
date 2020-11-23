@@ -1,4 +1,4 @@
-import { isNumber, isNil } from '../typeChecking';
+import { isNumber, isNil, getTypeName } from '../typeChecking';
 import { Serializer } from '../../types';
 import { Errors } from '../../errors';
 
@@ -23,7 +23,7 @@ const arrayStringsSerializer: Serializer<string[]> = {
 
     if (!Array.isArray(array)) {
       throw new Errors.QueryParamsUpdateError(
-        `was expecting an array but received a ${typeof array}.`
+        `was expecting an array but received a ${getTypeName(array)}.`
       );
     }
 
@@ -50,7 +50,7 @@ const arrayNumbersSerializer: Serializer<number[]> = {
 
     if (!Array.isArray(array)) {
       throw new Errors.QueryParamsUpdateError(
-        `was expecting an array but received a ${typeof array}.`
+        `was expecting an array but received a ${getTypeName(array)}.`
       );
     }
 
@@ -69,7 +69,7 @@ const stringSerializer: Serializer<string> = {
 
     if (typeof str !== 'string') {
       throw new Errors.QueryParamsUpdateError(
-        `was expecting a string but received a ${typeof str}.`
+        `was expecting a string but received a ${getTypeName(str)}.`
       );
     }
 
@@ -106,7 +106,7 @@ const booleanSerializer: Serializer<boolean> = {
 
     if (typeof bool !== 'boolean') {
       throw new Errors.QueryParamsUpdateError(
-        `was expecting a boolean but received a ${typeof bool}.`
+        `was expecting a boolean but received a ${getTypeName(bool)}.`
       );
     }
 
@@ -130,7 +130,7 @@ const numberSerializer: Serializer<number> = {
 
     if (!isNumber(number)) {
       throw new Errors.QueryParamsUpdateError(
-        `was expecting a number but received a ${typeof number}.`
+        `was expecting a number but received a ${getTypeName(number)}.`
       );
     }
 

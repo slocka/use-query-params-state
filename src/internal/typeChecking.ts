@@ -23,3 +23,16 @@ export function isNumber(value: any): value is number {
 export function isNil(value: any): value is undefined | null {
   return isUndefined(value) || value === null;
 }
+
+/**
+ * Returns the type of the value.
+ * This is a slightly smarter version of `typeof X`
+ * which can handle arrays.
+ */
+export function getTypeName(value: any): string {
+  if (Array.isArray(value)) {
+    return 'array';
+  }
+
+  return typeof value;
+}
