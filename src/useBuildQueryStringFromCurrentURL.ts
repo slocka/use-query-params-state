@@ -7,7 +7,7 @@ import {
   QS_BUILD_STRATEGY,
 } from './types';
 
-import { buildQueryStringFromCurrentURL } from './helpers';
+import { buildQueryStringFromCurrentURL } from './internal/buildQueryStringFromCurrentURL';
 
 /**
  * React hook returning a function to build a new query string from the current

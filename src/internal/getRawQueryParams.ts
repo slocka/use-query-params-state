@@ -1,5 +1,5 @@
 import { RawQueryParams, IQueryParamsSchema, QueryParams } from '../types';
-import { serializeQueryParamsValues } from '../serializer/serialize';
+import { serializeQueryParamsValues } from '../internal/serializer/serialize';
 
 /**
  * Convert each queryParams value to its "raw" (stringified) version based

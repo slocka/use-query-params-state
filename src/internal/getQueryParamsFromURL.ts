@@ -2,7 +2,7 @@ import { IQueryParamsSchema, RawQueryParams } from '../types';
 
 import { useLocation } from 'react-router-dom';
 
-import { parseQueryString } from '../lib';
+import { parseQueryString } from '../internal/queryString';
 
 /**
  * @internal

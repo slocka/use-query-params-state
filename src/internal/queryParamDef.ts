@@ -1,4 +1,4 @@
-import { isUndefined, isFunction } from './lib';
+import { isUndefined, isFunction } from './typeChecking';
 
 import {
   Serializer,
@@ -6,7 +6,7 @@ import {
   DefaultValue,
   DefaultValueFunction,
   ValidatorFunction,
-} from './types';
+} from '../types';
 
 export class QueryParamDef<T> {
   private defaultValue?: DefaultValue<T>;

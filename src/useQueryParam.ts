@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { QPARAMS } from './qparams';
 
-import { QueryParamDef } from './queryParamDef';
+import { QueryParamDef } from './internal/queryParamDef';
 
 import { useQueryParamsState } from './useQueryParamsState';
 
@@ -21,6 +21,9 @@ export function useQueryParam<T>(
   contextData?: any
 ): [T | null | undefined, (value?: T | null | undefined) => void];
 
+/**
+ * Hook to manage one query param state at a time.
+ */
 export function useQueryParam(
   paramName: string,
   queryParamDef: QueryParamDef<any> = QPARAMS.string(),

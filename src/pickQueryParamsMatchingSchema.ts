@@ -1,4 +1,4 @@
-import { QueryParams, IQueryParamsSchema } from '../types';
+import { QueryParams, IQueryParamsSchema } from './types';
 
 /**
  * Take an object as input and return a new object keeping only

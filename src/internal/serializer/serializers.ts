@@ -1,6 +1,6 @@
-import { isNumber, isNil } from '../lib';
-import { Serializer } from '../types';
-import { Errors } from '../errors';
+import { isNumber, isNil } from '../typeChecking';
+import { Serializer } from '../../types';
+import { Errors } from '../../errors';
 
 const ARRAY_DELIMITER = ',';
 
