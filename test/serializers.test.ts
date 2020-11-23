@@ -1,4 +1,4 @@
-import serializers from '../src/serializer/serializers';
+import serializers from '../src/internal/serializer/serializers';
 
 import { Serializer } from '../src/types';
 

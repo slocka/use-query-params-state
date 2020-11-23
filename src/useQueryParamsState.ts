@@ -12,7 +12,7 @@ import {
   RawQueryParams,
 } from './types';
 
-import { deserializeQueryParamsValues } from './serializer/serialize';
+import { deserializeQueryParamsValues } from './internal/serializer/serialize';
 
 import { runParamsValidators } from './validators';
 

@@ -8,7 +8,7 @@ import {
 } from './getQueryParamsFromURL';
 
 import { runParamsValidatorsPartial } from '../validators';
-import { serializeQueryParamsValues } from '../serializer/serialize';
+import { serializeQueryParamsValues } from '../internal/serializer/serialize';
 import { getDefaultQueryParamsState } from './getDefaultQueryParamsState';
 import { createQueryString } from '../internal/queryString';
 
