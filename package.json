@@ -15,7 +15,9 @@
     "build": "tsdx build",
     "test": "tsdx test --passWithNoTests",
     "lint": "tsdx lint",
-    "prepare": "tsdx build"
+    "prepare": "tsdx build",
+    "doc": "typedoc src/index.ts",
+    "doc:local": "npm run doc && http-server ./docs -p 8081 -o"
   },
   "peerDependencies": {
     "react": ">=16.8.0",
@@ -51,6 +53,7 @@
     "@types/react-dom": "^16.9.6",
     "@types/react-router-dom": "^5.1.4",
     "history": "^4.10.1",
+    "http-server": "^0.12.3",
     "husky": "^4.3.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -58,6 +61,7 @@
     "react-router-dom": "^5.1.2",
     "react-test-renderer": "^16.13.1",
     "ts-expect": "^1.1.0",
-    "tsdx": "^0.14.1"
+    "tsdx": "^0.14.1",
+    "typedoc": "^0.20.0-beta.8"
   }
 }
