@@ -4,6 +4,9 @@ import { useLocation } from 'react-router-dom';
 
 import { parseQueryString } from '../lib';
 
+/**
+ * @internal
+ */
 export function getAllRawQueryParamsFromURL(
   location: ReturnType<typeof useLocation>
 ) {
@@ -12,6 +15,9 @@ export function getAllRawQueryParamsFromURL(
   return parseQueryString(queryString);
 }
 
+/**
+ * @internal
+ */
 export function getRawQueryParamsInSchemaFromURL<
   QueryParamsSchema extends IQueryParamsSchema
 >(
@@ -35,6 +41,9 @@ export function getRawQueryParamsInSchemaFromURL<
   );
 }
 
+/**
+ * @internal
+ */
 export function getExternalQueryParamsFromURL<
   QueryParamsSchema extends IQueryParamsSchema
 >(

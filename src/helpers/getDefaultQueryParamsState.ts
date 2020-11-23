@@ -1,5 +1,8 @@
 import { IQueryParamsSchema, QueryParams } from '../types';
 
+/**
+ * @internal
+ */
 export function getDefaultQueryParamsState<
   QueryParamsSchema extends IQueryParamsSchema
 >(

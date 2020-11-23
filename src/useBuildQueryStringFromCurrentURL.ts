@@ -9,6 +9,11 @@ import {
 
 import { buildQueryStringFromCurrentURL } from './helpers';
 
+/**
+ * React hook returning a function to build a new query string from the current
+ * URL location query string. This is useful if you want to create a new query string
+ * while preserving some parameters from the current one.
+ */
 export function useBuildQueryStringFromCurrentURL<
   QueryParamsSchema extends IQueryParamsSchema
 >(

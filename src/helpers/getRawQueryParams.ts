@@ -4,6 +4,7 @@ import { serializeQueryParamsValues } from '../serializer/serialize';
 /**
  * Convert each queryParams value to its "raw" (stringified) version based
  * on the provided schema.
+ * @internal
  */
 export function getRawQueryParams<QueryParamsSchema extends IQueryParamsSchema>(
   queryParams: QueryParams<QueryParamsSchema>,

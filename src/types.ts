@@ -1,9 +1,23 @@
 import { QueryParamDef } from './queryParamDef';
 
 export enum QS_BUILD_STRATEGY {
+  /**
+   * Create a new query string from new params and preserve all pre-existing params.
+   */
   PRESERVE_ALL,
+  /**
+   * Create a new query string from new params and only preserve pre-existing params that are not
+   * outside the schema.
+   */
   PRESERVE_EXTERNAL_ONLY,
+  /**
+   * Create a new query string from new params, preserve all pre-existing params, and add params defined in schema
+   * but are missing from the query string. (For those, the param value will be the default value).
+   */
   PRESERVE_ALL_WITH_DEFAULT,
+  /**
+   * Create a new query string from new params only.
+   */
   PRESERVE_NONE,
 }
 
