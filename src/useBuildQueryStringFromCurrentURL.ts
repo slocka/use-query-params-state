@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import {
   IQueryParamsStateSchema,
   QueryParamsState,
-  QueryStringBuilderFunction,
+  BuildQueryStringFromCurrentUrl,
   QS_BUILD_STRATEGY,
 } from './types';
 
@@ -18,7 +18,7 @@ export function useBuildQueryStringFromCurrentURL<
   QueryParamsSchema extends IQueryParamsStateSchema
 >(
   queryParamsSchema: QueryParamsSchema
-): QueryStringBuilderFunction<QueryParamsSchema> {
+): BuildQueryStringFromCurrentUrl<QueryParamsSchema> {
   const location = useLocation();
 
   function buildQueryString(
