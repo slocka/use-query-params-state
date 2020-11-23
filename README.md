@@ -61,10 +61,16 @@ npm install use-query-params-state
 
 ### How to use?
 
-#### useQueryParamsState(queryParamsSchema)
+### Defining your query params schema.
+
+use-query-params-state relies on schema definition to automatically transform the URL query string to its React state and vice versa. 
+
+The QueryParamsSchema is a map between the name of the parameter and its definition (type, default value, validator). It is used to define what parameters are part of the state, and how to serialize/deserialize each of them.
+
+The first step is to build your query param state schema:
 
 ```js
-import { QPARAMS, useQueryParamsState, VALIDATORS } from "use-query-params-state"
+import { QPARAMS, VALIDATORS } from "use-query-params-state"
 
 /**
  * Configure each param with:
@@ -73,45 +79,96 @@ import { QPARAMS, useQueryParamsState, VALIDATORS } from "use-query-params-state
  *  - An optional validator function.
  */
 const queryParamsSchema = {
-    "search": QPARAMS.string(),
-    "minRating": QPARAMS.number(0 /* default value*/),
-    "sizes": QPARAMS.arrayOfNumbers(),
-    "brands": QPARAMS.arrayOfStrings(null),
-    "sortDirection": QPARAMS.string("desc").validator(VALIDATORS.oneOf(["asc", "desc"])),
-    "sortBy": QPARAMS.string("price"),
-    "newOnly": QPARAMS.boolean(false)
+    search: QPARAMS.string(),
+    minRating: QPARAMS.number(0 /* default value*/),
+    sizes: QPARAMS.arrayOfNumbers(),
+    brands: QPARAMS.arrayOfStrings(null),
+    sortDirection: QPARAMS.string("desc").validator(VALIDATORS.oneOf(["asc", "desc"])),
+    sortBy: QPARAMS.string("price"),
+    newOnly: QPARAMS.boolean(false)
+}
+```
+
+QPARAMS object exposes the following factory functions to define each query param of your schema:
+
+| QueryParamDef factory | Query param state type        | Query string format    | Query params state         |
+|-----------------------|-------------------------------|------------------------|----------------------------|
+| .number()             | number \| null \| undefined   | ?rating=4              | { rating: 4 }              |
+| .string()             | string \| null \| undefined   | ?search="tennis+shoes" | { search: "tennis shoes" } |
+| .boolean()            | boolean \| null \| undefined  | ?freeDelivery=true     | { freeDelivery: true }     |
+| .arrayOfStrings()     | string[] \| null \| undefined | ?sizes=S,M,L           | { sizes: ["S", "M", "L"] } |
+| .arrayOfNumbers()     | number[] \| null \| undefined | ?sizes=9,10,11         | { sizes: [9,10,11] }       |
+
+Each factory function can accept a default value. See [API reference guide](API_REFERENCE.md#QPARAMS) to learn more about it.
+
+### Read the query params state
+
+Once your schema is defined, you can use the `useQueryParamsState` hook to access the current state of your query parameters.
+
+```js
+import { QPARAMS, VALIDATORS, useQueryParamsStates } from "use-query-params-state"
+
+// Define the schema
+const queryParamsSchema = {
+    search: QPARAMS.string(),
+    minRating: QPARAMS.number(0 /* default value*/),
+    sizes: QPARAMS.arrayOfNumbers(),
+    brands: QPARAMS.arrayOfStrings(null),
+    sortDirection: QPARAMS.string("desc").validator(VALIDATORS.oneOf(["asc", "desc"])),
+    sortBy: QPARAMS.string("price"),
+    newOnly: QPARAMS.boolean(false)
+}
+
+function MyComponent() {
+    // queryParamsState is the React state directly derived from the URL query string based on the provided schema.
+    const [queryParamsState] = useQueryParamsState(queryParamsSchema)
+}
+```
+
+### Update the query params state
+
+useQueryParamsState also exposes a setter function to update the state of your query params. The setter function applies a partial update by default, meaning that you only need to pass the query parameters that you want to change (other params will be preserved).  
+
+```ts
+// Define the schema
+const queryParamsSchema = {
+    search: QPARAMS.string(),
+    minRating: QPARAMS.number(0 /* default value*/),
+    sizes: QPARAMS.arrayOfNumbers(),
+    brands: QPARAMS.arrayOfStrings(null),
+    sortDirection: QPARAMS.string("desc").validator(VALIDATORS.oneOf(["asc", "desc"])),
+    sortBy: QPARAMS.string("price"),
+    newOnly: QPARAMS.boolean(false)
 }
 
 function MyComponent() {
     const [queryParamsState, setQueryParamsState] = useQueryParamsState(queryParamsSchema)
-}
-```
-Note: If you need to dynamically change your config base on your component props, you can also do it.
 
-```js
-function MyComponent(props) {
-    const [queryParamsState, setQueryParamsState] = useQueryParamsState({
-        "sortBy": QPARAMS.string(props.userPreferences.defaultSortBy)
-    })
+    const onSearchChange = (newSearchValue: string) => {
+        // Update the search param value in the URL and in the React state.
+        setQueryParamsState({ search: newSearchValue })
+    }
 }
 ```
 
-#### createUseQueryParamsStateHook(queryParamsSchema)
+Note: When updating the query params state, the change is automatically reflected in the URL query string. In fact, use-query-params-state does not create any local state, it uses the URL as the unique source of truth and derives the query params state from the current query string and the provided schema.
 
-If you want to call useQueryParamsState in multiple components and want to avoid having to specify the config
-everywhere, you can use the createUseQueryParamsStateHook factory to create a hook with an embeded config.
+### Usage of useQueryParamsState across multiple components
+
+If you want to call useQueryParamsState in multiple components and want to avoid having to specify the schema each time,
+you can use the [createUseQueryParamsStateHook](doc/API_REFERENCE.md#createUseQueryParamsStateHook) factory.
 
 ```js
 import { createUseQueryParamsStateHook, QPARAMS, VALIDATORS } from "use-query-params-state"
 
 const queryParamsSchema = {
-    "search": QPARAMS.string(),
-    "minRating": QPARAMS.number(0 /* default value*/),
-    "sizes": QPARAMS.arrayOfNumbers(),
-    "brands": QPARAMS.arrayOfStrings(null),
-    "sortDirection": QPARAMS.string("desc").validator(VALIDATORS.oneOf(["asc", "desc"])),
-    "sortBy": QPARAMS.string("price"),
-    "newOnly": QPARAMS.boolean(false)
+    search: QPARAMS.string(),
+    minRating: QPARAMS.number(0 /* default value*/),
+    sizes: QPARAMS.arrayOfNumbers(),
+    brands: QPARAMS.arrayOfStrings(null),
+    sortDirection: QPARAMS.string("desc").validator(VALIDATORS.oneOf(["asc", "desc"])),
+    sortBy: QPARAMS.string("price"),
+    newOnly: QPARAMS.boolean(false)
 }
 
 const useProductSearchFilters = createUseQueryParamsStateHook(queryParamsSchema)
@@ -122,40 +179,6 @@ function MyComponent1() {
 
 function MyComponent2() {
     const [filters, setFilters] = useProductSearchFilters()
-}
-```
-
-### Defining your query params schema.
-
-The QueryParamsSchema is a map between the name of the parameter and its definition (type, default value, validator). It is used to define what parameters are part of the state, and how to serialize/deserialize each of them.
-
-#### Query parameters definition
-
-#### Default value
-Each parameter definition factory function can receive a default value as the first argument.
-```js
-function MyComponent() {
-    const [queryParamsState, setQueryParamsState] = useQueryParamsState({
-        sortBy: QPARAMS.string("myDefaultValue")
-    })
-    console.log(queryParamsState.sortBy)
-    // => "myDefaultValue" if "sortBy" doesn't exist in the URL query string.
-}
-```
-
-The default value can also be a function that will be executed each time we need to re-evaluate the query param state.
-```js
-// Read from local storage,
-function getSortByUserPreference() {
-    const userPreferences = JSON.parse(localStorage.getItem("user_preferences"))
-    return userPreferences.sortBy
-}
-
-function MyComponent() {
-    const [queryParamsState, setQueryParamsState] = useQueryParamsState({
-        // Read default from local storage.
-        sortBy: QPARAMS.string(getSortByUserPreference)
-    })
 }
 ```
 

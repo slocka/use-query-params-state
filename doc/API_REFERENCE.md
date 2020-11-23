@@ -114,6 +114,15 @@ function MyComponent() {
 }
 ```
 
+If you need to dynamically change your config base on your component props, you can also do it.
+
+```js
+function MyComponent(props) {
+    const [queryParamsState, setQueryParamsState] = useQueryParamsState({
+        "sortBy": QPARAMS.string(props.userPreferences.defaultSortBy)
+    })
+}
+```
 
 ## useQueryParam
 
@@ -185,6 +194,8 @@ const useProductSearchFilters = () => {
     return useQueryParamsState(queryParamsSchema)
 }
 ```
+
+
 
 ## buildQueryString
 
