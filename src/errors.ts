@@ -1,20 +1,26 @@
-export class QueryParamsValidationError extends Error {
+class QueryParamsValidationError extends Error {
   constructor(message: string) {
     super(message);
     this.name = 'QueryParamsValidationError';
   }
 }
 
-export class QueryParamsConfigError extends Error {
+class QueryParamsConfigError extends Error {
   constructor(message: string) {
     super(message);
     this.name = 'QueryParamsConfigError';
   }
 }
 
-export class QueryParamsUpdateError extends Error {
+class QueryParamsUpdateError extends Error {
   constructor(message: string) {
     super(message);
     this.name = 'QueryParamsUpdateError';
   }
 }
+
+export const Errors = {
+  QueryParamsValidationError,
+  QueryParamsConfigError,
+  QueryParamsUpdateError,
+};

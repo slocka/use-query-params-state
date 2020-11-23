@@ -13,7 +13,7 @@ import {
   createUseQueryParamsStateHook,
 } from '../src/index';
 
-import { QueryParamsValidationError } from '../src/errors';
+import { Errors } from '../src/errors';
 
 let history: MemoryHistory;
 let wrapper: React.ComponentType;
@@ -448,7 +448,7 @@ describe('Serializer', () => {
 describe('query param validators', () => {
   const lessThan10Validator = (stateValue: number) => {
     if (stateValue >= 10) {
-      throw new QueryParamsValidationError('Invalid number');
+      throw new Errors.QueryParamsValidationError('Invalid number');
     }
   };
 
@@ -458,7 +458,7 @@ describe('query param validators', () => {
     contextData: any
   ) => {
     if (stateValue >= contextData.max) {
-      throw new QueryParamsValidationError('Invalid number');
+      throw new Errors.QueryParamsValidationError('Invalid number');
     }
   };
 

@@ -1,7 +1,7 @@
 import { isUndefined } from '../lib';
 import { QueryParams, RawQueryParams, IQueryParamsSchema } from '../types';
 
-import { QueryParamsUpdateError } from '../errors';
+import { Errors } from '../errors';
 
 /**
  * Parse each individual query params with the parser provided for each prop
@@ -43,7 +43,7 @@ export function serializeQueryParamsValues<
       const queryParamDef = queryParamsSchema[queryParamKey];
       if (!queryParamDef) {
         const availableQueryParamsKeys = Object.keys(queryParamsSchema);
-        throw new QueryParamsUpdateError(
+        throw new Errors.QueryParamsUpdateError(
           `"${queryParamKey}" is not defined in queryParams Schema. Defined query params are: ${JSON.stringify(
             availableQueryParamsKeys
           )}.`

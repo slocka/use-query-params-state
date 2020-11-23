@@ -1,4 +1,4 @@
-import { QueryParamsConfigError, QueryParamsValidationError } from './errors';
+import { Errors } from './errors';
 import { IQueryParamsSchema, QueryParams } from './types';
 
 /**
@@ -71,26 +71,29 @@ export function runParamsValidatorsPartial<
   );
 }
 
-export const paramValidators = {
-  oneOf: (possibleValues: Array<any>) => {
-    if (!possibleValues || !Array.isArray(possibleValues)) {
-      throw new QueryParamsConfigError(
-        "Validator 'oneOf()' takes an array as first argument."
+function oneOfValidator<T>(possibleValues: Array<T>) {
+  if (!possibleValues || !Array.isArray(possibleValues)) {
+    throw new Errors.QueryParamsConfigError(
+      "Validator 'oneOf()' takes an array as first argument."
+    );
+  }
+
+  return (paramValue: any): T => {
+    if (possibleValues.indexOf(paramValue) === -1) {
+      throw new Errors.QueryParamsValidationError(
+        `Invalid value '${paramValue}'. Accepted values are: ${possibleValues.join(
+          ','
+        )}.`
       );
     }
 
-    return (paramValue: any) => {
-      if (possibleValues.indexOf(paramValue) === -1) {
-        throw new QueryParamsValidationError(
-          `Invalid value '${paramValue}'. Accepted values are: ${possibleValues.join(
-            ','
-          )}.`
-        );
-      }
+    return paramValue;
+  };
+}
 
-      return paramValue;
-    };
-  },
+export const VALIDATORS = {
+  /**
+   * Returns a validator function that checks if the paramValue is shallow equal to one of the provided `possibleValues`.
+   */
+  oneOf: oneOfValidator,
 };
-
-export default paramValidators;

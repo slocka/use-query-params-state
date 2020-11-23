@@ -7,7 +7,7 @@ import '@testing-library/jest-dom';
 import { getAppWrapper } from './getAppWrapper';
 
 import { useQueryParam, QPARAMS } from '../src/index';
-import { QueryParamsValidationError } from '../src/errors';
+import { Errors } from '../src/errors';
 
 let history: MemoryHistory;
 let wrapper: React.ComponentType;
@@ -157,7 +157,7 @@ describe('With default value', () => {
 describe('With validator function', () => {
   const lessThan10Validator = (stateValue: any) => {
     if (stateValue >= 10) {
-      throw new QueryParamsValidationError('Invalid number');
+      throw new Errors.QueryParamsValidationError('Invalid number');
     }
   };
 
