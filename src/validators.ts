@@ -1,12 +1,12 @@
 import { Errors } from './errors';
-import { IQueryParamsSchema, QueryParams } from './types';
+import { IQueryParamsStateSchema, QueryParams } from './types';
 
 /**
  * For each query param where a validator function was provided, run the validator function.
  * If the validation fails, the provided default value will be used.
  */
 export function runParamsValidators<
-  QueryParamsSchema extends IQueryParamsSchema
+  QueryParamsSchema extends IQueryParamsStateSchema
 >(
   queryParamsSchema: QueryParamsSchema,
   queryParams: QueryParams<QueryParamsSchema>,
@@ -35,7 +35,7 @@ export function runParamsValidators<
 }
 
 export function runParamsValidatorsPartial<
-  QueryParamsSchema extends IQueryParamsSchema
+  QueryParamsSchema extends IQueryParamsStateSchema
 >(
   queryParamsSchema: QueryParamsSchema,
   queryParams: Partial<QueryParams<QueryParamsSchema>>,

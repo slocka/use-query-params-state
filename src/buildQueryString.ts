@@ -1,4 +1,4 @@
-import { IQueryParamsSchema, QueryParams } from './types';
+import { IQueryParamsStateSchema, QueryParams } from './types';
 
 import { runParamsValidatorsPartial } from './validators';
 import { serializeQueryParamsValues } from './internal/serializer/serialize';
@@ -8,7 +8,9 @@ import { createQueryString } from './internal/queryString';
  * Create a new query string based on the provided schema and a matching query params object.
  * An error will be thrown if the param does not match the type defined in the schema.
  */
-export function buildQueryString<QueryParamsSchema extends IQueryParamsSchema>(
+export function buildQueryString<
+  QueryParamsSchema extends IQueryParamsStateSchema
+>(
   /**
    * The parameters schema followed by the query string.
    */

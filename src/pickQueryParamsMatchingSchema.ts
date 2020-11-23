@@ -1,4 +1,4 @@
-import { QueryParams, IQueryParamsSchema } from './types';
+import { QueryParams, IQueryParamsStateSchema } from './types';
 
 /**
  * Take an object as input and return a new object keeping only
@@ -16,7 +16,7 @@ import { QueryParams, IQueryParamsSchema } from './types';
  * This util does not do any type validation.
  */
 export function pickQueryParamsMatchingSchema<
-  QueryParamsSchema extends IQueryParamsSchema
+  QueryParamsSchema extends IQueryParamsStateSchema
 >(
   queryParamsSchema: QueryParamsSchema,
   queryParams: Record<string, any>

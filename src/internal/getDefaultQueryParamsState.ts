@@ -1,10 +1,10 @@
-import { IQueryParamsSchema, QueryParams } from '../types';
+import { IQueryParamsStateSchema, QueryParams } from '../types';
 
 /**
  * @internal
  */
 export function getDefaultQueryParamsState<
-  QueryParamsSchema extends IQueryParamsSchema
+  QueryParamsSchema extends IQueryParamsStateSchema
 >(
   queryParamsSchema: QueryParamsSchema,
   contextData?: any

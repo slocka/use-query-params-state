@@ -1,5 +1,9 @@
 import { isUndefined } from '../typeChecking';
-import { QueryParams, RawQueryParams, IQueryParamsSchema } from '../../types';
+import {
+  QueryParams,
+  RawQueryParams,
+  IQueryParamsStateSchema,
+} from '../../types';
 
 import { Errors } from '../../errors';
 
@@ -12,7 +16,7 @@ import { Errors } from '../../errors';
  * @param queryParams - Raw query params extracted from the URL but not parsed.
  */
 export function deserializeQueryParamsValues<
-  QueryParamsSchema extends IQueryParamsSchema
+  QueryParamsSchema extends IQueryParamsStateSchema
 >(
   queryParamsSchema: QueryParamsSchema,
   rawQueryParams: Partial<RawQueryParams<QueryParamsSchema>>,
@@ -33,7 +37,7 @@ export function deserializeQueryParamsValues<
 }
 
 export function serializeQueryParamsValues<
-  QueryParamsSchema extends IQueryParamsSchema
+  QueryParamsSchema extends IQueryParamsStateSchema
 >(
   queryParamsSchema: QueryParamsSchema,
   queryParams: Partial<QueryParams<QueryParamsSchema>>

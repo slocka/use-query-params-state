@@ -4,7 +4,7 @@ import { buildQueryStringFromCurrentURL } from './internal/buildQueryStringFromC
 import { getRawQueryParamsInSchemaFromURL } from './internal/getQueryParamsFromURL';
 
 import {
-  IQueryParamsSchema,
+  IQueryParamsStateSchema,
   QS_BUILD_STRATEGY,
   QueryParams,
   QueryParamsSetter,
@@ -16,7 +16,7 @@ import { deserializeQueryParamsValues } from './internal/serializer/serialize';
 import { runParamsValidators } from './validators';
 
 export function useQueryParamsState<
-  QueryParamsSchema extends IQueryParamsSchema
+  QueryParamsSchema extends IQueryParamsStateSchema
 >(
   queryParamsSchema: QueryParamsSchema,
   contextData?: any
@@ -54,16 +54,18 @@ export function useQueryParamsState<
  * of a key/value object.
  * The current implementation is tight to React-router.
  */
-function useRawQueryParamsFromUrl<QueryParamsSchema extends IQueryParamsSchema>(
-  schema: QueryParamsSchema
-): Partial<RawQueryParams<QueryParamsSchema>> {
+function useRawQueryParamsFromUrl<
+  QueryParamsSchema extends IQueryParamsStateSchema
+>(schema: QueryParamsSchema): Partial<RawQueryParams<QueryParamsSchema>> {
   const location = useLocation();
   const queryStringParams = getRawQueryParamsInSchemaFromURL(location, schema);
 
   return queryStringParams;
 }
 
-function useSetQueryParamsState<QueryParamsSchema extends IQueryParamsSchema>(
+function useSetQueryParamsState<
+  QueryParamsSchema extends IQueryParamsStateSchema
+>(
   queryParamsSchema: QueryParamsSchema,
   contextData?: any
 ): QueryParamsSetter<QueryParamsSchema> {

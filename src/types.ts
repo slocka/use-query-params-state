@@ -27,24 +27,24 @@ export type ValidatorFunction<T> = (
   contextData: any
 ) => void;
 
-export type IQueryParamsSchema = Record<string, QueryParamDef<any>>;
-export type QueryParams<S extends IQueryParamsSchema> = {
+export type IQueryParamsStateSchema = Record<string, QueryParamDef<any>>;
+export type QueryParams<S extends IQueryParamsStateSchema> = {
   [K in keyof S]: S[K] extends QueryParamDef<infer T>
     ? T | null | undefined
     : never;
 };
 
-export type QueryParamsSetter<T extends IQueryParamsSchema> = (
+export type QueryParamsSetter<T extends IQueryParamsStateSchema> = (
   newQueryParams: Partial<QueryParams<T>>,
   fromCurrent?: boolean
 ) => void;
 
-export type RawQueryParams<S extends IQueryParamsSchema> = Record<
+export type RawQueryParams<S extends IQueryParamsStateSchema> = Record<
   keyof S,
   string | null | undefined
 >;
 
-export type QueryStringBuilderFunction<T extends IQueryParamsSchema> = (
+export type QueryStringBuilderFunction<T extends IQueryParamsStateSchema> = (
   newQueryParams?: Partial<QueryParams<T>>,
   buildStrategy?: QS_BUILD_STRATEGY,
   contextData?: any

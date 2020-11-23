@@ -1,6 +1,10 @@
 import { useLocation } from 'react-router-dom';
 
-import { IQueryParamsSchema, QueryParams, QS_BUILD_STRATEGY } from '../types';
+import {
+  IQueryParamsStateSchema,
+  QueryParams,
+  QS_BUILD_STRATEGY,
+} from '../types';
 
 import {
   getAllRawQueryParamsFromURL,
@@ -15,7 +19,7 @@ import { buildQueryString } from '../buildQueryString';
  * @internal
  */
 export function buildQueryStringFromCurrentURL<
-  QueryParamsSchema extends IQueryParamsSchema
+  QueryParamsSchema extends IQueryParamsStateSchema
 >(
   location: ReturnType<typeof useLocation>,
   queryParamsSchema: QueryParamsSchema,
@@ -42,7 +46,7 @@ export function buildQueryStringFromCurrentURL<
  * Get object in which the new query params are going be merged into.
  * The returned object has its valued already stringified.
  */
-function getMergeDestination<QueryParamsSchema extends IQueryParamsSchema>(
+function getMergeDestination<QueryParamsSchema extends IQueryParamsStateSchema>(
   location: ReturnType<typeof useLocation>,
   queryParamsSchema: QueryParamsSchema,
   buildStrategy: QS_BUILD_STRATEGY,
