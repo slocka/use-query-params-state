@@ -4,11 +4,11 @@ React hooks to manage your application state using the URL query string ([search
 
 ## Why use-query-params-state?
 
-use-query-params-state aims to improve the end user experience by providing a solution helping developers creating more shareable React web application. It is doing so by making URL state management easy, reliable and type safe and therefore encouraging developers to use the URL query string more often.
+use-query-params-state aims to improve the end user experience by encouraging developers to create more shareable web application. It has been built to make URL state management easy, reliable and type safe using React and the URL query string.
 
-**Note:** Not all the states of your application can/should be stored in the URL. use-query-params-state is typically suited to manage states corresponding to parameters manipulated by the user that influence the current page.
+**Note:** Not all the states of your application can/should be stored in the URL. use-query-params-state is typically suited to manage simple states like parameters that influence the current page and are manipulated by the user.
 
-Example of URL state using use-query-params-state: 
+Example of URL storing parameters in the query string: 
 ```js
 "/products-search?search=red+bike&page=10&pageSize=20&minRating=20&free_delivery=true"
 ```
@@ -18,18 +18,18 @@ It is a common pattern for modern web applications to use the URL search query s
 - Your application content can easily be shared across the web.
 - Users can directly access a specific state of your application through a hyperlink.
 - Users can undo/redo their actions through the browser history.
-- Users can bookmark the page and come back later on the same or different device with the application in the state it was left in.
+- Users can bookmark the page and come back later on the same or different device with the application in the same state.
  
 ### A better developer experience
 
-If managing your state through the URL can improve the user experience, the developer experience can quickly suffer from it. Implementing this pattern from scratch can be challenging and tedious as there are multiple things to manage:
+If managing a part of your state through the URL can improve the user experience, the developer experience can quickly suffer from it. Implementing this pattern from scratch can be challenging and tedious as there are multiple things to manage:
 - Keeping the URL and your React state in sync.
 - Convert the query string to your React state when reading from the URL.
 - Convert your React state to its query string representation when writing to the URL.
 - Keeping track of the correct type of each param during encoding/decoding phase (everything in the URL is a string).
 - Making sure the state defined by the URL hasn't been wrongly altered by the user or isn't corrupted.
 
-use-query-params-state handles all those problems for you and offers a React hook solution similar to React `useState`.
+use-query-params-state simplify all these and offers a simple React hook solution similar to React `useState`.
 
 ### Other benefits
 - SEO: By making the different states of your application accessible directly by a simple link, you are working towards making your content more discoverable by search engine crawlers and therefore potentially more optimized for SEO ranking.
@@ -70,7 +70,7 @@ npm install use-query-params-state
 
 use-query-params-state relies on a schema definition defined by the developer to automatically transform the URL query string to its React state and vice versa. 
 
-The QueryParamsSchema is a map between the name of the parameter and its definition (type, default value, validator). It is used to define what parameters are part of the state, and how to serialize/deserialize each of them.
+The QueryParamsStateSchema is a map between the name of the parameter and its definition (type, default value, validator). It is used to define what parameters are part of the state, and how to serialize/deserialize each of them.
 
 The first step is to build your query param state schema:
 
@@ -83,7 +83,7 @@ import { QPARAMS, VALIDATORS } from "use-query-params-state"
  *  - An optional default value.
  *  - An optional validator function.
  */
-const queryParamsSchema = {
+const queryParamsStateSchema = {
     search: QPARAMS.string(),
     minRating: QPARAMS.number(0 /* default value*/),
     sizes: QPARAMS.arrayOfNumbers(),
@@ -114,7 +114,7 @@ Once your schema is defined, you can use the `useQueryParamsState` hook to acces
 import { QPARAMS, VALIDATORS, useQueryParamsStates } from "use-query-params-state"
 
 // Define the schema
-const queryParamsSchema = {
+const queryParamsStateSchema = {
     search: QPARAMS.string(),
     minRating: QPARAMS.number(0 /* default value*/),
     sizes: QPARAMS.arrayOfNumbers(),
@@ -126,7 +126,7 @@ const queryParamsSchema = {
 
 function MyComponent() {
     // queryParamsState is the React state directly derived from the URL query string based on the provided schema.
-    const [queryParamsState] = useQueryParamsState(queryParamsSchema)
+    const [queryParamsState] = useQueryParamsState(queryParamsStateSchema)
 
     /**
      * In this example, if the URL is "/products-search?search=red+bike&brands=loulou&sortDirection=desc"
@@ -150,7 +150,7 @@ useQueryParamsState also exposes a setter function to update the state of your q
 
 ```ts
 // Define the schema
-const queryParamsSchema = {
+const queryParamsStateSchema = {
     search: QPARAMS.string(),
     minRating: QPARAMS.number(0 /* default value*/),
     sizes: QPARAMS.arrayOfNumbers(),
@@ -161,7 +161,7 @@ const queryParamsSchema = {
 }
 
 function MyComponent() {
-    const [queryParamsState, setQueryParamsState] = useQueryParamsState(queryParamsSchema)
+    const [queryParamsState, setQueryParamsState] = useQueryParamsState(queryParamsStateSchema)
 
     const onSearchChange = (newSearchValue: string) => {
         // Update the search param value in the URL and in the React state.
@@ -180,7 +180,7 @@ you can use the [createUseQueryParamsStateHook](doc/API_REFERENCE.md#createUseQu
 ```js
 import { createUseQueryParamsStateHook, QPARAMS, VALIDATORS } from "use-query-params-state"
 
-const queryParamsSchema = {
+const queryParamsStateSchema = {
     search: QPARAMS.string(),
     minRating: QPARAMS.number(0 /* default value*/),
     sizes: QPARAMS.arrayOfNumbers(),
@@ -190,7 +190,7 @@ const queryParamsSchema = {
     newOnly: QPARAMS.boolean(false)
 }
 
-const useProductSearchFilters = createUseQueryParamsStateHook(queryParamsSchema)
+const useProductSearchFilters = createUseQueryParamsStateHook(queryParamsStateSchema)
 
 function MyComponent1() {
     const [filters] = useProductSearchFilters()
@@ -211,12 +211,12 @@ If your version of React is compatible but you prefer to use class components, u
 import hocify from "hocify"
 import { QPARAMS, useQueryParamsState } from "use-query-params-state"
 
-const queryParamsSchema = {
+const queryParamsStateSchema = {
     sortBy: QPARAMS.string("myDefaultValue")
 }
 
 export const withQueryParams = hocify(() => {
-    const [queryParams, setQueryParams] = useQueryParamsState(queryParamsSchema)
+    const [queryParams, setQueryParams] = useQueryParamsState(queryParamsStateSchema)
 
     return {
         queryParams,
