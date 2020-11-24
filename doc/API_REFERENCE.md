@@ -67,18 +67,18 @@ Hook to manipulate your query params state.
   
 ### Returns
 
-- **([QueryParams, QueryParamsSetter])**: Tuple where the first index is the state representing the current query params state, and the second one is the function to update this query params state (and therefore the URL query string).
+- **([QueryParamsState, SetQueryParamsState])**: Tuple where the first index is the state representing the current query params state, and the second one is the function to update this query params state (and therefore the URL query string).
 
-#### QueryParams
+#### QueryParamsState
 Object following the shape defined in your schema representing the current state. The key is the name of your parameter and the value is the current value of the parameter. When one parameter does not currently exist in the query string, its value will be `undefined` or the default value you potentially provided when creating the schema. 
 
-#### QueryParamsSetter
+#### SetQueryParamsState
 Function to call when updating the state of your query parameters. Calling that function will update the current URL query string and will automatically re-render your components with the new query params state.
 
 The function has the following signature:
 
 #### Arguments
-- **newQueryParams (Partial<QueryParams>)**: Object with the query params key/value you want to update.
+- **newQueryParams (Partial<QueryParamsState<QueryParamsStateSchema>>)**: Object with the query params key/value you want to update.
 - **isPartialUpdate? (boolean)**: Define if the update should be applied on top of the current query params state or not. Default to `true`.
   - If `true`, the new query params will be applied on top of the current query params state (i.e: `const newState = { ...oldState, ...newQueryParams }`.
   - If `false`, the new query params will be applied on top of an empty object, (i.e: `const newState = { ...newQueryParams }`). This can also be used to reset the state.
@@ -88,13 +88,13 @@ The function has the following signature:
 
 ```ts
 // Current URL is https://localhost:8000?search=wallet
-const queryParamsSchema = {
+const queryParamsStateSchema = {
     "search": QPARAMS.string(),
     "minRating": QPARAMS.number(0 /* default value*/),
 }
 
 function MyComponent() {
-    const [queryParamsState, setQueryParamsState] = useQueryParamsState(queryParamsSchema)
+    const [queryParamsState, setQueryParamsState] = useQueryParamsState(queryParamsStateSchema)
     // queryParamsState => { search: "wallet", minRating: 0 }
 
     const onMinRatingChange = () => {
@@ -169,17 +169,17 @@ This is a simple shortcut to create a useQueryParamsState hook with the schema a
 
 ### Returns
 
-- **((context: any) => [QueryParams, QueryParamsSetter])**: Hook equivalent to [useQueryParamsState](#usequeryparamsstate) but for which you don't need to specify the schema. 
+- **((context: any) => [QueryParamsState, QueryParamsStateSetter])**: Hook equivalent to [useQueryParamsState](#usequeryparamsstate) but for which you don't need to specify the schema. 
 
 ### Example
 
 ```js
 import { createUseQueryParamsStateHook, QPARAMS, VALIDATORS } from "use-query-params-state"
 
-const queryParamsSchema = {
+const queryParamsStateSchema = {
     ...
 }
-const useProductSearchFilters = createUseQueryParamsStateHook(queryParamsSchema)
+const useProductSearchFilters = createUseQueryParamsStateHook(queryParamsStateSchema)
 
 function MyComponent() {
     const [productFilters, setProductFilters] = useProductSearchFilters()
@@ -191,12 +191,12 @@ The snippet above is basically equivalent to:
 ```js
 import { useQueryParamsState, QPARAMS, VALIDATORS } from "use-query-params-state"
 
-const queryParamsSchema = {
+const queryParamsStateSchema = {
     ...
 }
 
 const useProductSearchFilters = () => {
-    return useQueryParamsState(queryParamsSchema)
+    return useQueryParamsState(queryParamsStateSchema)
 }
 
 function MyComponent() {
@@ -210,8 +210,8 @@ Helper function to create a new query string based on the provided schema and a 
 An error will be thrown if the param does not match the type defined in the schema.
 
 ### Arguments
-- **queryParamsSchema (QueryParamsSchema)**: The query params schema defining your query string.
-- **newQueryParams (Partial<QueryParams<QueryParamsSchema>>)**: The query parameters you want to add to the query string and are part of the schema.
+- **queryParamsSchema (QueryParamsStateSchema)**: The query params schema defining your query string.
+- **newQueryParams (Partial<QueryParamsState<QueryParamsStateSchema>>)**: The query parameters you want to add to the query string and are part of the schema.
 - **contextData? (any)**: Context data
 - **otherRawParams? (Record<string, string | null | undefined>)**: Optional other query parameters you want to add to the query string but don't belong to the schema. Each parameter value is expected to already be in its string format as those parameters won't be validated nor transformed.
 
@@ -243,15 +243,15 @@ const queryString2 = buildQueryString(schema, { search: 3 })
 React hook returning a function to build a new query string from the current URL location query string. This is useful if you want to create a new query string while preserving some parameters from the current one.
 
 ### Arguments
-- **queryParamsSchema (QueryParamsSchema)**: The query params schema defining your query string.
+- **queryParamsSchema (QueryParamsStateSchema)**: The query params schema defining your query string.
 
 ### Returns
-- **(QueryStringBuilderFunction<QueryParamsSchema>)**: A function to build the query string.
+- **(QueryStringBuilderFunction<QueryParamsStateSchema>)**: A function to build the query string.
 
 The returned function has the following signature:
 
 #### Arguments
- - **newQueryParams? (Partial<QueryParams<QueryParamsSchema>>)**: The query parameters you want to add to the query string and are part of the schema.
+ - **newQueryParams? (Partial<QueryParamsState<QueryParamsStateSchema>>)**: The query parameters you want to add to the query string and are part of the schema.
  - **buildStrategy? (QS_BUILD_STRATEGY)**: Define what strategy you want to use to preserve query parameters from the current query string to the new query one. Default to QS_BUILD_STRATEGY.PRESERVE_ALL
  - **contextData? (any)**: Context data
 
