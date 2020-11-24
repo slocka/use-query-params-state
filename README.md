@@ -1,47 +1,57 @@
 # use-query-params-state (BETA)
 
-React hooks to manage your application state using the URL query parameters.
-The current version is only compatible with React-router.
+React hooks to manage your application state using the URL query string ([search params](https://developer.mozilla.org/en-US/docs/Web/API/URL/searchParams)).
 
 ## Why use-query-params-state?
-Very often a page uses some parameters to control the state of your application. Using the URL
-to manage some parts of the state offers multiple advantages:
-- Your application content becomes easy to share across the web.
-- Users can access a specific state of your application through a hyperlink.
-- Users can undo/redo their actions through the browser history.
-- Users can easily come back later on the same or different device with your application in the same state as they left it.
 
-Example of url using use-query-params-state: 
+use-query-params-state aims to improve the end user experience by encouraging developers to create more shareable web application. It has been built to make URL state management easy, reliable and type safe using React and the URL query string.
+
+**Note:** Not all the states of your application can/should be stored in the URL. use-query-params-state is typically suited to manage simple states like parameters that influence the current page and are manipulated by the user.
+
+Example of URL storing parameters in the query string: 
 ```js
 "/products-search?search=red+bike&page=10&pageSize=20&minRating=20&free_delivery=true"
 ```
+### A better user experience
 
-On the other hand, managing your state through the URL can be challenging and tedious as there are multiple things to manage:
-- Keeping the URL in sync with your application state.
-- Decoding the query string to your URLs state when reading from the URL.
-- Encoding your javascript state to its query string representation when writing into the URL.
-- Converting each param into the correct javascript type during encoding/decoding phase (everything in the URL is a string).
+It is a common pattern for modern web applications to use the URL search query string to control the state of the current page. This pattern enables multiple things:
+- Your application content can easily be shared across the web.
+- Users can directly access a specific state of your application through a hyperlink.
+- Users can undo/redo their actions through the browser history.
+- Users can bookmark the page and come back later on the same or different device with the application in the same state.
+ 
+### A better developer experience
+
+If managing a part of your state through the URL can improve the user experience, the developer experience can quickly suffer from it. Implementing this pattern from scratch can be challenging and tedious as there are multiple things to manage:
+- Keeping the URL and your React state in sync.
+- Convert the query string to your React state when reading from the URL.
+- Convert your React state to its query string representation when writing to the URL.
+- Keeping track of the correct type of each param during encoding/decoding phase (everything in the URL is a string).
 - Making sure the state defined by the URL hasn't been wrongly altered by the user or isn't corrupted.
 
+use-query-params-state simplify all these and offers a simple React hook solution similar to React `useState`.
+
+### Other benefits
+- SEO: By making the different states of your application accessible directly by a simple link, you are working towards making your content more discoverable by search engine crawlers and therefore potentially more optimized for SEO ranking.
 
 ## Features
-- Always keep your React application state in sync with the URL query parameters.
-- Auto serialization/de-serialization of the query string to the correct Javascript types based on your configuration.
-- Use a default value if the query parameter is not present in the URL query string. The default value can also be dynamically computed at execution time.
-- Query params validation to verify that the URL is not corrupted or that the value of the query parameter is valid.
-  - Validate the query parameter type.
-  - Validate the param based on the value of other query params.
-  - Validate the param based on other data provided at execution time.
-- Customize the serialization to handle more complex param types.
-- Typescript support.
 
+- Typescript support.
+- Always keep your React application state in sync with the URL query string.
+- Auto serialization/de-serialization of the query string to the correct Javascript types based on defined schema.
+- Use a default value when the query parameter is not present in the URL query string. The default value can also be dynamically computed at execution time.
+- Validate the URL search parameters to verify that the URL is not corrupted or that the value of the query parameter is valid.
+- Customize the serialization to handle more complex or custom param types.
+- Offers some helper functions to create new query string for your internal hyperlinks.
 
 ## Getting started
 
 ---
 **WARNING**
 
-This is still work in progress and the library is not yet stable. Please do not use in production.
+- This is still work in progress and the library is not yet stable. Please do not use in production.
+
+- The current version is only compatible with React-router.
 
 ---
 
@@ -56,10 +66,16 @@ npm install use-query-params-state
 
 ### How to use?
 
-#### useQueryParamsState(queryParamsSchema)
+### Defining your query params schema.
+
+use-query-params-state relies on a schema definition defined by the developer to automatically transform the URL query string to its React state and vice versa. 
+
+The QueryParamsStateSchema is a map between the name of the parameter and its definition (type, default value, validator). It is used to define what parameters are part of the state, and how to serialize/deserialize each of them.
+
+The first step is to build your query param state schema:
 
 ```js
-import { QPARAMS, useQueryParamsState, VALIDATORS } from "use-query-params-state"
+import { QPARAMS, VALIDATORS } from "use-query-params-state"
 
 /**
  * Configure each param with:
@@ -67,49 +83,114 @@ import { QPARAMS, useQueryParamsState, VALIDATORS } from "use-query-params-state
  *  - An optional default value.
  *  - An optional validator function.
  */
-const queryParamsSchema = {
-    "search": QPARAMS.string(),
-    "minRating": QPARAMS.number(0 /* default value*/),
-    "sizes": QPARAMS.arrayOfNumbers(),
-    "brands": QPARAMS.arrayOfStrings(null),
-    "sortDirection": QPARAMS.string("desc").validator(VALIDATORS.oneOf(["asc", "desc"])),
-    "sortBy": QPARAMS.string("price"),
-    "newOnly": QPARAMS.boolean(false)
+const queryParamsStateSchema = {
+    search: QPARAMS.string(),
+    minRating: QPARAMS.number(0 /* default value*/),
+    sizes: QPARAMS.arrayOfNumbers(),
+    brands: QPARAMS.arrayOfStrings(null),
+    sortDirection: QPARAMS.string("desc").validator(VALIDATORS.oneOf(["asc", "desc"])),
+    sortBy: QPARAMS.string("price"),
+    newOnly: QPARAMS.boolean(false)
+}
+```
+
+QPARAMS object exposes the following factory functions to define each query param of your schema:
+
+| QueryParamDef factory | Query param state type        | Query string format    | Query params state         |
+|-----------------------|-------------------------------|------------------------|----------------------------|
+| .number()             | number \| null \| undefined   | ?rating=4              | { rating: 4 }              |
+| .string()             | string \| null \| undefined   | ?search="tennis+shoes" | { search: "tennis shoes" } |
+| .boolean()            | boolean \| null \| undefined  | ?freeDelivery=true     | { freeDelivery: true }     |
+| .arrayOfStrings()     | string[] \| null \| undefined | ?sizes=S,M,L           | { sizes: ["S", "M", "L"] } |
+| .arrayOfNumbers()     | number[] \| null \| undefined | ?sizes=9,10,11         | { sizes: [9,10,11] }       |
+
+Each factory function can accept a default value. See [API reference guide](doc/API_REFERENCE.md#QPARAMS) to learn more about it.
+
+### Read the query params state
+
+Once your schema is defined, you can use the `useQueryParamsState` hook to access the current state of your query parameters.
+
+```js
+import { QPARAMS, VALIDATORS, useQueryParamsStates } from "use-query-params-state"
+
+// Define the schema
+const queryParamsStateSchema = {
+    search: QPARAMS.string(),
+    minRating: QPARAMS.number(0 /* default value*/),
+    sizes: QPARAMS.arrayOfNumbers(),
+    brands: QPARAMS.arrayOfStrings(null),
+    sortDirection: QPARAMS.string("desc").validator(VALIDATORS.oneOf(["asc", "desc"])),
+    sortBy: QPARAMS.string("price"),
+    newOnly: QPARAMS.boolean(false)
 }
 
 function MyComponent() {
-    const [queryParamsState, setQueryParamsState] = useQueryParamsState(config)
+    // queryParamsState is the React state directly derived from the URL query string based on the provided schema.
+    const [queryParamsState] = useQueryParamsState(queryParamsStateSchema)
+
+    /**
+     * In this example, if the URL is "/products-search?search=red+bike&brands=loulou&sortDirection=desc"
+     * queryParamsState object will be:
+     * {
+     *  search: "red bike",
+     *  minRating: 0,
+     *  sizes: undefined,
+     *  brands: ["loulou"],
+     *  sortDirection: "desc",
+     *  sortBy: "price",
+     *  newOnly: false
+     * }
+     */
 }
 ```
-Note: If you need to dynamically change your config base on your component props, you can also do it.
 
-```js
-function MyComponent(props) {
-    const [queryParamsState, setQueryParamsState] = useQueryParamsState({
-        "sortBy": QPARAMS.string(props.userPreferences.defaultSortBy)
-    })
+### Update the query params state
+
+useQueryParamsState also exposes a setter function to update the state of your query params. The setter function applies a partial update by default, meaning that you only need to pass the query parameters that you want to change (other params will be preserved).  
+
+```ts
+// Define the schema
+const queryParamsStateSchema = {
+    search: QPARAMS.string(),
+    minRating: QPARAMS.number(0 /* default value*/),
+    sizes: QPARAMS.arrayOfNumbers(),
+    brands: QPARAMS.arrayOfStrings(null),
+    sortDirection: QPARAMS.string("desc").validator(VALIDATORS.oneOf(["asc", "desc"])),
+    sortBy: QPARAMS.string("price"),
+    newOnly: QPARAMS.boolean(false)
+}
+
+function MyComponent() {
+    const [queryParamsState, setQueryParamsState] = useQueryParamsState(queryParamsStateSchema)
+
+    const onSearchChange = (newSearchValue: string) => {
+        // Update the search param value in the URL and in the React state.
+        setQueryParamsState({ search: newSearchValue })
+    }
 }
 ```
 
-#### createUseQueryParamsStateHook(queryParamsSchema)
+Note: When updating the query params state, the change is automatically reflected in the URL query string. In fact, use-query-params-state does not create any local state, it uses the URL as the only source of truth and derives the query params state from the current query string and the provided schema.
 
-If you want to call useQueryParamsState in different components and want to avoid having to specify the config
-everywhere, you can use the createUseQueryParamsStateHook factory to create a hook with an embeded config.
+### Usage of useQueryParamsState across multiple components
+
+If you want to call useQueryParamsState in multiple components and want to avoid having to pass the schema each time,
+you can use the [createUseQueryParamsStateHook](doc/API_REFERENCE.md#createUseQueryParamsStateHook) factory.
 
 ```js
-import { createUseQueryParamsStateHook, PARAM_TYPES, VALIDATORS } from "use-query-params-state"
+import { createUseQueryParamsStateHook, QPARAMS, VALIDATORS } from "use-query-params-state"
 
-const queryParamsSchema = {
-    "search": QPARAMS.string(),
-    "minRating": QPARAMS.number(0 /* default value*/),
-    "sizes": QPARAMS.arrayOfNumbers(),
-    "brands": QPARAMS.arrayOfStrings(null),
-    "sortDirection": QPARAMS.string("desc").validator(VALIDATORS.oneOf(["asc", "desc"])),
-    "sortBy": QPARAMS.string("price"),
-    "newOnly": QPARAMS.boolean(false)
+const queryParamsStateSchema = {
+    search: QPARAMS.string(),
+    minRating: QPARAMS.number(0 /* default value*/),
+    sizes: QPARAMS.arrayOfNumbers(),
+    brands: QPARAMS.arrayOfStrings(null),
+    sortDirection: QPARAMS.string("desc").validator(VALIDATORS.oneOf(["asc", "desc"])),
+    sortBy: QPARAMS.string("price"),
+    newOnly: QPARAMS.boolean(false)
 }
 
-const useProductSearchFilters = createUseQueryParamsStateHook(queryParamsSchema)
+const useProductSearchFilters = createUseQueryParamsStateHook(queryParamsStateSchema)
 
 function MyComponent1() {
     const [filters] = useProductSearchFilters()
@@ -119,90 +200,6 @@ function MyComponent2() {
     const [filters, setFilters] = useProductSearchFilters()
 }
 ```
-
-#### useQueryParam()
-
-Sometimes it's just easier to treat each query param as an independent state, you can achieve that using `useQueryParam`.
-
-
-```js
-function MyComponent() {
-    const [minRating, setMinRating] = useQueryParam("minRating", QPARAMS.number(0))
-    const [search, setSearch] = useQueryParam("search")
-}
-```
-
-### Defining your query params schema.
-
-The QueryParamsSchema is a map between the name of the parameter and its definition (type, default value, validator). It is used to define what parameters are part of the state, and how to serialize/deserialize each of them.
-
-#### Query parameters definition
-
-QPARAMS contains a factory function for each type:
-```js
-QPARAMS.number()
-QPARAMS.string()
-QPARAMS.boolean()
-QPARAMS.arrayOfStrings()
-QPARAMS.arrayOfNumbers()
-QPARAMS.date() // not yet available!
-QPARAMS.object() // not yet available!
-
-// Note: All those types also accept `undefined` and `null` as a value.
-```
-
-#### Default value
-Each parameter definition factory function can receive a default value as the first argument.
-```js
-function MyComponent() {
-    const [queryParamsState, setQueryParamsState] = useQueryParamsState({
-        sortBy: QPARAMS.string("myDefaultValue")
-    })
-    console.log(queryParamsState.sortBy)
-    // => "myDefaultValue" if "sortBy" doesn't exist in the URL query string.
-}
-```
-
-The default value can also be a function that will be executed each time we need to re-evaluate the query param state.
-```js
-// Read from local storage,
-function getSortByUserPreference() {
-    const userPreferences = JSON.parse(localStorage.getItem("user_preferences"))
-    return userPreferences.sortBy
-}
-
-function MyComponent() {
-    const [queryParamsState, setQueryParamsState] = useQueryParamsState({
-        // Read default from local storage.
-        sortBy: QPARAMS.string(getSortByUserPreference)
-    })
-}
-```
-
-You can also access "context data" inside your default value function:
-
-```js
-const queryParamsSchema = {
-    "sortBy": QPARAMS.string((contextData) => {
-        contextData.defaultSortBy
-    }),
-}
-
-const useProductSearchFilters = createUseQueryParamsStateHook(queryParamsSchema)
-
-function MyComponent1(props) {
-    const contextData = {
-        defaultSortBy: props.defaultSortBy
-    }
-    // Context data will be available inside the function calculating
-    // the default value of the "sortBy" query param.
-    const [filters] = useProductSearchFilters(contextData)
-}
-```
-
-#### Validator
-
-@TODO
 
 ## use-query-params-state with class components
 
@@ -214,12 +211,12 @@ If your version of React is compatible but you prefer to use class components, u
 import hocify from "hocify"
 import { QPARAMS, useQueryParamsState } from "use-query-params-state"
 
-const queryParamsSchema = {
+const queryParamsStateSchema = {
     sortBy: QPARAMS.string("myDefaultValue")
 }
 
 export const withQueryParams = hocify(() => {
-    const [queryParams, setQueryParams] = useQueryParamsState(queryParamsSchema)
+    const [queryParams, setQueryParams] = useQueryParamsState(queryParamsStateSchema)
 
     return {
         queryParams,
@@ -228,3 +225,6 @@ export const withQueryParams = hocify(() => {
 })
 ```
 
+## API REFERENCE
+
+[See the API_REFERENCE page for more information](doc/API_REFERENCE.md)
