@@ -33,8 +33,8 @@ describe('String serializer', () => {
         /^was expecting a string but received a number.$/
       );
       // @ts-expect-error
-      expect(() => serializers.STRING.toUrl(false)).toThrow(
-        /^was expecting a string but received a boolean.$/
+      expect(() => serializers.STRING.toUrl([])).toThrow(
+        /^was expecting a string but received a array.$/
       );
     });
   });

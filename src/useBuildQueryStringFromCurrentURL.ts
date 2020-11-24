@@ -1,9 +1,9 @@
 import { useLocation } from 'react-router-dom';
 
 import {
-  IQueryParamsSchema,
-  QueryParams,
-  QueryStringBuilderFunction,
+  IQueryParamsStateSchema,
+  QueryParamsState,
+  BuildQueryStringFromCurrentUrl,
   QS_BUILD_STRATEGY,
 } from './types';
 
@@ -15,14 +15,14 @@ import { buildQueryStringFromCurrentURL } from './internal/buildQueryStringFromC
  * while preserving some parameters from the current one.
  */
 export function useBuildQueryStringFromCurrentURL<
-  QueryParamsSchema extends IQueryParamsSchema
+  QueryParamsSchema extends IQueryParamsStateSchema
 >(
   queryParamsSchema: QueryParamsSchema
-): QueryStringBuilderFunction<QueryParamsSchema> {
+): BuildQueryStringFromCurrentUrl<QueryParamsSchema> {
   const location = useLocation();
 
   function buildQueryString(
-    newQueryParams?: Partial<QueryParams<QueryParamsSchema>>,
+    newQueryParams?: Partial<QueryParamsState<QueryParamsSchema>>,
     buildStrategy: QS_BUILD_STRATEGY = QS_BUILD_STRATEGY.PRESERVE_ALL,
     contextData?: any
   ): string {

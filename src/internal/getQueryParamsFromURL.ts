@@ -1,4 +1,4 @@
-import { IQueryParamsSchema, RawQueryParams } from '../types';
+import { IQueryParamsStateSchema, RawQueryParams } from '../types';
 
 import { useLocation } from 'react-router-dom';
 
@@ -19,7 +19,7 @@ export function getAllRawQueryParamsFromURL(
  * @internal
  */
 export function getRawQueryParamsInSchemaFromURL<
-  QueryParamsSchema extends IQueryParamsSchema
+  QueryParamsSchema extends IQueryParamsStateSchema
 >(
   location: ReturnType<typeof useLocation>,
   schema: QueryParamsSchema
@@ -45,7 +45,7 @@ export function getRawQueryParamsInSchemaFromURL<
  * @internal
  */
 export function getExternalQueryParamsFromURL<
-  QueryParamsSchema extends IQueryParamsSchema
+  QueryParamsSchema extends IQueryParamsStateSchema
 >(
   location: ReturnType<typeof useLocation>,
   schema: QueryParamsSchema

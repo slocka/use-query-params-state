@@ -1,18 +1,18 @@
 import { Errors } from './errors';
-import { IQueryParamsSchema, QueryParams } from './types';
+import { IQueryParamsStateSchema, QueryParamsState } from './types';
 
 /**
  * For each query param where a validator function was provided, run the validator function.
  * If the validation fails, the provided default value will be used.
  */
 export function runParamsValidators<
-  QueryParamsSchema extends IQueryParamsSchema
+  QueryParamsSchema extends IQueryParamsStateSchema
 >(
   queryParamsSchema: QueryParamsSchema,
-  queryParams: QueryParams<QueryParamsSchema>,
+  queryParams: QueryParamsState<QueryParamsSchema>,
   contextData?: any,
   throwOnError: boolean = false
-): QueryParams<QueryParamsSchema> {
+): QueryParamsState<QueryParamsSchema> {
   return Object.keys(queryParamsSchema).reduce(
     (acc, queryParamKey: keyof QueryParamsSchema) => {
       const queryParamDef = queryParamsSchema[queryParamKey];
@@ -35,16 +35,16 @@ export function runParamsValidators<
 }
 
 export function runParamsValidatorsPartial<
-  QueryParamsSchema extends IQueryParamsSchema
+  QueryParamsSchema extends IQueryParamsStateSchema
 >(
   queryParamsSchema: QueryParamsSchema,
-  queryParams: Partial<QueryParams<QueryParamsSchema>>,
+  queryParams: Partial<QueryParamsState<QueryParamsSchema>>,
   contextData?: any,
   throwOnError: boolean = false
-): Partial<QueryParams<QueryParamsSchema>> {
+): Partial<QueryParamsState<QueryParamsSchema>> {
   return Object.keys(queryParams).reduce(
     (
-      acc: Partial<QueryParams<QueryParamsSchema>>,
+      acc: Partial<QueryParamsState<QueryParamsSchema>>,
       queryParamKey: keyof QueryParamsSchema
     ) => {
       const queryParamDef = queryParamsSchema[queryParamKey];

@@ -1,4 +1,8 @@
-import { RawQueryParams, IQueryParamsSchema, QueryParams } from '../types';
+import {
+  RawQueryParams,
+  IQueryParamsStateSchema,
+  QueryParamsState,
+} from '../types';
 import { serializeQueryParamsValues } from '../internal/serializer/serialize';
 
 /**
@@ -6,8 +10,10 @@ import { serializeQueryParamsValues } from '../internal/serializer/serialize';
  * on the provided schema.
  * @internal
  */
-export function getRawQueryParams<QueryParamsSchema extends IQueryParamsSchema>(
-  queryParams: QueryParams<QueryParamsSchema>,
+export function getRawQueryParams<
+  QueryParamsSchema extends IQueryParamsStateSchema
+>(
+  queryParams: QueryParamsState<QueryParamsSchema>,
   queryParamsSchema: QueryParamsSchema
 ): RawQueryParams<QueryParamsSchema> {
   return serializeQueryParamsValues(queryParamsSchema, queryParams);
