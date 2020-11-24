@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { expectType } from 'ts-expect';
 
 import { createMemoryHistory, MemoryHistory } from 'history';
@@ -299,7 +301,45 @@ describe('Basic tests', () => {
     });
   });
 
-  test.skip("It doesn't change the query params reference", () => {});
+  test('It should memoize the query params state object reference', () => {
+    const url = '/test?booleanParam=true';
+    history.push(url);
+
+    const { result } = renderHook(
+      () => {
+        const [queryParams, setQueryParams] = useQueryParamsState(
+          queryParamsStateSchema
+        );
+        const [testState, setTestState] = useState(false);
+
+        return {
+          setQueryParams: setQueryParams,
+          queryParams: queryParams,
+          setTestState: setTestState,
+          testState: testState,
+        };
+      },
+      { wrapper }
+    );
+
+    const { queryParams, testState } = result.current;
+    act(() => {
+      const { setTestState } = result.current;
+      // Create a new re-render, queryParams ref should stay the same
+      setTestState(true);
+    });
+
+    expect(result.current.testState).not.toBe(testState);
+    expect(result.current.queryParams).toBe(queryParams);
+
+    act(() => {
+      const { setQueryParams } = result.current;
+      // Update to the same value, this should not regenerate a new queryParams ref
+      setQueryParams({ booleanParam: true });
+    });
+
+    expect(result.current.queryParams).toBe(queryParams);
+  });
 });
 
 describe('With default value', () => {
