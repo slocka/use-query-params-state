@@ -805,4 +805,25 @@ describe('With other query params outside of the schema', () => {
       '?utm_source=Google&stringParam=hello'
     );
   });
+
+  test("It doesn't remove the hash fragment during an update", () => {
+    const url = '/test?booleanParam=true&stringParam=test#myId';
+    history.push(url);
+
+    const { result } = renderHook(
+      () => useQueryParamsState(queryParamsStateSchema),
+      { wrapper }
+    );
+
+    act(() => {
+      const setParams = result.current[1];
+      setParams({
+        stringParam: 'hello',
+      });
+    });
+
+    expect(history.createHref(history.location)).toEqual(
+      '/test?booleanParam=true&stringParam=hello#myId'
+    );
+  });
 });
