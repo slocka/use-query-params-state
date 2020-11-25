@@ -39,13 +39,13 @@ export enum QS_BUILD_STRATEGY {
    */
   PRESERVE_ALL,
   /**
-   * Create a new query string from new params and only preserve pre-existing params that are not
+   * Create a new query string from new params and only preserve pre-existing params that are
    * outside the schema.
    */
   PRESERVE_EXTERNAL_ONLY,
   /**
    * Create a new query string from new params, preserve all pre-existing params, and add params defined in schema
-   * but are missing from the query string. (For those, the param value will be the default value).
+   * but are missing from the current query string. (For those, the param value will be the default value).
    */
   PRESERVE_ALL_WITH_DEFAULT,
   /**
