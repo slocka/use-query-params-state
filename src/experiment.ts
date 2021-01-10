@@ -44,6 +44,7 @@ type Serializer<T, MyOptions> = {
 };
 
 type QueryParamDef<T, MyOptions extends Partial<QueryParamOptions>> = {
+  // SWITCHING RETURN VALUE TO "string" breaks typescript!?!?
   toUrl: (value: QueryParamValue<T, MyOptions>) => any;
   fromUrl: (value: string) => QueryParamValue<T, MyOptions>;
 };
@@ -68,8 +69,10 @@ function createQueryParamDef<T, MyOptions extends Partial<QueryParamOptions>>(
   options: MyOptions
 ) {
   return {
-    toUrl(value: QueryParamValue<T, MyOptions>): string {
-      return serializer.toUrl(value);
+    toUrl(
+      value: QueryParamValue<T, MyOptions>
+    ): QueryParamValue<string, MyOptions> {
+      return serializer.toUrl(value) as QueryParamValue<string, MyOptions>;
     },
     fromUrl(value: string): QueryParamValue<T, MyOptions> {
       return serializer.fromUrl(value);
