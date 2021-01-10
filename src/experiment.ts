@@ -37,9 +37,9 @@ export type ResolveUndefinedType<
 type _<T> = T;
 type FlattenTypes<T> = _<{ [k in keyof T]: T[k] }>;
 
-type Serializer = {
-  toUrl: (value: any) => any;
-  fromUrl: (value: string) => any;
+type Serializer<T, MyOptions> = {
+  toUrl: (value: QueryParamValue<T, MyOptions>) => string;
+  fromUrl: (value: string) => QueryParamValue<T, MyOptions>;
 };
 
 type QueryParamDef<T, MyOptions extends Partial<QueryParamOptions>> = {
@@ -63,7 +63,7 @@ type QueryParamDef<T, MyOptions extends Partial<QueryParamOptions>> = {
 // }
 
 function createQueryParamDef<T, MyOptions extends Partial<QueryParamOptions>>(
-  serializer: Serializer,
+  serializer: Serializer<T, MyOptions>,
   options: MyOptions
 ) {
   return {
@@ -125,20 +125,14 @@ const SERIALIZERS = {
 //   testNumber: new QueryParamDef<number>(SERIALIZERS.number),
 // };
 const schema = {
-  testString: createQueryParamDef<string, { allowNull: true }>(
-    SERIALIZERS.string,
-    {
-      allowNull: true,
-    }
-  ),
-  testBool: createQueryParamDef<boolean, { allowNull: true }>(
-    SERIALIZERS.boolean,
-    {
-      allowNull: true,
-    }
-  ),
-  testNumber: createQueryParamDef<number, {}>(SERIALIZERS.number, {
+  testString: createQueryParamDef(SERIALIZERS.string, {
     allowNull: true,
+  }),
+  testBool: createQueryParamDef(SERIALIZERS.boolean, {
+    allowNull: true,
+  }),
+  testNumber: createQueryParamDef(SERIALIZERS.number, {
+    allowNull: false,
   }),
 };
 
@@ -163,7 +157,7 @@ export type QueryParamsState<
 export type RawQueryParams<
   QueryParamsSchema extends IQueryParamsStateSchema
 > = {
-  [P in keyof QueryParamsSchema]: ReturnType<QueryParamsSchema[P]['toUrl']>; //string | (string | null)[] | null | undefined;
+  [P in keyof QueryParamsSchema]: ReturnType<QueryParamsSchema[P]['toUrl']>;
 };
 
 export function encodeQueryParams<
