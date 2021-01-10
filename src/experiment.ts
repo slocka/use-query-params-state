@@ -3,6 +3,7 @@
 //   testBool: { getValue: () => true},
 //   testNumber: { getValue: () => 30 }
 // }
+import { isUndefined } from './internal/typeChecking';
 
 export type QueryParamOptions = Partial<{
   allowNull: boolean;
@@ -130,6 +131,7 @@ const schema = {
   }),
   testBool: createQueryParamDef(SERIALIZERS.boolean, {
     allowNull: true,
+    allowUndefined: true,
   }),
   testNumber: createQueryParamDef(SERIALIZERS.number, {
     allowNull: false,
@@ -154,37 +156,67 @@ export type QueryParamsState<
 /**
  * Mapping from a query parameter name to its encoded value type
  */
-export type RawQueryParams<
+export type SerializedQueryParams<
   QueryParamsSchema extends IQueryParamsStateSchema
 > = {
   [P in keyof QueryParamsSchema]: ReturnType<QueryParamsSchema[P]['toUrl']>;
 };
 
-export function encodeQueryParams<
+export function serializeQueryParams<
   QueryParamsSchema extends IQueryParamsStateSchema
 >(
-  queryParamSchema: QueryParamsSchema,
+  queryParamsSchema: QueryParamsSchema,
   queryParams: QueryParamsState<QueryParamsSchema>
-): FlattenTypes<RawQueryParams<QueryParamsSchema>> {
-  const encodedQuery = {} as RawQueryParams<QueryParamsSchema>;
+): FlattenTypes<SerializedQueryParams<QueryParamsSchema>> {
+  return Object.keys(queryParams).reduce(
+    (
+      acc: SerializedQueryParams<QueryParamsSchema>,
+      queryParamKey: keyof QueryParamsSchema
+    ) => {
+      const queryParamDef = queryParamsSchema[queryParamKey];
+      if (!queryParamDef) {
+        // const availableQueryParamsKeys = Object.keys(queryParamsSchema);
+        // throw new Errors.QueryParamsUpdateError(
+        //   `"${queryParamKey}" is not defined in queryParams Schema. Defined query params are: ${JSON.stringify(
+        //     availableQueryParamsKeys
+        //   )}.`
+        // );
+      }
+      try {
+        let value = queryParamDef.toUrl(queryParams[queryParamKey]);
+        if (!isUndefined(value)) {
+          acc[queryParamKey] = value;
+        }
+      } catch (error) {
+        // Add query param name information to the error
+        error.message = `${queryParamKey} ${error.message}`;
+        throw error;
+      }
+      return acc;
+    },
+    {} as SerializedQueryParams<QueryParamsSchema>
+  );
 
-  const paramNames = Object.keys(queryParams);
-  for (const paramName of paramNames) {
-    const decodedValue = queryParams[paramName];
+  // const encodedQuery = {} as SerializedQueryParams<QueryParamsSchema>;
 
-    encodedQuery[paramName as keyof QueryParamsSchema] = queryParamSchema[
-      paramName
-    ].toUrl(decodedValue);
-  }
+  // const paramNames = Object.keys(queryParams);
 
-  return encodedQuery;
+  // for (const paramName of paramNames) {
+  //   const decodedValue = queryParams[paramName];
+
+  //   encodedQuery[paramName as keyof QueryParamsSchema] = queryParamSchema[
+  //     paramName
+  //   ].toUrl(decodedValue);
+  // }
+
+  // return encodedQuery;
 }
 
-export function decodeQueryParams<
+export function deserializeQueryParams<
   QueryParamsSchema extends IQueryParamsStateSchema
 >(
   queryParamSchema: QueryParamsSchema,
-  encodedQuery: RawQueryParams<QueryParamsSchema>
+  encodedQuery: SerializedQueryParams<QueryParamsSchema>
 ): FlattenTypes<QueryParamsState<QueryParamsSchema>> {
   const decodedQuery = {} as QueryParamsState<QueryParamsSchema>;
 
@@ -202,12 +234,13 @@ export function decodeQueryParams<
   return decodedQuery;
 }
 
-const resEncoded = encodeQueryParams(schema, mainObject2);
-const resDecoded = decodeQueryParams(schema, {
+const serializedQueryParams = serializeQueryParams(schema, mainObject2);
+const queryParams = deserializeQueryParams(schema, {
   testString: 'hello world',
   testBool: 'true',
   testNumber: '30',
 });
+
 // function test<S extends Record<string, { getValue: () => string }>>(input: S): Partial<RawObject<S>> {
 //   const decodedQuery = {} as Partial<RawObject<S>>;
 //    // iterate over all keys in the config (#30)
