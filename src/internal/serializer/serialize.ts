@@ -25,10 +25,10 @@ export function deserializeQueryParamsValues<
   return Object.keys(queryParamsSchema).reduce(
     (acc, queryParamKey: keyof QueryParamsSchema) => {
       const queryParamDef = queryParamsSchema[queryParamKey];
-      acc[queryParamKey] = queryParamDef.fromURL(
-        rawQueryParams[queryParamKey],
-        contextData
-      );
+      if (queryParamKey in rawQueryParams) {
+        const rawValue = rawQueryParams[queryParamKey] as string;
+        acc[queryParamKey] = queryParamDef.fromURL(rawValue, contextData);
+      }
 
       return acc;
     },
@@ -43,7 +43,10 @@ export function serializeQueryParamsValues<
   queryParams: Partial<QueryParamsState<QueryParamsSchema>>
 ): RawQueryParams<QueryParamsSchema> {
   return Object.keys(queryParams).reduce(
-    (acc, queryParamKey: keyof QueryParamsSchema) => {
+    (
+      acc: RawQueryParams<QueryParamsSchema>,
+      queryParamKey: keyof QueryParamsSchema
+    ) => {
       const queryParamDef = queryParamsSchema[queryParamKey];
       if (!queryParamDef) {
         const availableQueryParamsKeys = Object.keys(queryParamsSchema);

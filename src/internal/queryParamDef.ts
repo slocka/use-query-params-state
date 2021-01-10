@@ -6,14 +6,22 @@ import {
   DefaultValue,
   DefaultValueFunction,
   ValidatorFunction,
+  QueryParamOptions,
+  QueryParamValue,
 } from '../types';
 
-export class QueryParamDef<T> {
-  private defaultValue?: DefaultValue<T>;
-  private validatorFn?: ValidatorFunction<T>;
-  private serializer: Serializer<T>;
+export class QueryParamDef<T, MyQueryParamsOptions extends QueryParamOptions> {
+  private defaultValue?: DefaultValue<QueryParamValue<T, MyQueryParamsOptions>>;
+  private validatorFn?: ValidatorFunction<T, MyQueryParamsOptions>;
+  private serializer: Serializer<T, MyQueryParamsOptions>;
+  private options: MyQueryParamsOptions;
 
-  constructor(serializer: Serializer<T>, defaultValue?: DefaultValue<T>) {
+  constructor(
+    serializer: Serializer<T, MyQueryParamsOptions>,
+    defaultValue?: DefaultValue<QueryParamValue<T, MyQueryParamsOptions>>,
+    options?: MyQueryParamsOptions
+  ) {
+    this.options = options || ({} as MyQueryParamsOptions);
     this.serializer = serializer;
     this.defaultValue = defaultValue;
   }
@@ -23,8 +31,12 @@ export class QueryParamDef<T> {
    * calculating the default value
    */
   private isDefaultValueFunction(
-    defaultValue: DefaultValue<T>
-  ): defaultValue is DefaultValueFunction<T> {
+    defaultValue:
+      | DefaultValue<QueryParamValue<T, MyQueryParamsOptions>>
+      | undefined
+  ): defaultValue is DefaultValueFunction<
+    QueryParamValue<T, MyQueryParamsOptions>
+  > {
     return isFunction(defaultValue);
   }
 
@@ -32,7 +44,9 @@ export class QueryParamDef<T> {
    * Get the default static value or run defaultValue function to get it.
    * @param contextData
    */
-  public getDefaultValue = (contextData?: any): T | null | undefined => {
+  public getDefaultValue = (
+    contextData?: any
+  ): QueryParamValue<T, MyQueryParamsOptions> | undefined => {
     if (this.isDefaultValueFunction(this.defaultValue)) {
       return this.defaultValue(contextData);
     }
@@ -43,7 +57,9 @@ export class QueryParamDef<T> {
   /**
    * Set Validator
    */
-  public validator = (validatorFn: ValidatorFunction<T>) => {
+  public validator = (
+    validatorFn: ValidatorFunction<T, MyQueryParamsOptions>
+  ) => {
     this.validatorFn = validatorFn;
     return this;
   };
@@ -52,14 +68,20 @@ export class QueryParamDef<T> {
    * Deserialize the query params from string to the defined query param type.
    */
   public fromURL = (
-    value?: string | null,
+    value: QueryParamValue<string, MyQueryParamsOptions>,
     contextData?: any
-  ): T | null | undefined => {
+  ): QueryParamValue<T, MyQueryParamsOptions> => {
     const parsedValue = this.serializer.fromUrl(value);
 
     // Value not found in the URL
     if (isUndefined(parsedValue)) {
-      return this.getDefaultValue(contextData);
+      const defaultValue = this.getDefaultValue(contextData);
+      // TODO: Check for allowNull, allowUndefined option
+      if (!defaultValue) {
+        throw new Error('Missing default value');
+      }
+
+      return defaultValue;
     }
 
     return parsedValue;
@@ -68,12 +90,14 @@ export class QueryParamDef<T> {
   /**
    * Serialized the query param from the defined query param type to string
    */
-  public toURL: SerializerToUrlFunction<T> = value => {
+  public toURL = (
+    value: QueryParamValue<T, MyQueryParamsOptions>
+  ): QueryParamValue<string, MyQueryParamsOptions> => {
     return this.serializer.toUrl(value);
   };
 
   public runValidator = (
-    value: T,
+    value: QueryParamValue<T, MyQueryParamsOptions>,
     parsedQueryParams: object,
     contextData?: any
   ): void => {
