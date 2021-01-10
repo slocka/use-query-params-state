@@ -4,23 +4,47 @@
 //   testNumber: { getValue: () => 30 }
 // }
 
+export type QueryParamOptions = Partial<{
+  allowNull: boolean;
+  allowUndefined: boolean;
+  // validator:
+}>;
+
+export type QueryParamValue<
+  T,
+  Options extends QueryParamOptions
+> = ResolveUndefinedType<ResolveNullType<T, Options>, Options>;
+
+export type ResolveNullType<
+  T,
+  Options extends QueryParamOptions
+> = Options extends {
+  allowNull: true;
+}
+  ? T | null
+  : T;
+
+export type ResolveUndefinedType<
+  T,
+  Options extends QueryParamOptions
+> = Options extends {
+  allowUndefined: true;
+}
+  ? T | undefined
+  : T;
+
 // Cool trick
 type _<T> = T;
 type FlattenTypes<T> = _<{ [k in keyof T]: T[k] }>;
 
 type Serializer = {
-  encode: (value: any) => any;
-  decode: (value: string) => any;
+  toUrl: (value: any) => any;
+  fromUrl: (value: string) => any;
 };
 
-// type QueryParamDef = {
-//   toUrl: (value: any) => any;
-//   fromUrl: (value: string) => any;
-// };
-
-type QueryParamDef<T> = {
-  toUrl: (value: T) => any;
-  fromUrl: (value: string) => T;
+type QueryParamDef<T, MyOptions extends Partial<QueryParamOptions>> = {
+  toUrl: (value: QueryParamValue<T, MyOptions>) => any;
+  fromUrl: (value: string) => QueryParamValue<T, MyOptions>;
 };
 
 // class QueryParamDef<T> {
@@ -30,15 +54,32 @@ type QueryParamDef<T> = {
 //   }
 
 //   toUrl(value: T): string {
-//     return this.serializer.encode(value);
+//     return this.serializer.toUrl(value);
 //   }
 
 //   fromUrl(value: string): T {
-//     return this.serializer.decode(value);
+//     return this.serializer.fromUrl(value);
 //   }
 // }
 
-type IQueryParamsStateSchema = Record<string, QueryParamDef<any>>;
+function createQueryParamDef<T, MyOptions extends Partial<QueryParamOptions>>(
+  serializer: Serializer,
+  options: MyOptions
+) {
+  return {
+    toUrl(value: QueryParamValue<T, MyOptions>): string {
+      return serializer.toUrl(value);
+    },
+    fromUrl(value: string): QueryParamValue<T, MyOptions> {
+      return serializer.fromUrl(value);
+    },
+  };
+}
+
+type IQueryParamsStateSchema = Record<
+  string,
+  QueryParamDef<any, QueryParamOptions>
+>;
 
 /** SOLUTION IS "encode" should be type "any" in Serializer but schema declaration "encode" function below specify a return type   */
 
@@ -72,17 +113,34 @@ const SERIALIZERS = {
   },
 };
 
-const schema = {
-  testString: SERIALIZERS.string,
-  testBool: SERIALIZERS.boolean,
-  testNumber: SERIALIZERS.number,
-};
+// const schema = {
+//   testString: SERIALIZERS.string,
+//   testBool: SERIALIZERS.boolean,
+//   testNumber: SERIALIZERS.number,
+// };
 
 // const schema = {
 //   testString: new QueryParamDef<string>(SERIALIZERS.string),
 //   testBool: new QueryParamDef<boolean>(SERIALIZERS.boolean),
 //   testNumber: new QueryParamDef<number>(SERIALIZERS.number),
 // };
+const schema = {
+  testString: createQueryParamDef<string, { allowNull: true }>(
+    SERIALIZERS.string,
+    {
+      allowNull: true,
+    }
+  ),
+  testBool: createQueryParamDef<boolean, { allowNull: true }>(
+    SERIALIZERS.boolean,
+    {
+      allowNull: true,
+    }
+  ),
+  testNumber: createQueryParamDef<number, {}>(SERIALIZERS.number, {
+    allowNull: true,
+  }),
+};
 
 const mainObject2 = {
   testString: 'hello world',
