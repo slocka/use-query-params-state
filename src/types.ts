@@ -1,8 +1,25 @@
-import { QueryParamDef } from './internal/queryParamDef';
+// import { QueryParamDef } from './internal/queryParamDef';
 
-// Cool trick
+// Allow to flatten complex generic types
 type _<T> = T;
-type FlattenTypes<T> = _<{ [k in keyof T]: T[k] }>;
+export type FlattenTypes<T> = _<{ [k in keyof T]: T[k] }>;
+
+export type QueryParamDef<T, MyQueryParamsOptions extends QueryParamOptions> = {
+  fromURL: (
+    value: QueryParamValue<string, MyQueryParamsOptions>,
+    contextData?: any
+  ) => QueryParamValue<T, MyQueryParamsOptions>;
+  toURL: (value: QueryParamValue<T, MyQueryParamsOptions>) => any;
+  runValidator: (
+    value: any,
+    parsedQueryParams: object,
+    contextData: any
+  ) => void;
+  getDefaultValue: (contextData?: any) => any;
+  validator: (
+    newValidatorFn: ValidatorFunction<T, MyQueryParamsOptions>
+  ) => QueryParamDef<T, MyQueryParamsOptions>;
+};
 
 /**
  * Interface any query-params-state schema needs to extend.
@@ -38,8 +55,10 @@ export type SetQueryParamsState<T extends IQueryParamsStateSchema> = (
 //     : never;
 // };
 
-export type RawQueryParams<S extends IQueryParamsStateSchema> = {
-  [K in keyof S]: ReturnType<S[K]['toURL']>;
+export type RawQueryParams<
+  QueryParamsSchema extends IQueryParamsStateSchema
+> = {
+  [K in keyof QueryParamsSchema]: ReturnType<QueryParamsSchema[K]['toURL']>;
 };
 
 /**

@@ -27,7 +27,7 @@ beforeEach(() => {
 
 describe('Basic tests', () => {
   const queryParamsStateSchema = {
-    booleanParam: QPARAMS.boolean(),
+    booleanParam: QPARAMS.boolean(undefined, { allowNull: true }),
     stringParam: QPARAMS.string(),
     numberParam: QPARAMS.number(),
     arrayStringParam: QPARAMS.arrayOfStrings(),

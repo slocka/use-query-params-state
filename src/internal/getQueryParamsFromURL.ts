@@ -29,11 +29,11 @@ export function getRawQueryParamsInSchemaFromURL<
   return Object.keys(allRawQueryParams).reduce(
     (
       acc: Partial<RawQueryParams<QueryParamsSchema>>,
-      queryParamKey: string
+      queryParamKey: keyof QueryParamsSchema
     ) => {
       if (schema.hasOwnProperty(queryParamKey)) {
-        acc[queryParamKey as keyof QueryParamsSchema] =
-          allRawQueryParams[queryParamKey];
+        const value = allRawQueryParams[queryParamKey as string];
+        acc[queryParamKey] = value; // as any fixes the issue??
       }
       return acc;
     },
