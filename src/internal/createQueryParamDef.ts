@@ -18,7 +18,7 @@ export function createQueryParamDef<
   serializer: Serializer<T, MyQueryParamsOptions>,
   defaultValue?: DefaultValue<QueryParamValue<T, MyQueryParamsOptions>>,
   options?: MyQueryParamsOptions
-): FlattenTypes<QueryParamDef<T, MyQueryParamsOptions>> {
+) {
   let validatorFn: ValidatorFunction<T, MyQueryParamsOptions>;
 
   /**
@@ -68,7 +68,6 @@ export function createQueryParamDef<
     contextData?: any
   ): QueryParamValue<T, MyQueryParamsOptions> {
     const parsedValue = serializer.fromUrl(value);
-
     // Value not found in the URL
     if (isUndefined(parsedValue)) {
       const defaultValue = getDefaultValue(contextData);
@@ -76,10 +75,8 @@ export function createQueryParamDef<
       if (!defaultValue) {
         throw new Error('Missing default value');
       }
-
       return defaultValue;
     }
-
     return parsedValue;
   }
 

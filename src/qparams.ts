@@ -4,17 +4,22 @@ import { DefaultValue } from './types';
 import { createQueryParamDef } from './internal/createQueryParamDef';
 
 import serializers from './internal/serializer/serializers';
-import { QueryParamOptions } from './types';
+import {
+  QueryParamOptions,
+  QueryParamDef,
+  QueryParamValue,
+  FlattenTypes,
+} from './types';
 
 /**
  * Object used to build your query params state schema.
  * It contains a factory function for each param type.
  */
 export const QPARAMS = {
-  number: (
-    defaultValue?: DefaultValue<number>,
-    queryParamsOptions?: QueryParamOptions
-  ) => {
+  number: <MyQueryParamsOptions extends QueryParamOptions>(
+    defaultValue?: DefaultValue<QueryParamValue<number, MyQueryParamsOptions>>,
+    queryParamsOptions?: MyQueryParamsOptions
+  ): QueryParamDef<number, MyQueryParamsOptions> => {
     return createQueryParamDef(
       serializers.NUMBER,
       defaultValue,
@@ -31,9 +36,9 @@ export const QPARAMS = {
       queryParamsOptions
     );
   },
-  boolean: (
-    defaultValue?: DefaultValue<boolean>,
-    queryParamsOptions?: QueryParamOptions
+  boolean: <MyQueryParamsOptions extends QueryParamOptions>(
+    defaultValue?: QueryParamValue<boolean, MyQueryParamsOptions>,
+    queryParamsOptions?: MyQueryParamsOptions
   ) => {
     return createQueryParamDef(
       serializers.BOOLEAN,

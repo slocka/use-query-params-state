@@ -26,6 +26,9 @@ beforeEach(() => {
 });
 
 describe('Basic tests', () => {
+  const def = QPARAMS.boolean(null, { allowNull: true });
+  type TEST = ReturnType<typeof def['fromURL']>;
+
   const queryParamsStateSchema = {
     booleanParam: QPARAMS.boolean(undefined, { allowNull: true }),
     stringParam: QPARAMS.string(),
@@ -47,7 +50,7 @@ describe('Basic tests', () => {
     const [params] = result.current;
 
     /** Verify the type of each param */
-    expectType<boolean | null | undefined>(params.booleanParam);
+    expectType<boolean | null>(params.booleanParam);
     expectType<number | null | undefined>(params.numberParam);
     expectType<string | null | undefined>(params.stringParam);
     expectType<string[] | null | undefined>(params.arrayStringParam);

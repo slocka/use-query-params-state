@@ -39,3 +39,8 @@ const queryParams = deserializeQueryParams(schema, {
   testBool2: 'false',
   testNumber: '30',
 });
+
+const def = QueryParams.boolean({
+  allowNull: true,
+  allowUndefined: true,
+});

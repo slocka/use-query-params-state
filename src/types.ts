@@ -33,10 +33,19 @@ export type IQueryParamsStateSchema = Record<
  * The Javascript state representing the content of the URL query string based on the associated
  * query-params-state schema.
  */
-export type QueryParamsState<S extends IQueryParamsStateSchema> = {
-  [K in keyof S]: S[K] extends QueryParamDef<infer T, infer Options>
-    ? QueryParamValue<T, Options>
-    : never;
+// export type QueryParamsState<S extends IQueryParamsStateSchema> = {
+//   [K in keyof S]: S[K] extends QueryParamDef<infer T, infer Options>
+//     ? QueryParamValue<T, Options>
+//     : never;
+// };
+
+export type QueryParamsState<
+  QueryParamsSchema extends IQueryParamsStateSchema
+> = {
+  [K in keyof QueryParamsSchema]: ReturnType<QueryParamsSchema[K]['fromURL']>;
+  // [K in keyof S]: S[K] extends QueryParamDef<infer T, infer Options>
+  //   ? QueryParamValue<T, Options>
+  //   : never;
 };
 
 export type SetQueryParamsState<T extends IQueryParamsStateSchema> = (

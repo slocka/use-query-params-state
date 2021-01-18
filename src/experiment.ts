@@ -268,3 +268,11 @@ const queryParams = deserializeQueryParams(schema, {
 // }
 
 // const myTestObj = test(schema, mainObject2)
+
+const myVar: any = 'test';
+
+function getMyVar(): boolean {
+  return myVar;
+}
+
+const test = getMyVar();
