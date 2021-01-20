@@ -29,7 +29,10 @@ describe('Basic tests', () => {
   const queryParamsStateSchema = {
     booleanParam: QPARAMS.boolean(),
     stringParam: QPARAMS.string(),
-    numberParam: QPARAMS.number(),
+    numberParam: QPARAMS.number(undefined, {
+      allowUndefined: true,
+      allowNull: true,
+    }),
     arrayStringParam: QPARAMS.arrayOfStrings(),
     arrayNumberParam: QPARAMS.arrayOfNumbers(),
   };
@@ -526,7 +529,7 @@ describe('query param validators', () => {
     describe('When invalid', () => {
       test('It should have access to context data in validator function', () => {
         const queryParamsStateSchema = {
-          numberParam: QPARAMS.number(0).validator(lessThanXValidator),
+          numberParam: QPARAMS.number(0, { validator: lessThanXValidator }),
         };
 
         const url = '/test?numberParam=9';
@@ -544,7 +547,7 @@ describe('query param validators', () => {
 
       test('It should use the default state when default is a value', () => {
         const queryParamsStateSchema = {
-          numberParam: QPARAMS.number(6).validator(lessThan10Validator),
+          numberParam: QPARAMS.number(6, { validator: lessThanXValidator }),
         };
 
         const url = '/test?numberParam=12';
@@ -562,7 +565,9 @@ describe('query param validators', () => {
       test('It should use the default state when default is a function using context data', () => {
         const defaultFn = (contextData: any) => contextData.defaultNumber;
         const queryParamsStateSchema = {
-          numberParam: QPARAMS.number(defaultFn).validator(lessThan10Validator),
+          numberParam: QPARAMS.number(defaultFn, {
+            validator: lessThanXValidator,
+          }),
         };
 
         const url = '/test?numberParam=12';
@@ -584,9 +589,9 @@ describe('query param validators', () => {
     describe('With predefined validators', () => {
       test('It should not touch the state if value is oneOf(..)', () => {
         const queryParamsStateSchema = {
-          stringParam: QPARAMS.string('default value').validator(
-            VALIDATORS.oneOf(['default value', 'hello'])
-          ),
+          stringParam: QPARAMS.string('default value', {
+            validator: VALIDATORS.oneOf(['default value', 'hello']),
+          }),
         };
 
         const url = '/test?stringParam=hello';
@@ -603,9 +608,9 @@ describe('query param validators', () => {
 
       test('It should default the state if value is not oneOf(..)', () => {
         const queryParamsStateSchema = {
-          stringParam: QPARAMS.string('default value').validator(
-            VALIDATORS.oneOf(['default value', 'hello'])
-          ),
+          stringParam: QPARAMS.string('default value', {
+            validator: VALIDATORS.oneOf(['default value', 'hello']),
+          }),
         };
 
         const url = '/test?stringParam=world';
@@ -625,7 +630,7 @@ describe('query param validators', () => {
   describe('When writing the state', () => {
     test('It update param if param is valid', () => {
       const queryParamsStateSchema = {
-        numberParam: QPARAMS.number(6).validator(lessThan10Validator),
+        numberParam: QPARAMS.number(6, { validator: lessThanXValidator }),
       };
 
       const { result } = renderHook(
@@ -650,7 +655,7 @@ describe('query param validators', () => {
     describe('When invalid', () => {
       test('It should have access to context data in validator function', () => {
         const queryParamsStateSchema = {
-          numberParam: QPARAMS.number(0).validator(lessThanXValidator),
+          numberParam: QPARAMS.number(0, { validator: lessThanXValidator }),
         };
 
         const contextData = { max: 5 };
@@ -670,7 +675,7 @@ describe('query param validators', () => {
 
       test('It should use the default state when default is a value', () => {
         const queryParamsStateSchema = {
-          numberParam: QPARAMS.number(6).validator(lessThan10Validator),
+          numberParam: QPARAMS.number(6, { validator: lessThanXValidator }),
         };
 
         const { result } = renderHook(
@@ -697,7 +702,9 @@ describe('query param validators', () => {
         const defaultFn = (contextData: any) => contextData.defaultNumber;
 
         const queryParamsStateSchema = {
-          numberParam: QPARAMS.number(defaultFn).validator(lessThan10Validator),
+          numberParam: QPARAMS.number(defaultFn, {
+            validator: lessThanXValidator,
+          }),
         };
 
         const contextData = {
@@ -728,9 +735,9 @@ describe('query param validators', () => {
     describe('With predefined validators', () => {
       test('It should set the state if value is oneOf(..)', () => {
         const queryParamsStateSchema = {
-          stringParam: QPARAMS.string('default value').validator(
-            VALIDATORS.oneOf(['default value', 'hello'])
-          ),
+          stringParam: QPARAMS.string('default value', {
+            validator: VALIDATORS.oneOf(['default value', 'hello']),
+          }),
         };
 
         const { result } = renderHook(
@@ -754,9 +761,9 @@ describe('query param validators', () => {
 
       test('It should default the state if value is not oneOf(..)', () => {
         const queryParamsStateSchema = {
-          stringParam: QPARAMS.string('default value').validator(
-            VALIDATORS.oneOf(['default value', 'hello'])
-          ),
+          stringParam: QPARAMS.string('default value', {
+            validator: VALIDATORS.oneOf(['default value', 'hello']),
+          }),
         };
 
         const { result } = renderHook(
