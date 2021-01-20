@@ -1,25 +1,49 @@
-import { QueryParamDef } from './internal/queryParamDef';
-
-// Cool trick
+// Allow to flatten complex generic types
 type _<T> = T;
-type FlattenTypes<T> = _<{ [k in keyof T]: T[k] }>;
+export type FlattenTypes<T> = _<{ [k in keyof T]: T[k] }>;
+
+export type QueryParamDef<T, QueryParamsOptions extends IQueryParamOptions> = {
+  fromURL: (
+    value: string,
+    contextData?: any
+  ) => QueryParamValue<T, QueryParamsOptions>;
+  toURL: (value: QueryParamValue<T, QueryParamsOptions>) => any;
+  runValidator: (
+    value: any,
+    parsedQueryParams: object,
+    contextData: any
+  ) => void;
+  getDefaultValue: (contextData?: any) => any;
+  validator: (
+    newValidatorFn: ValidatorFunction<T, QueryParamsOptions>
+  ) => QueryParamDef<T, QueryParamsOptions>;
+};
 
 /**
  * Interface any query-params-state schema needs to extend.
  */
 export type IQueryParamsStateSchema = Record<
   string,
-  QueryParamDef<any, QueryParamOptions>
+  QueryParamDef<any, IQueryParamOptions>
 >;
 
 /**
  * The Javascript state representing the content of the URL query string based on the associated
  * query-params-state schema.
  */
-export type QueryParamsState<S extends IQueryParamsStateSchema> = {
-  [K in keyof S]: S[K] extends QueryParamDef<infer T, infer Options>
-    ? QueryParamValue<T, Options>
-    : never;
+// export type QueryParamsState<S extends IQueryParamsStateSchema> = {
+//   [K in keyof S]: S[K] extends QueryParamDef<infer T, infer Options>
+//     ? QueryParamValue<T, Options>
+//     : never;
+// };
+
+export type QueryParamsState<
+  QueryParamsSchema extends IQueryParamsStateSchema
+> = {
+  [K in keyof QueryParamsSchema]: ReturnType<QueryParamsSchema[K]['fromURL']>;
+  // [K in keyof S]: S[K] extends QueryParamDef<infer T, infer Options>
+  //   ? QueryParamValue<T, Options>
+  //   : never;
 };
 
 export type SetQueryParamsState<T extends IQueryParamsStateSchema> = (
@@ -38,8 +62,10 @@ export type SetQueryParamsState<T extends IQueryParamsStateSchema> = (
 //     : never;
 // };
 
-export type RawQueryParams<S extends IQueryParamsStateSchema> = {
-  [K in keyof S]: ReturnType<S[K]['toURL']>;
+export type RawQueryParams<
+  QueryParamsSchema extends IQueryParamsStateSchema
+> = {
+  [K in keyof QueryParamsSchema]: ReturnType<QueryParamsSchema[K]['toURL']>;
 };
 
 /**
@@ -97,42 +123,20 @@ export type Serializer<T, Options> = {
   fromUrl: SerializerFromUrlFunction<T, Options>;
 };
 
-export type QueryParamOptions = Partial<{
+export type IQueryParamOptions = Partial<{
   allowNull: boolean;
   allowUndefined: boolean;
-  // validator:
+  validator: ValidatorFunction<any, IQueryParamOptions>;
 }>;
-
-// export type QueryParamsValueType<T, Options> = Options extends {
-//   allowNull: true;
-//   allowUndefined: true;
-// }
-//   ? T | null | undefined
-//   : Options extends {
-//       allowNull: false;
-//       allowUndefined: true;
-//     }
-//   ? T | undefined
-//   : Options extends {
-//       allowNull: true;
-//       allowUndefined: false;
-//     }
-//   ? T | null
-//   : Options extends {
-//       allowNull: false;
-//       allowUndefined: false;
-//     }
-//   ? T
-//   : never;
 
 export type QueryParamValue<
   T,
-  Options extends QueryParamOptions
+  Options extends IQueryParamOptions
 > = ResolveUndefinedType<ResolveNullType<T, Options>, Options>;
 
 export type ResolveNullType<
   T,
-  Options extends QueryParamOptions
+  Options extends IQueryParamOptions
 > = Options extends {
   allowNull: true;
 }
@@ -141,11 +145,9 @@ export type ResolveNullType<
 
 export type ResolveUndefinedType<
   T,
-  Options extends QueryParamOptions
+  Options extends IQueryParamOptions
 > = Options extends {
   allowUndefined: true;
 }
   ? T | undefined
   : T;
-
-// type TEST = QueryParamValue<string, { allowUndefined: true; allowNull: true }>;

@@ -6,11 +6,11 @@ import {
   DefaultValue,
   DefaultValueFunction,
   ValidatorFunction,
-  QueryParamOptions,
+  IQueryParamOptions,
   QueryParamValue,
 } from '../types';
 
-export class QueryParamDef<T, MyQueryParamsOptions extends QueryParamOptions> {
+export class QueryParamDef<T, MyQueryParamsOptions extends IQueryParamOptions> {
   private defaultValue?: DefaultValue<QueryParamValue<T, MyQueryParamsOptions>>;
   private validatorFn?: ValidatorFunction<T, MyQueryParamsOptions>;
   private serializer: Serializer<T, MyQueryParamsOptions>;

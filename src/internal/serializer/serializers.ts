@@ -4,7 +4,7 @@ import { Errors } from '../../errors';
 
 const ARRAY_DELIMITER = ',';
 
-const arrayStringsSerializer: Serializer<string[]> = {
+const arrayStringsSerializer: Serializer<string[], any> = {
   fromUrl(str?: string | null): Array<string> | null | undefined {
     if (isNil(str)) {
       return str;
@@ -31,7 +31,7 @@ const arrayStringsSerializer: Serializer<string[]> = {
   },
 };
 
-const arrayNumbersSerializer: Serializer<number[]> = {
+const arrayNumbersSerializer: Serializer<number[], any> = {
   fromUrl(str?: string | null): Array<number> | null | undefined {
     if (isNil(str)) {
       return str;
@@ -58,7 +58,7 @@ const arrayNumbersSerializer: Serializer<number[]> = {
   },
 };
 
-const stringSerializer: Serializer<string> = {
+const stringSerializer: Serializer<string, any> = {
   fromUrl: (str?: string | null): string | null | undefined => {
     return str;
   },
@@ -77,7 +77,7 @@ const stringSerializer: Serializer<string> = {
   },
 };
 
-const booleanSerializer: Serializer<boolean> = {
+const booleanSerializer: Serializer<boolean, any> = {
   fromUrl: (str?: string | null): boolean | null | undefined => {
     if (isNil(str)) {
       return str;
@@ -114,7 +114,7 @@ const booleanSerializer: Serializer<boolean> = {
   },
 };
 
-const numberSerializer: Serializer<number> = {
+const numberSerializer: Serializer<number, any> = {
   fromUrl: (str?: string | null): number | null | undefined => {
     if (isNil(str)) {
       return str;
