@@ -505,7 +505,10 @@ describe('query param validators', () => {
   describe('When reading the state', () => {
     test('It should not touch the param if param is valid', () => {
       const queryParamsStateSchema = {
-        numberParam: QPARAMS.number(6).validator(lessThan10Validator),
+        numberParam: QPARAMS.number(6, {
+          validator: lessThan10Validator,
+          allowUndefined: false,
+        }),
       };
 
       const url = '/test?numberParam=9';

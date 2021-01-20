@@ -1,11 +1,11 @@
-import { DefaultValue } from './types';
+import { DefaultValue, ValidatorFunction } from './types';
 
 import { createQueryParamDef } from './internal/createQueryParamDef';
 
 import serializers from './internal/serializer/serializers';
 import {
-  IQueryParamOptions,
-  QueryParamDef,
+  IQueryParamTypeOptions,
+  QueryParamOptions,
   QueryParamValue,
   Serializer,
 } from './types';
@@ -15,54 +15,65 @@ import {
  * It contains a factory function for each param type.
  */
 export const QPARAMS = {
-  number: <QueryParamsOptions extends IQueryParamOptions>(
-    defaultValue?: DefaultValue<QueryParamValue<number, QueryParamsOptions>>,
-    queryParamsOptions?: QueryParamsOptions
+  number: <QueryParamTypeOptions extends IQueryParamTypeOptions>(
+    defaultValue?: DefaultValue<QueryParamValue<number, QueryParamTypeOptions>>,
+    queryParamsOptions?: QueryParamOptions<number, QueryParamTypeOptions>
   ) => {
-    return createQueryParamDef(
-      serializers.NUMBER,
-      defaultValue,
-      queryParamsOptions
-    );
+    const serializer = serializers.NUMBER as Serializer<
+      number,
+      QueryParamTypeOptions
+    >;
+
+    return createQueryParamDef(serializer, defaultValue, queryParamsOptions);
   },
-  string: (
-    defaultValue?: DefaultValue<string>,
-    queryParamsOptions?: IQueryParamOptions
+  string: <QueryParamTypeOptions extends IQueryParamTypeOptions>(
+    defaultValue?: DefaultValue<QueryParamValue<string, QueryParamTypeOptions>>,
+    queryParamsOptions?: QueryParamOptions<string, QueryParamTypeOptions>
   ) => {
-    return createQueryParamDef(
-      serializers.STRING,
-      defaultValue,
-      queryParamsOptions
-    );
+    const serializer = serializers.STRING as Serializer<
+      string,
+      QueryParamTypeOptions
+    >;
+
+    return createQueryParamDef(serializer, defaultValue, queryParamsOptions);
   },
-  boolean: <QueryParamsOptions extends IQueryParamOptions>(
-    defaultValue?: QueryParamValue<boolean, QueryParamsOptions>,
-    queryParamsOptions?: QueryParamsOptions
+  boolean: <QueryParamTypeOptions extends IQueryParamTypeOptions>(
+    defaultValue?: DefaultValue<
+      QueryParamValue<boolean, QueryParamTypeOptions>
+    >,
+    queryParamsOptions?: QueryParamOptions<boolean, QueryParamTypeOptions>
   ) => {
     const serializer = serializers.BOOLEAN as Serializer<
       boolean,
-      QueryParamsOptions
+      QueryParamTypeOptions
     >;
+
     return createQueryParamDef(serializer, defaultValue, queryParamsOptions);
   },
-  arrayOfNumbers: (
-    defaultValue?: DefaultValue<number[]>,
-    queryParamsOptions?: IQueryParamOptions
+  arrayOfNumbers: <QueryParamTypeOptions extends IQueryParamTypeOptions>(
+    defaultValue?: DefaultValue<
+      QueryParamValue<number[], QueryParamTypeOptions>
+    >,
+    queryParamsOptions?: QueryParamOptions<number[], QueryParamTypeOptions>
   ) => {
-    return createQueryParamDef(
-      serializers.ARRAY__NUMBERS,
-      defaultValue,
-      queryParamsOptions
-    );
+    const serializer = serializers.ARRAY__NUMBERS as Serializer<
+      number[],
+      QueryParamTypeOptions
+    >;
+
+    return createQueryParamDef(serializer, defaultValue, queryParamsOptions);
   },
-  arrayOfStrings: (
-    defaultValue?: DefaultValue<string[]>,
-    queryParamsOptions?: IQueryParamOptions
+  arrayOfStrings: <QueryParamTypeOptions extends IQueryParamTypeOptions>(
+    defaultValue?: DefaultValue<
+      QueryParamValue<string[], QueryParamTypeOptions>
+    >,
+    queryParamsOptions?: QueryParamOptions<string[], QueryParamTypeOptions>
   ) => {
-    return createQueryParamDef(
-      serializers.ARRAY__STRINGS,
-      defaultValue,
-      queryParamsOptions
-    );
+    const serializer = serializers.ARRAY__STRINGS as Serializer<
+      string[],
+      QueryParamTypeOptions
+    >;
+
+    return createQueryParamDef(serializer, defaultValue, queryParamsOptions);
   },
 };

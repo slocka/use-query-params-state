@@ -4,21 +4,21 @@ import {
   Serializer,
   DefaultValue,
   DefaultValueFunction,
-  ValidatorFunction,
-  IQueryParamOptions,
+  IQueryParamTypeOptions,
   QueryParamValue,
+  QueryParamOptions,
   FlattenTypes,
 } from '../types';
 
 export function createQueryParamDef<
   T,
-  QueryParamOptions extends Partial<IQueryParamOptions>
+  QueryParamTypeOptions extends Partial<IQueryParamTypeOptions>
 >(
-  serializer: Serializer<T, QueryParamOptions>,
-  defaultValue?: DefaultValue<QueryParamValue<T, QueryParamOptions>>,
-  options?: QueryParamOptions
+  serializer: Serializer<T, QueryParamTypeOptions>,
+  defaultValue?: DefaultValue<QueryParamValue<T, QueryParamTypeOptions>>,
+  options?: QueryParamOptions<T, QueryParamTypeOptions>
 ) {
-  let validatorFn: ValidatorFunction<T, QueryParamOptions>;
+  let validatorFn = options?.validator;
 
   /**
    * defaultValue value can be a static value or a function
@@ -26,10 +26,10 @@ export function createQueryParamDef<
    */
   function isDefaultValueFunction(
     defaultValue:
-      | DefaultValue<QueryParamValue<T, QueryParamOptions>>
+      | DefaultValue<QueryParamValue<T, QueryParamTypeOptions>>
       | undefined
   ): defaultValue is DefaultValueFunction<
-    QueryParamValue<T, QueryParamOptions>
+    QueryParamValue<T, QueryParamTypeOptions>
   > {
     return isFunction(defaultValue);
   }
@@ -40,7 +40,7 @@ export function createQueryParamDef<
    */
   function getDefaultValue(
     contextData?: any
-  ): QueryParamValue<T, QueryParamOptions> | undefined {
+  ): QueryParamValue<T, QueryParamTypeOptions> | undefined {
     if (isDefaultValueFunction(defaultValue)) {
       return defaultValue(contextData);
     }
@@ -48,22 +48,22 @@ export function createQueryParamDef<
     return defaultValue;
   }
 
-  /**
-   * Set Validator
-   */
-  function validator(newValidatorFn: ValidatorFunction<T, QueryParamOptions>) {
-    validatorFn = newValidatorFn;
+  // /**
+  //  * Set Validator
+  //  */
+  // function validator(newValidatorFn: ValidatorFunction<T, QueryParamTypeOptions>) {
+  //   validatorFn = newValidatorFn;
 
-    return queryParamDef;
-  }
+  //   return queryParamDef;
+  // }
 
   /**
    * Deserialize the query params from string to the defined query param type.
    */
   function fromURL(
-    value: QueryParamValue<string, QueryParamOptions>,
+    value: QueryParamValue<string, QueryParamTypeOptions>,
     contextData?: any
-  ): QueryParamValue<T, QueryParamOptions> {
+  ): QueryParamValue<T, QueryParamTypeOptions> {
     const parsedValue = serializer.fromUrl(value);
     // Value not found in the URL
     if (isUndefined(parsedValue)) {
@@ -81,13 +81,13 @@ export function createQueryParamDef<
    * Serialized the query param from the defined query param type to string
    */
   function toURL(
-    value: QueryParamValue<T, QueryParamOptions>
-  ): QueryParamValue<string, QueryParamOptions> {
+    value: QueryParamValue<T, QueryParamTypeOptions>
+  ): QueryParamValue<string, QueryParamTypeOptions> {
     return serializer.toUrl(value);
   }
 
   function runValidator(
-    value: QueryParamValue<T, QueryParamOptions>,
+    value: QueryParamValue<T, QueryParamTypeOptions>,
     parsedQueryParams: object,
     contextData?: any
   ): void {
@@ -101,7 +101,6 @@ export function createQueryParamDef<
     toURL,
     runValidator,
     getDefaultValue,
-    validator,
   };
 
   return queryParamDef;

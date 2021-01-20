@@ -2,7 +2,10 @@
 type _<T> = T;
 export type FlattenTypes<T> = _<{ [k in keyof T]: T[k] }>;
 
-export type QueryParamDef<T, QueryParamsOptions extends IQueryParamOptions> = {
+export type QueryParamDef<
+  T,
+  QueryParamsOptions extends IQueryParamTypeOptions
+> = {
   fromURL: (
     value: string,
     contextData?: any
@@ -14,9 +17,6 @@ export type QueryParamDef<T, QueryParamsOptions extends IQueryParamOptions> = {
     contextData: any
   ) => void;
   getDefaultValue: (contextData?: any) => any;
-  validator: (
-    newValidatorFn: ValidatorFunction<T, QueryParamsOptions>
-  ) => QueryParamDef<T, QueryParamsOptions>;
 };
 
 /**
@@ -24,7 +24,7 @@ export type QueryParamDef<T, QueryParamsOptions extends IQueryParamOptions> = {
  */
 export type IQueryParamsStateSchema = Record<
   string,
-  QueryParamDef<any, IQueryParamOptions>
+  QueryParamDef<any, IQueryParamTypeOptions>
 >;
 
 /**
@@ -123,20 +123,26 @@ export type Serializer<T, Options> = {
   fromUrl: SerializerFromUrlFunction<T, Options>;
 };
 
-export type IQueryParamOptions = Partial<{
+export type IQueryParamTypeOptions = Partial<{
   allowNull: boolean;
   allowUndefined: boolean;
-  validator: ValidatorFunction<any, IQueryParamOptions>;
 }>;
+
+export type QueryParamOptions<
+  T,
+  QueryParamTypeOptions extends IQueryParamTypeOptions
+> = QueryParamTypeOptions & {
+  validator?: ValidatorFunction<T, QueryParamTypeOptions>;
+};
 
 export type QueryParamValue<
   T,
-  Options extends IQueryParamOptions
+  Options extends IQueryParamTypeOptions
 > = ResolveUndefinedType<ResolveNullType<T, Options>, Options>;
 
 export type ResolveNullType<
   T,
-  Options extends IQueryParamOptions
+  Options extends IQueryParamTypeOptions
 > = Options extends {
   allowNull: true;
 }
@@ -145,7 +151,7 @@ export type ResolveNullType<
 
 export type ResolveUndefinedType<
   T,
-  Options extends IQueryParamOptions
+  Options extends IQueryParamTypeOptions
 > = Options extends {
   allowUndefined: true;
 }
