@@ -1,4 +1,7 @@
 import { isUndefined } from '../internal/typeChecking';
+import { isNumber, isNil, getTypeName } from '../internal/typeChecking';
+import { Errors } from '../errors';
+
 import {
   FlattenTypes,
   IQueryParamsStateSchema,
@@ -13,9 +16,41 @@ export const SERIALIZERS = {
     fromUrl: (value: string) => value,
   },
   boolean: {
-    toUrl: (value: any): string => value.toString(),
-    fromUrl: (value: string) => Boolean(value),
-  },
+    fromUrl: (str?: string | null): boolean | null | undefined => {
+      if (isNil(str)) {
+        return str;
+      }
+
+      if (str === 'true') {
+        return true;
+      }
+
+      if (str === 'false') {
+        return false;
+      }
+
+      // This is the scenario where we have `?flag`,
+      // flag value is an empty string.
+      if (str === '') {
+        return true;
+      }
+
+      return undefined;
+    },
+    toUrl: (bool?: boolean | null): string | null | undefined => {
+      if (isNil(bool)) {
+        return bool;
+      }
+
+      if (typeof bool !== 'boolean') {
+        throw new Errors.QueryParamsUpdateError(
+          `was expecting a boolean but received a ${getTypeName(bool)}.`
+        );
+      }
+
+      return bool.toString();
+    },
+  } as Serializer<boolean, any>,
   number: {
     toUrl: (value: any): string => value.toString(),
     fromUrl: (value: string) => parseInt(value),
