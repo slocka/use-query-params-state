@@ -14,7 +14,7 @@ export function createQueryParamDef<
   QueryParamTypeOptions extends Partial<IQueryParamTypeOptions>
 >(
   serializer: Serializer<T, QueryParamTypeOptions>,
-  defaultValue?: DefaultValue<QueryParamValue<T, QueryParamTypeOptions>>,
+  defaultValue?: DefaultValue<T, QueryParamTypeOptions>,
   options?: QueryParamOptions<T, QueryParamTypeOptions>
 ) {
   let validatorFn = options?.validator;
@@ -24,9 +24,7 @@ export function createQueryParamDef<
    * calculating the default value
    */
   function isDefaultValueFunction(
-    defaultValue:
-      | DefaultValue<QueryParamValue<T, QueryParamTypeOptions>>
-      | undefined
+    defaultValue: DefaultValue<T, QueryParamTypeOptions> | undefined
   ): defaultValue is DefaultValueFunction<
     QueryParamValue<T, QueryParamTypeOptions>
   > {
@@ -46,15 +44,6 @@ export function createQueryParamDef<
 
     return defaultValue;
   }
-
-  // /**
-  //  * Set Validator
-  //  */
-  // function validator(newValidatorFn: ValidatorFunction<T, QueryParamTypeOptions>) {
-  //   validatorFn = newValidatorFn;
-
-  //   return queryParamDef;
-  // }
 
   /**
    * Deserialize the query params from string to the defined query param type.

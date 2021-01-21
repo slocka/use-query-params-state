@@ -102,7 +102,12 @@ export type BuildQueryStringFromCurrentUrl<
 ) => string;
 
 export type DefaultValueFunction<T> = (context?: any) => T;
-export type DefaultValue<T> = T | DefaultValueFunction<T>;
+export type DefaultValue<
+  T,
+  QueryParamTypeOptions extends IQueryParamTypeOptions
+> =
+  | QueryParamValue<T, QueryParamTypeOptions>
+  | DefaultValueFunction<QueryParamValue<T, QueryParamTypeOptions>>;
 
 export type ValidatorFunction<T, Options> = (
   value: QueryParamValue<T, Options>,
