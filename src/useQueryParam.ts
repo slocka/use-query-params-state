@@ -1,9 +1,10 @@
 import { useCallback } from 'react';
 import { QPARAMS } from './qparams';
 
-import { QueryParamDef } from './internal/queryParamDef';
+// import { QueryParamDef } from './internal/queryParamDef';
 
 import { useQueryParamsState } from './useQueryParamsState';
+import { IQueryParamTypeOptions, QueryParamDef } from './types';
 
 /**
  * Create function overload to handle the default value queryParamDef = QPARAMS.string()
@@ -15,9 +16,12 @@ export function useQueryParam(
   contextData?: any
 ): [string | null | undefined, (value?: string | null | undefined) => void];
 
-export function useQueryParam<T>(
+export function useQueryParam<
+  T,
+  QueryParamTypeOptions extends IQueryParamTypeOptions
+>(
   paramName: string,
-  queryParamDef: QueryParamDef<T>,
+  queryParamDef: QueryParamDef<T, QueryParamTypeOptions>,
   contextData?: any
 ): [T | null | undefined, (value?: T | null | undefined) => void];
 
@@ -26,7 +30,10 @@ export function useQueryParam<T>(
  */
 export function useQueryParam(
   paramName: string,
-  queryParamDef: QueryParamDef<any> = QPARAMS.string(),
+  queryParamDef: QueryParamDef<
+    any,
+    { allowUndefined: true }
+  > = QPARAMS.string(undefined, { allowUndefined: true }),
   contextData?: any
 ): [any | null | undefined, (value?: any | null | undefined) => void] {
   const [params, setParams] = useQueryParamsState(

@@ -27,14 +27,18 @@ beforeEach(() => {
 
 describe('Basic tests', () => {
   const queryParamsStateSchema = {
-    booleanParam: QPARAMS.boolean(),
-    stringParam: QPARAMS.string(),
+    booleanParam: QPARAMS.boolean(undefined, { allowUndefined: true }),
+    stringParam: QPARAMS.string(undefined, { allowUndefined: true }),
     numberParam: QPARAMS.number(undefined, {
       allowUndefined: true,
       allowNull: true,
     }),
-    arrayStringParam: QPARAMS.arrayOfStrings(),
-    arrayNumberParam: QPARAMS.arrayOfNumbers(),
+    arrayStringParam: QPARAMS.arrayOfStrings(undefined, {
+      allowUndefined: true,
+    }),
+    arrayNumberParam: QPARAMS.arrayOfNumbers(undefined, {
+      allowUndefined: true,
+    }),
   };
 
   /**
@@ -193,9 +197,9 @@ describe('Basic tests', () => {
     const { result } = renderHook(
       () =>
         useQueryParamsState({
-          booleanParam: QPARAMS.boolean(),
+          booleanParam: QPARAMS.boolean(undefined, { allowUndefined: true }),
           stringParam: QPARAMS.string('default value'),
-          numberParam: QPARAMS.number(),
+          numberParam: QPARAMS.number(undefined, { allowUndefined: true }),
         }),
       { wrapper }
     );
@@ -203,7 +207,6 @@ describe('Basic tests', () => {
     const [paramsBeforeUpdate] = result.current;
 
     expect(paramsBeforeUpdate.numberParam).toBe(0);
-    // All the other params should have been reset to their default value
     expect(paramsBeforeUpdate.booleanParam).toBe(true);
     expect(paramsBeforeUpdate.stringParam).toBe('test');
 
@@ -234,9 +237,9 @@ describe('Basic tests', () => {
     const { result } = renderHook(
       () =>
         useQueryParamsState({
-          booleanParam: QPARAMS.boolean(),
+          booleanParam: QPARAMS.boolean(undefined, { allowUndefined: true }),
           stringParam: QPARAMS.string('default value'),
-          numberParam: QPARAMS.number(),
+          numberParam: QPARAMS.number(undefined, { allowUndefined: true }),
         }),
       { wrapper }
     );
@@ -388,7 +391,7 @@ describe('With default value', () => {
     let dynamicValue = 1;
     const queryParamsStateSchema = {
       numberParam: QPARAMS.number(() => dynamicValue),
-      otherParam: QPARAMS.string(),
+      otherParam: QPARAMS.string(undefined, { allowUndefined: true }),
     };
 
     const { result } = renderHook(
@@ -445,8 +448,8 @@ describe('With default value', () => {
 
 describe('Serializer', () => {
   const queryParamsStateSchema = {
-    stringParam: QPARAMS.string(),
-    stringParamEncoded: QPARAMS.string(),
+    stringParam: QPARAMS.string(undefined, { allowUndefined: true }),
+    stringParamEncoded: QPARAMS.string(undefined, { allowUndefined: true }),
   };
 
   test("It shouldn't not interpret commas in params of type STRING as array separator.", () => {
@@ -566,7 +569,7 @@ describe('query param validators', () => {
         const defaultFn = (contextData: any) => contextData.defaultNumber;
         const queryParamsStateSchema = {
           numberParam: QPARAMS.number(defaultFn, {
-            validator: lessThanXValidator,
+            validator: lessThan10Validator,
           }),
         };
 
@@ -630,7 +633,7 @@ describe('query param validators', () => {
   describe('When writing the state', () => {
     test('It update param if param is valid', () => {
       const queryParamsStateSchema = {
-        numberParam: QPARAMS.number(6, { validator: lessThanXValidator }),
+        numberParam: QPARAMS.number(6, { validator: lessThan10Validator }),
       };
 
       const { result } = renderHook(
@@ -675,7 +678,7 @@ describe('query param validators', () => {
 
       test('It should use the default state when default is a value', () => {
         const queryParamsStateSchema = {
-          numberParam: QPARAMS.number(6, { validator: lessThanXValidator }),
+          numberParam: QPARAMS.number(6, { validator: lessThan10Validator }),
         };
 
         const { result } = renderHook(
@@ -703,7 +706,7 @@ describe('query param validators', () => {
 
         const queryParamsStateSchema = {
           numberParam: QPARAMS.number(defaultFn, {
-            validator: lessThanXValidator,
+            validator: lessThan10Validator,
           }),
         };
 
@@ -792,8 +795,8 @@ describe('query param validators', () => {
 
 describe('With other query params outside of the schema', () => {
   const queryParamsStateSchema = {
-    booleanParam: QPARAMS.boolean(),
-    stringParam: QPARAMS.string(),
+    booleanParam: QPARAMS.boolean(undefined, { allowUndefined: true }),
+    stringParam: QPARAMS.string(undefined, { allowUndefined: true }),
   };
   test('It should not set them in the queryParamsState', () => {
     const url = '/test?booleanParam=true&stringParam=test&utm_source=Google';

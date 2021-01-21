@@ -25,7 +25,11 @@ describe('Basic tests', () => {
    */
   test('Typescript types', () => {
     const { result } = renderHook(
-      () => useQueryParam('booleanParam', QPARAMS.boolean()),
+      () =>
+        useQueryParam(
+          'booleanParam',
+          QPARAMS.boolean(undefined, { allowUndefined: true })
+        ),
       {
         wrapper,
       }
@@ -55,7 +59,11 @@ describe('Basic tests', () => {
     history.push(url);
 
     const { result } = renderHook(
-      () => useQueryParam('booleanParam', QPARAMS.boolean()),
+      () =>
+        useQueryParam(
+          'booleanParam',
+          QPARAMS.boolean(undefined, { allowUndefined: true })
+        ),
       { wrapper }
     );
     const [booleanParam] = result.current;
@@ -65,7 +73,11 @@ describe('Basic tests', () => {
 
   test('It updates the URL with the correct value', () => {
     const { result } = renderHook(
-      () => useQueryParam('stringParam', QPARAMS.string()),
+      () =>
+        useQueryParam(
+          'stringParam',
+          QPARAMS.string(undefined, { allowUndefined: true })
+        ),
       { wrapper }
     );
     act(() => {
@@ -133,7 +145,11 @@ describe('With default value', () => {
     );
 
     const { result: resultOtherParam } = renderHook(
-      () => useQueryParam('otherParam', QPARAMS.string()),
+      () =>
+        useQueryParam(
+          'otherParam',
+          QPARAMS.string(undefined, { allowUndefined: true })
+        ),
       { wrapper }
     );
 
@@ -170,7 +186,7 @@ describe('With validator function', () => {
       () =>
         useQueryParam(
           'numberParam',
-          QPARAMS.number(6).validator(lessThan10Validator)
+          QPARAMS.number(6, { validator: lessThan10Validator })
         ),
       { wrapper }
     );
@@ -187,7 +203,7 @@ describe('With validator function', () => {
       () =>
         useQueryParam(
           'numberParam',
-          QPARAMS.number(6).validator(lessThan10Validator)
+          QPARAMS.number(6, { validator: lessThan10Validator })
         ),
       { wrapper }
     );

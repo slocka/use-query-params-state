@@ -7,7 +7,6 @@ import {
   IQueryParamTypeOptions,
   QueryParamValue,
   QueryParamOptions,
-  FlattenTypes,
 } from '../types';
 
 export function createQueryParamDef<
@@ -65,12 +64,16 @@ export function createQueryParamDef<
     contextData?: any
   ): QueryParamValue<T, QueryParamTypeOptions> {
     const parsedValue = serializer.fromUrl(value);
+
     // Value not found in the URL
     if (isUndefined(parsedValue)) {
       const defaultValue = getDefaultValue(contextData);
-      // TODO: Check for allowNull, allowUndefined option
-      if (!defaultValue) {
-        throw new Error('Missing default value');
+      if (isUndefined(defaultValue)) {
+        if (options?.allowUndefined) {
+          return undefined as QueryParamValue<T, QueryParamTypeOptions>;
+        } else {
+          throw new Error('Missing default value');
+        }
       }
       return defaultValue;
     }

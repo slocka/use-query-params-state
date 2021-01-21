@@ -32,8 +32,10 @@ export function getRawQueryParamsInSchemaFromURL<
       queryParamKey: string
     ) => {
       if (schema.hasOwnProperty(queryParamKey)) {
-        acc[queryParamKey as keyof QueryParamsSchema] =
-          allRawQueryParams[queryParamKey];
+        acc[queryParamKey as keyof QueryParamsSchema] = allRawQueryParams[
+          queryParamKey
+          /** TODO: dirty fix, need to be checked properly */
+        ] as any;
       }
       return acc;
     },

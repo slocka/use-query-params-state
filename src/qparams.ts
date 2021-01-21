@@ -1,4 +1,4 @@
-import { DefaultValue, ValidatorFunction } from './types';
+import { DefaultValue } from './types';
 
 import { createQueryParamDef } from './internal/createQueryParamDef';
 
@@ -16,7 +16,7 @@ import {
  */
 export const QPARAMS = {
   number: <QueryParamTypeOptions extends IQueryParamTypeOptions>(
-    defaultValue?: DefaultValue<QueryParamValue<number, QueryParamTypeOptions>>,
+    defaultValue: DefaultValue<QueryParamValue<number, QueryParamTypeOptions>>,
     queryParamsOptions?: QueryParamOptions<number, QueryParamTypeOptions>
   ) => {
     const serializer = serializers.NUMBER as Serializer<
@@ -27,7 +27,7 @@ export const QPARAMS = {
     return createQueryParamDef(serializer, defaultValue, queryParamsOptions);
   },
   string: <QueryParamTypeOptions extends IQueryParamTypeOptions>(
-    defaultValue?: DefaultValue<QueryParamValue<string, QueryParamTypeOptions>>,
+    defaultValue: DefaultValue<QueryParamValue<string, QueryParamTypeOptions>>,
     queryParamsOptions?: QueryParamOptions<string, QueryParamTypeOptions>
   ) => {
     const serializer = serializers.STRING as Serializer<
@@ -38,9 +38,7 @@ export const QPARAMS = {
     return createQueryParamDef(serializer, defaultValue, queryParamsOptions);
   },
   boolean: <QueryParamTypeOptions extends IQueryParamTypeOptions>(
-    defaultValue?: DefaultValue<
-      QueryParamValue<boolean, QueryParamTypeOptions>
-    >,
+    defaultValue: DefaultValue<QueryParamValue<boolean, QueryParamTypeOptions>>,
     queryParamsOptions?: QueryParamOptions<boolean, QueryParamTypeOptions>
   ) => {
     const serializer = serializers.BOOLEAN as Serializer<
@@ -51,7 +49,7 @@ export const QPARAMS = {
     return createQueryParamDef(serializer, defaultValue, queryParamsOptions);
   },
   arrayOfNumbers: <QueryParamTypeOptions extends IQueryParamTypeOptions>(
-    defaultValue?: DefaultValue<
+    defaultValue: DefaultValue<
       QueryParamValue<number[], QueryParamTypeOptions>
     >,
     queryParamsOptions?: QueryParamOptions<number[], QueryParamTypeOptions>
@@ -64,7 +62,7 @@ export const QPARAMS = {
     return createQueryParamDef(serializer, defaultValue, queryParamsOptions);
   },
   arrayOfStrings: <QueryParamTypeOptions extends IQueryParamTypeOptions>(
-    defaultValue?: DefaultValue<
+    defaultValue: DefaultValue<
       QueryParamValue<string[], QueryParamTypeOptions>
     >,
     queryParamsOptions?: QueryParamOptions<string[], QueryParamTypeOptions>
