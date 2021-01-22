@@ -10,6 +10,6 @@ export { buildQueryString } from './buildQueryString';
 export { pickQueryParamsMatchingSchema } from './pickQueryParamsMatchingSchema';
 
 /** Other */
-export { QS_BUILD_STRATEGY } from './types';
+export { QS_BUILD_STRATEGY, QueryParamsState } from './types';
 export { Errors } from './errors';
 export { VALIDATORS } from './validators';
