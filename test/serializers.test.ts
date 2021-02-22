@@ -269,7 +269,7 @@ describe('Array number serializer', () => {
 
 /** All serializers should be able to handle undefined and null values. */
 describe('Handling of undefined and null values', () => {
-  const serializerList: Array<[string, Serializer<any>]> = Object.keys(
+  const serializerList: Array<[string, Serializer<any, any>]> = Object.keys(
     serializers
   ).map(serializerType => {
     return [

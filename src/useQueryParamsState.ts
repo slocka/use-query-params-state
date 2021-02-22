@@ -9,6 +9,7 @@ import {
   QueryParamsState,
   SetQueryParamsState,
   RawQueryParams,
+  FlattenTypes,
 } from './types';
 
 import { deserializeQueryParamsValues } from './internal/serializer/serialize';
@@ -21,7 +22,7 @@ export function useQueryParamsState<
   queryParamsSchema: QueryParamsSchema,
   contextData?: any
 ): [
-  QueryParamsState<QueryParamsSchema>,
+  FlattenTypes<QueryParamsState<QueryParamsSchema>>,
   SetQueryParamsState<QueryParamsSchema>
 ] {
   const rawQueryParams = useRawQueryParamsFromUrl(queryParamsSchema);
