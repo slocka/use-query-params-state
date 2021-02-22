@@ -20,11 +20,15 @@ beforeEach(() => {
 
 describe('Basic functionalities', () => {
   const queryParamsStateSchema = {
-    booleanParam: QPARAMS.boolean(),
-    stringParam: QPARAMS.string(),
-    numberParam: QPARAMS.number(),
-    arrayStringParam: QPARAMS.arrayOfStrings(),
-    arrayNumberParam: QPARAMS.arrayOfNumbers(),
+    booleanParam: QPARAMS.boolean(undefined, { allowUndefined: true }),
+    stringParam: QPARAMS.string(undefined, { allowUndefined: true }),
+    numberParam: QPARAMS.number(undefined, { allowUndefined: true }),
+    arrayStringParam: QPARAMS.arrayOfStrings(undefined, {
+      allowUndefined: true,
+    }),
+    arrayNumberParam: QPARAMS.arrayOfNumbers(undefined, {
+      allowUndefined: true,
+    }),
   };
 
   test('The hook should return a function', () => {
@@ -234,9 +238,13 @@ describe('Basic functionalities', () => {
     const queryParamsStateSchema = {
       booleanParam: QPARAMS.boolean(false),
       stringParam: QPARAMS.string('default'),
-      numberParam: QPARAMS.number(),
-      arrayStringParam: QPARAMS.arrayOfStrings(),
-      arrayNumberParam: QPARAMS.arrayOfNumbers(),
+      numberParam: QPARAMS.number(undefined, { allowUndefined: true }),
+      arrayStringParam: QPARAMS.arrayOfStrings(undefined, {
+        allowUndefined: true,
+      }),
+      arrayNumberParam: QPARAMS.arrayOfNumbers(undefined, {
+        allowUndefined: true,
+      }),
     };
 
     test('It should keep all params with their default value', () => {

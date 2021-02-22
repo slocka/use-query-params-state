@@ -4,8 +4,8 @@ import { QPARAMS } from '../src/index';
 describe('buildQueryString', () => {
   test('It creates a new query string', () => {
     const queryParamsStateSchema = {
-      booleanParam: QPARAMS.boolean(),
-      stringParam: QPARAMS.string(),
+      booleanParam: QPARAMS.boolean(undefined, { allowUndefined: true }),
+      stringParam: QPARAMS.string(undefined, { allowUndefined: true }),
     };
 
     const queryString = buildQueryString(queryParamsStateSchema, {
@@ -17,7 +17,7 @@ describe('buildQueryString', () => {
 
   test('It creates a new query string with partial params ', () => {
     const schema = {
-      search: QPARAMS.string(),
+      search: QPARAMS.string(undefined, { allowUndefined: true }),
       minRating: QPARAMS.number(0),
       sortBy: QPARAMS.string('price'),
     };
@@ -32,7 +32,7 @@ describe('buildQueryString', () => {
 
   test('It throws an error if param does not exist', () => {
     const schema = {
-      search: QPARAMS.string(),
+      search: QPARAMS.string(undefined, { allowUndefined: true }),
       minRating: QPARAMS.number(0),
       sortBy: QPARAMS.string('price'),
     };
@@ -50,7 +50,7 @@ describe('buildQueryString', () => {
 
   test('It throws an error if param has invalid type', () => {
     const schema = {
-      search: QPARAMS.string(),
+      search: QPARAMS.string(undefined, { allowUndefined: true }),
       minRating: QPARAMS.number(0),
       sortBy: QPARAMS.string('price'),
     };
@@ -65,7 +65,7 @@ describe('buildQueryString', () => {
 
   test('It creates a new query string with param outside the schema', () => {
     const schema = {
-      search: QPARAMS.string(),
+      search: QPARAMS.string(undefined, { allowUndefined: true }),
       minRating: QPARAMS.number(0),
       sortBy: QPARAMS.string('price'),
     };

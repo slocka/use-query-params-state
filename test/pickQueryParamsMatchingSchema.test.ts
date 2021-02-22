@@ -2,8 +2,8 @@ import { pickQueryParamsMatchingSchema } from '../src/index';
 import { QPARAMS } from '../src/index';
 
 const queryParamsStateSchema = {
-  booleanParam: QPARAMS.boolean(),
-  stringParam: QPARAMS.string(),
+  booleanParam: QPARAMS.boolean(undefined, { allowUndefined: true }),
+  stringParam: QPARAMS.string(undefined, { allowUndefined: true }),
 };
 
 describe('pickQueryParamsMatchingSchema', () => {
